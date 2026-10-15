@@ -5,6 +5,7 @@ import { testDatabase } from './test-database';
 import { basename } from 'node:path';
 import { encryptMfa, totp } from '../src/lib/mfa';
 import { hashPassword } from '../src/lib/crypto';
+import exerciseSnapshot from '../data/wger/catalog.json';
 const databaseUrl = process.env.TEST_DB_PATH;
 const origin = process.env.TEST_APP_URL ?? 'http://localhost:3100';
 assert.ok(
@@ -386,16 +387,25 @@ test(
       },
     );
     await t.test('Importação real é idempotente e mantém procedência/licenças', async () => {
+      // Bulk upgrades use the operator path; HTTP revalidation keeps its free-D1 query budget.
+      const { importExercises } = await import('../src/lib/exercise-import');
+      const bulk = await importExercises(db);
+      assert.equal(bulk.total, exerciseSnapshot.exercises.length);
+      assert.equal(bulk.imported + bulk.updated + bulk.unchanged, bulk.total);
+
       assert.equal((await pro.request('admin/import-exercises', { confirmed: true })).status, 403);
       const first = await admin.request('admin/import-exercises', { confirmed: true });
       assert.equal(first.status, 200);
-      assert.equal(first.data.result.total, 68);
+      assert.equal(first.data.result.total, exerciseSnapshot.exercises.length);
       const second = await admin.request('admin/import-exercises', { confirmed: true });
       assert.equal(second.status, 200);
       assert.equal(second.data.result.imported, 0);
       assert.equal(second.data.result.updated, 0);
-      assert.equal(second.data.result.unchanged, 68);
-      assert.equal(await db.exercise.count({ where: { source: 'WGER' } }), 68);
+      assert.equal(second.data.result.unchanged, exerciseSnapshot.exercises.length);
+      assert.equal(
+        await db.exercise.count({ where: { source: 'WGER' } }),
+        exerciseSnapshot.exercises.length,
+      );
     });
     let globalId = '';
     await t.test('Catálogo protegido, busca com acentos/aliases, filtros e paginação', async () => {
@@ -522,7 +532,10 @@ test(
       assert.equal((await pro.request(`exercises/${id}/status`, { active: false })).status, 200);
       assert.equal((await pro.request(`exercises?q=${suffix}`)).data.total, 0);
       assert.equal((await pro.request(`exercises?q=${suffix}&includeInactive=true`)).data.total, 1);
-      assert.equal(await db.exercise.count({ where: { source: 'WGER' } }), 68);
+      assert.equal(
+        await db.exercise.count({ where: { source: 'WGER' } }),
+        exerciseSnapshot.exercises.length,
+      );
     });
     let trainingVersion = '',
       trainingSession = '',

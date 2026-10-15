@@ -70,6 +70,15 @@ type Exercise = {
     source: string;
     sourceUrl?: string;
     changes?: string;
+    displayLanguage?: string;
+    instructionsLanguage?: string;
+    media?: {
+      type: string;
+      url: string;
+      aiGenerated?: boolean;
+      credit: Credit;
+      duration?: string | null;
+    }[];
     base?: Credit;
     translations?: Credit[];
   };
@@ -341,6 +350,23 @@ export function ExerciseCatalog({ role }: { role: string }) {
             {categoryName[selected.sourceCategory ?? selected.category] ?? selected.sourceCategory}{' '}
             • {selected.active ? 'Ativo' : 'Desativado'}
           </p>
+          {(selected.provenance.displayLanguage || selected.provenance.instructionsLanguage) && (
+            <p className="small muted">
+              Nome:{' '}
+              {selected.provenance.displayLanguage === 'pt'
+                ? 'português'
+                : selected.provenance.displayLanguage === 'en'
+                  ? 'inglês'
+                  : selected.provenance.displayLanguage}{' '}
+              · Instruções:{' '}
+              {selected.provenance.instructionsLanguage === 'pt'
+                ? 'português'
+                : selected.provenance.instructionsLanguage === 'en'
+                  ? 'inglês'
+                  : selected.provenance.instructionsLanguage}
+              . Conteúdo mantido no idioma da fonte.
+            </p>
+          )}
           <h3>Instruções da fonte</h3>
           <p style={{ whiteSpace: 'pre-wrap' }}>
             {selected.instructions ||
@@ -376,6 +402,38 @@ export function ExerciseCatalog({ role }: { role: string }) {
               </p>
             </div>
           </div>
+          {!!selected.provenance.media?.length && (
+            <section className="exercise-media-links">
+              <h3>Demonstrações na fonte</h3>
+              <p className="small muted">
+                Imagens e vídeos licenciados, abertos diretamente no wger.
+              </p>
+              {selected.provenance.media.map((media, index) => (
+                <article key={media.url} className="link-card">
+                  <a
+                    href={safeHttp(media.url)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: 'underline' }}
+                  >
+                    Ver {media.type === 'video' ? 'vídeo' : 'imagem'} {index + 1}
+                    {media.duration ? ' · ' + media.duration + 's' : ''}
+                  </a>
+                  <p className="small muted">
+                    {media.credit.author || 'Autoria não informada na fonte'} ·{' '}
+                    <a
+                      href={safeHttp(media.credit.licenseUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {media.credit.license}
+                    </a>
+                    {media.aiGenerated ? ' · Fonte identifica imagem gerada por IA' : ''}
+                  </p>
+                </article>
+              ))}
+            </section>
+          )}
           {selected.source === 'WGER' && (
             <div className="code">
               <h3>Fonte e atribuição</h3>
@@ -389,7 +447,7 @@ export function ExerciseCatalog({ role }: { role: string }) {
                 >
                   wger
                 </a>
-                . Sem imagens ou vídeos nesta importação.
+                . Metadados e créditos mantidos por registro; arquivos de mídia permanecem na fonte.
               </p>
               {[selected.provenance.base, ...(selected.provenance.translations ?? [])]
                 .filter(Boolean)

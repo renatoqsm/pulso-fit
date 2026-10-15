@@ -2,7 +2,7 @@
 
 Plataforma de treinos e alimentação em português, hospedada com **Cloudflare Workers + D1 (SQLite)**. Inclui contas e habilitações por área, consentimento/vínculos, fichas e planos versionados, execução de séries, evolução, diário alimentar, comentários, MFA, privacidade e PWA.
 
-Catálogos reais: 68 exercícios em português do wger e 7.793 alimentos USDA SR Legacy 2018-04. Nutrientes por 100 g, fonte/versão e licença preservadas. Os alimentos mantêm nomes originais em inglês; tradução PT permanece pendente. Não há históricos ou alimentos fictícios em desenvolvimento/produção; fixtures são exclusivas dos bancos de testes.
+Catálogos reais: 934 exercícios do wger (68 com nome em português; demais em inglês) e 7.793 alimentos USDA SR Legacy 2018-04. Nutrientes por 100 g, fonte/versão e licença preservadas. Os alimentos mantêm nomes originais em inglês; tradução PT permanece pendente. Não há históricos ou alimentos fictícios em desenvolvimento/produção; fixtures são exclusivas dos bancos de testes.
 
 ## Desenvolvimento
 

@@ -875,7 +875,24 @@ export class D1Store {
         items.push(command);
         grouped.set(command.model.name, items);
       }
-      for (const items of grouped.values()) {
+      // A child queued for an existing parent can precede a new parent of the
+      // same model. Order grouped inserts by FK dependencies, not first use.
+      const remaining = new Map(grouped);
+      const ordered: (typeof inserts)[] = [];
+      while (remaining.size) {
+        const ready = [...remaining].find(([name, items]) =>
+          items[0].model.fields.every(
+            (field) =>
+              !field.relationFromFields?.length ||
+              field.type === name ||
+              !remaining.has(field.type),
+          ),
+        );
+        if (!ready) throw new Error('Cyclic grouped insert dependencies.');
+        ordered.push(ready[1]);
+        remaining.delete(ready[0]);
+      }
+      for (const items of ordered) {
         const model = items[0].model,
           fields = scalarFields(model);
         // One JSON binding batches inserts without exceeding D1's SQL parameter limit.

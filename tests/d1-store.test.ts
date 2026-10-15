@@ -271,3 +271,25 @@ test('D1: efeitos de autenticação só ocorrem após confirmar a gravação', a
     await f.dispose();
   }
 });
+
+test('D1: pais novos precedem relações já agrupadas para pais existentes', async () => {
+  const f = await fixture();
+  try {
+    const { profile, ...existingData } = userData();
+    const existing = await f.db.user.create({ data: existingData });
+    const created = await f.db.$transaction(async (tx) => {
+      await tx.profile.create({ data: { userId: existing.id, name: 'Perfil antigo' } });
+      return tx.user.create({ data: userData() });
+    });
+    assert.equal(
+      (await f.db.profile.findUniqueOrThrow({ where: { userId: existing.id } })).name,
+      'Perfil antigo',
+    );
+    assert.equal(
+      (await f.db.profile.findUniqueOrThrow({ where: { userId: created.id } })).name,
+      'Pessoa de teste',
+    );
+  } finally {
+    await f.dispose();
+  }
+});

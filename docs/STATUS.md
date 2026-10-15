@@ -16,11 +16,11 @@ A unidade de persistência usa batch atômico, guarda de revisão, triggers que 
 
 ## Banco remoto efetivamente preparado
 
-Banco exclusivo `pulso-fit` na Cloudflare, ID `2b735f22-afc1-432c-9b62-8ef9db70d46c`. As quatro migrations D1 foram aplicadas. Consulta remota confirmou **7.793 alimentos, 68 exercícios e zero usuários**. Não foram enviados dados de saúde nem usuários de desenvolvimento.
+Banco exclusivo `pulso-fit` na Cloudflare, ID `2b735f22-afc1-432c-9b62-8ef9db70d46c`. As quatro migrations D1 foram aplicadas. Na preparação inicial, a consulta remota confirmou 7.793 alimentos, 68 exercícios e zero usuários. Em 15/10/2026, a sincronização incremental confirmou **934 exercícios públicos ativos e 7.793 alimentos**; dados de usuários não foram exportados nem alterados pela carga.
 
 Alimentos oficiais USDA SR Legacy 2018-04, com URL/licença/versão/referência por 100 g e unidades preservadas. Cinco amostras distribuídas foram comparadas ao CSV oficial, incluindo no banco remoto. Os nomes mantêm o idioma original inglês. O arquivo é uma edição de 2018, não dados nutricionais atualizados em 2026. TACO/TBCA não foram importados.
 
-Exercícios do snapshot oficial wger em português, com atribuições e licenças originais. O bootstrap remoto importou somente tabelas públicas, com checkpoint: 349 comandos concluídos, 39.939 escritas reportadas. Os índices de busca e triggers de revisão foram instalados depois da carga inicial.
+Exercícios do snapshot oficial wger, com atribuições e licenças originais; catálogo ampliado descrito abaixo. O bootstrap remoto importou somente tabelas públicas, com checkpoint: 349 comandos concluídos, 39.939 escritas reportadas. Os índices de busca e triggers de revisão foram instalados depois da carga inicial.
 
 ## Verificações concluídas
 
@@ -71,3 +71,15 @@ Treinos usam abas de fichas, busca, exercícios expansíveis/reordenáveis, sér
 Validação: TypeScript, build OpenNext e 44 testes passaram tanto em Node quanto em workerd local. Chromium móvel confirmou menu, construção/publicação/execução, fila offline e recuperação, expansão de exercícios, cópia das séries, duplicação de refeição, diário e painel preenchido com plano real de teste; sem erros JavaScript ou overflow nos viewports verificados. Capturas em test-results são locais e usam apenas fixtures do banco dedicado. Dispositivos físicos e Safari permanecem pendentes.
 
 Atualização de navegação publicada na Cloudflare: versão `7d0f5068-c128-4c8f-8dce-30bfd168bcf5`. Os 44 testes e o navegador passaram no workerd local; o navegador também confirmou os estados ativos do menu e um editor com seis exercícios recolhidos. Publicação confirmada pela API/Wrangler; teste HTTP direto do domínio público continua condicionado à política de rede do ambiente.
+
+## Catálogo ampliado — 15/10/2026
+
+Pesquisa na API oficial completa do wger: 932 registros atuais, mais dois registros portugueses anteriores preservados. O catálogo agora tem **934 exercícios**, 68 nomes em português e 866 em inglês, 913 com instruções e referências licenciadas a 383 imagens e 78 vídeos. As mídias permanecem na fonte, com links e créditos individuais. Campos sem dados não receberam classificações ou traduções inventadas. Pesquisa adicional da base free-exercise-db (876 registros) foi capturada, mas não integrada nem somada como exercícios únicos. Ver BASES-EXERCICIOS.md.
+
+Sincronização do D1 remoto concluída: 866 inserções, 68 atualizações; segunda comparação confirmou 934 inalterados. Os 934 registros estão ativos e 913 têm instruções. Os 7.793 alimentos foram preservados e a verificação de chaves estrangeiras não apontou problemas. Operação restrita ao catálogo público WGER, suas taxonomias/relações e histórico de importação.
+
+O criador de treinos usa busca no servidor e paginação, removendo o limite anterior de 200 exercícios carregados. Inclui carregamento, erro com nova tentativa e cache dos nomes já selecionados. A carga de grande volume usa os comandos de operador; a revalidação administrativa HTTP conserva o limite de 50 consultas. Corrigida também a ordenação de inserções agrupadas por dependências de chaves estrangeiras, com teste de regressão.
+
+Validação desta atualização: **45 testes em Node e 45 em workerd local**, sem falhas ou ignorados; TypeScript e build OpenNext passaram. Chromium em Node e workerd confirmou a busca e adição de Zottman curl, fora dos primeiros 200 resultados, e os fluxos completos de planos/execução/nutrição/offline. Bundle Worker minificado de aproximadamente 1.173 MiB gzip, sem node:sqlite, abaixo do limite gratuito.
+
+Publicação confirmada pela Cloudflare: versão `920b8b04-e74c-4f3a-b6ff-df5abd34e7a8` em `https://pulso-fit.renatoqsousam.workers.dev`. O teste HTTP direto do domínio público continua bloqueado pela política de rede aplicada ao ambiente; os fluxos foram validados no workerd local.

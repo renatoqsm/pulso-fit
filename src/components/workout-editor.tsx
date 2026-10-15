@@ -111,6 +111,13 @@ function draftFrom(v: Version): Draft {
 export function WorkoutEditor() {
   const [data, setData] = useState<Data>();
   const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [catalogItems, setCatalogItems] = useState<Exercise[]>([]);
+  const [catalogPage, setCatalogPage] = useState(1);
+  const [catalogPages, setCatalogPages] = useState(1);
+  const [catalogTotal, setCatalogTotal] = useState(0);
+  const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogError, setCatalogError] = useState('');
+  const [catalogRetry, setCatalogRetry] = useState(0);
   const [version, setVersion] = useState<Version>();
   const [draft, setDraft] = useState<Draft>(fresh());
   const [targets, setTargets] = useState<string[]>([]);
@@ -134,21 +141,45 @@ export function WorkoutEditor() {
   }
   useEffect(() => {
     void load();
-    async function catalog() {
-      let page = 1;
-      const all = [];
-      while (page <= 10) {
-        const res = await fetch(`/api/exercises?page=${page}`);
-        if (!res.ok) return;
-        const result = await res.json();
-        all.push(...result.items);
-        if (page >= result.pages) break;
-        page++;
-      }
-      setExercises(all);
-    }
-    void catalog();
   }, []);
+  useEffect(() => {
+    const controller = new AbortController();
+    setCatalogLoading(true);
+    setCatalogError('');
+    setCatalogItems([]);
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          '/api/exercises?page=' + catalogPage + '&q=' + encodeURIComponent(exerciseSearch.trim()),
+          { signal: controller.signal, cache: 'no-store' },
+        );
+        const result = await response.json();
+        if (!response.ok)
+          throw new Error(result.error ?? 'Não foi possível carregar os exercícios.');
+        if (controller.signal.aborted) return;
+        setCatalogItems(result.items);
+        setCatalogPages(Math.max(1, result.pages));
+        setCatalogTotal(result.total);
+        setExercises((previous) => [
+          ...previous.filter(
+            (exercise) => !result.items.some((next: Exercise) => next.id === exercise.id),
+          ),
+          ...result.items,
+        ]);
+      } catch (error) {
+        if (!controller.signal.aborted)
+          setCatalogError(
+            error instanceof Error ? error.message : 'Não foi possível carregar os exercícios.',
+          );
+      } finally {
+        if (!controller.signal.aborted) setCatalogLoading(false);
+      }
+    }, 200);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [exerciseSearch, catalogPage, catalogRetry]);
   useEffect(() => {
     const navigate = () => {
       if (
@@ -169,6 +200,19 @@ export function WorkoutEditor() {
     setExpanded({});
     setDirty(false);
     setDraft(draftFrom(v));
+    setExerciseSearch('');
+    setCatalogPage(1);
+    setExercises((previous) => {
+      const byId = new Map(previous.map((exercise) => [exercise.id, exercise]));
+      for (const day of v.days)
+        for (const exercise of day.exercises)
+          if (!byId.has(exercise.exerciseId))
+            byId.set(exercise.exerciseId, {
+              id: exercise.exerciseId,
+              name: exercise.snapshot.name,
+            });
+      return [...byId.values()];
+    });
     setPreview(!!v.publishedAt);
     setTargets([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -589,12 +633,21 @@ export function WorkoutEditor() {
                           </div>
                         </details>
                         <div className="exercise-picker">
+                          <div className="catalog-heading">
+                            <strong>Catálogo de exercícios</strong>
+                            <span role="status">
+                              {catalogLoading ? 'Carregando…' : catalogTotal + ' resultados'}
+                            </span>
+                          </div>
                           <label>
                             <Search size={16} /> Buscar exercício
                             <input
                               placeholder="Digite o nome do exercício…"
                               value={exerciseSearch}
-                              onChange={(e) => setExerciseSearch(e.target.value)}
+                              onChange={(e) => {
+                                setExerciseSearch(e.target.value);
+                                setCatalogPage(1);
+                              }}
                             />
                           </label>
                           <label style={{ marginTop: 18 }}>
@@ -602,6 +655,7 @@ export function WorkoutEditor() {
                             <select
                               aria-label="Adicionar exercício"
                               value=""
+                              disabled={catalogLoading || !!catalogError}
                               onChange={(e) => {
                                 if (e.target.value) {
                                   mutate((v) => {
@@ -619,27 +673,66 @@ export function WorkoutEditor() {
                                 }
                               }}
                             >
-                              <option value="">Selecione no catálogo</option>
-                              {exercises
-                                .filter((e) =>
-                                  e.name
-                                    .normalize('NFD')
-                                    .replace(/[\u0300-\u036f]/g, '')
-                                    .toLowerCase()
-                                    .includes(
-                                      exerciseSearch
-                                        .normalize('NFD')
-                                        .replace(/[\u0300-\u036f]/g, '')
-                                        .toLowerCase(),
-                                    ),
-                                )
-                                .map((e) => (
-                                  <option value={e.id} key={e.id}>
-                                    {e.name}
-                                  </option>
-                                ))}
+                              <option value="">
+                                {catalogLoading
+                                  ? 'Carregando exercícios…'
+                                  : 'Selecione no catálogo'}
+                              </option>
+                              {catalogItems.map((exercise) => (
+                                <option value={exercise.id} key={exercise.id}>
+                                  {exercise.name}
+                                </option>
+                              ))}
                             </select>
                           </label>
+                          {catalogError && (
+                            <div className="message error catalog-error" role="alert">
+                              {catalogError}
+                              <button
+                                className="secondary"
+                                onClick={() => setCatalogRetry((n) => n + 1)}
+                              >
+                                Tentar carregar novamente
+                              </button>
+                            </div>
+                          )}
+                          {!catalogLoading && !catalogError && !catalogItems.length && (
+                            <p className="catalog-empty">
+                              Nenhum exercício encontrado.
+                              {exerciseSearch && (
+                                <button
+                                  className="secondary"
+                                  onClick={() => {
+                                    setExerciseSearch('');
+                                    setCatalogPage(1);
+                                  }}
+                                >
+                                  Limpar busca
+                                </button>
+                              )}
+                            </p>
+                          )}
+                          {catalogPages > 1 && (
+                            <nav className="catalog-pagination" aria-label="Páginas do catálogo">
+                              <button
+                                className="secondary"
+                                disabled={catalogLoading || catalogPage === 1}
+                                onClick={() => setCatalogPage((n) => n - 1)}
+                              >
+                                Anterior
+                              </button>
+                              <span>
+                                Página {catalogPage} de {catalogPages}
+                              </span>
+                              <button
+                                className="secondary"
+                                disabled={catalogLoading || catalogPage === catalogPages}
+                                onClick={() => setCatalogPage((n) => n + 1)}
+                              >
+                                Próxima
+                              </button>
+                            </nav>
+                          )}
                         </div>
                         <div className="exercise-list-toolbar">
                           <span className="muted small">

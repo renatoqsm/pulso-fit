@@ -25,24 +25,34 @@ export async function importExercises(db: PrismaClient, actorId?: string) {
   try {
     const counts = await db.$transaction(
       async (tx) => {
-        await tx.muscle.findMany();
-        await tx.equipment.findMany();
+        const currentMuscles = new Map(
+          (await tx.muscle.findMany()).map((value) => [value.id, value]),
+        );
+        const currentEquipment = new Map(
+          (await tx.equipment.findMany()).map((value) => [value.id, value]),
+        );
+        await tx.exerciseImportJob.findUnique({ where: { id: job.id } });
         await tx.exercise.findMany({ where: { source: 'WGER' } });
         await tx.exerciseMuscle.findMany();
         await tx.exerciseEquipment.findMany();
 
         for (const [id, m] of Object.entries(dataset.muscles))
-          await tx.muscle.upsert({
-            where: { id },
-            create: { id, name: m.name, alternateName: m.name_en },
-            update: { name: m.name, alternateName: m.name_en },
-          });
+          if (
+            currentMuscles.get(id)?.name !== m.name ||
+            currentMuscles.get(id)?.alternateName !== m.name_en
+          )
+            await tx.muscle.upsert({
+              where: { id },
+              create: { id, name: m.name, alternateName: m.name_en },
+              update: { name: m.name, alternateName: m.name_en },
+            });
         for (const [id, e] of Object.entries(dataset.equipment))
-          await tx.equipment.upsert({
-            where: { id },
-            create: { id, name: e.name },
-            update: { name: e.name },
-          });
+          if (currentEquipment.get(id)?.name !== e.name)
+            await tx.equipment.upsert({
+              where: { id },
+              create: { id, name: e.name },
+              update: { name: e.name },
+            });
         const counts = { imported: 0, updated: 0, unchanged: 0 };
         for (const item of dataset.exercises) {
           const hash = await digest(JSON.stringify(item));
@@ -57,7 +67,7 @@ export async function importExercises(db: PrismaClient, actorId?: string) {
             name: item.name,
             aliases: item.aliases,
             description: item.description,
-            instructions: item.description,
+            instructions: item.instructions ?? item.description,
             searchText: normalizeSearch([item.name, ...item.aliases].join(' ')),
             sourceCategory: item.sourceCategory,
             provenance: item.provenance,

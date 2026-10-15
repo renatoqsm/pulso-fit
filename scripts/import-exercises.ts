@@ -1,8 +1,9 @@
 import 'dotenv/config';
-import { withDb, getDb } from '../src/lib/db';
+import { getDb } from '../src/lib/db';
 import { importExercises } from '../src/lib/exercise-import';
 try {
-  console.log(await withDb((db) => importExercises(db)));
+  // Operator imports are not HTTP requests and can atomically update a larger catalog.
+  console.log(await importExercises(await getDb()));
 } finally {
   await (await getDb()).$disconnect();
 }

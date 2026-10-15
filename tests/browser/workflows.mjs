@@ -79,7 +79,15 @@ try {
   await page.getByLabel('Nome do programa', { exact: true }).fill('Programa browser ' + tag);
   await page.getByRole('button', { name: 'Criar programa', exact: true }).click();
   await page.getByRole('button', { name: 'Adicionar ficha', exact: true }).click();
+  await page.getByLabel('Buscar exercício', { exact: true }).fill('Zottman');
+  await page
+    .getByLabel('Adicionar exercício', { exact: true })
+    .locator('option')
+    .filter({ hasText: 'Zottman curl' })
+    .waitFor({ state: 'attached' });
+
   await page.getByLabel('Adicionar exercício', { exact: true }).selectOption({ index: 1 });
+  await page.getByLabel('Buscar exercício', { exact: true }).fill('');
   const repetitions = page.getByLabel('Repetições mín.', { exact: true }).filter({ visible: true });
   await repetitions.first().waitFor();
   for (let i = 0; i < (await repetitions.count()); i++) await repetitions.nth(i).fill('10');
