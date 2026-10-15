@@ -12,7 +12,10 @@ export async function currentUser(db: PrismaClient) {
     include: { user: { include: { profile: true } } },
   });
   return session && !session.user.disabledAt && session.expiresAt > new Date()
-    ? session.user
+    ? {
+        ...session.user,
+        role: session.user.role === 'PROFESSIONAL' ? ('STUDENT' as const) : session.user.role,
+      }
     : null;
 }
 export async function createSession(

@@ -2,8 +2,7 @@ import type { PrismaClient, User, Prisma } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { HttpError } from './http-error';
-import { authorship, studentAccess, professional, assignmentTargets } from './workflow-access';
-import { canAccessStudent } from './access';
+import { authorship, studentAccess, assignmentTargets } from './workflow-access';
 const txt = z.string().trim();
 const id = txt.min(1).max(100);
 const int = z.number().int().min(0).max(10000);
@@ -69,7 +68,7 @@ const ordered = {
   },
 };
 const sessionIncludes = {
-  version: { include: { program: true } },
+  version: { select: { number: true, program: { select: { name: true } } } },
   day: {
     include: {
       exercises: {
@@ -98,35 +97,15 @@ export async function workoutGet(db: PrismaClient, user: User, path: string, req
     const assigned =
       user.role === 'STUDENT'
         ? await db.workoutAssignment.findMany({
-            where: { studentId: user.id, version: { program: { removal: null } } },
+            where: {
+              studentId: user.id,
+              version: { program: { authorId: user.id, removal: null } },
+            },
             include: { version: { include: { ...ordered, program: true } } },
           })
         : [];
-    const available = [];
-    for (const a of assigned) {
-      if (
-        a.version.program.authorId === user.id ||
-        (await canAccessStudent(db, a.version.program.authorId, user.id, 'TRAINING'))
-      )
-        available.push(a);
-    }
-    const links =
-      user.role === 'PROFESSIONAL'
-        ? await db.professionalStudentLink.findMany({
-            where: {
-              professionalId: user.id,
-              area: 'TRAINING',
-              status: 'ACTIVE',
-              consents: { some: { scope: 'TRAINING_HISTORY', revokedAt: null } },
-            },
-            include: { student: { select: { id: true, profile: { select: { name: true } } } } },
-          })
-        : [];
-    const enabled =
-      user.role === 'STUDENT' ||
-      !!(await db.professionalCredential.findFirst({
-        where: { professionalId: user.id, area: 'TRAINING', status: 'VERIFIED' },
-      }));
+    const available = assigned.filter((a) => a.version.program.authorId === user.id);
+    const enabled = user.role === 'STUDENT';
     const now = new Date();
     const effective = available.filter(
       (a) =>
@@ -143,7 +122,7 @@ export async function workoutGet(db: PrismaClient, user: User, path: string, req
       own,
       assigned: latest,
       archived: assigned.filter((a) => !latest.some((b) => b.id === a.id)),
-      students: links.map((l) => l.student),
+      students: [],
       enabled,
       role: user.role,
     });
@@ -157,12 +136,7 @@ export async function workoutGet(db: PrismaClient, user: User, path: string, req
         assignments: { where: { studentId: user.id } },
       },
     });
-    if (
-      !version ||
-      version.program.removal ||
-      (version.program.authorId !== user.id &&
-        !(user.role === 'STUDENT' && version.publishedAt && version.assignments.length))
-    )
+    if (!version || version.program.removal || version.program.authorId !== user.id)
       throw new HttpError(404, 'Ficha não encontrada.');
     return json(version);
   }
@@ -188,26 +162,77 @@ export async function workoutGet(db: PrismaClient, user: User, path: string, req
     });
     if (!session) throw new HttpError(404, 'Sessão não encontrada.');
     await studentAccess(db, user, session.studentId, 'TRAINING');
-    const previous = await db.workoutSessionExercise.findMany({
-      where: {
-        session: { studentId: session.studentId, status: 'COMPLETED', id: { not: session.id } },
-        OR: [
-          {
-            substituteId: null,
-            prescription: { exerciseId: { in: session.day.exercises.map((e) => e.exerciseId) } },
-          },
-          { substituteId: { in: session.day.exercises.map((e) => e.exerciseId) } },
-        ],
-      },
-      include: {
-        prescription: true,
-        sets: { where: { completedAt: { not: null } }, include: { prescription: true } },
-        session: { select: { endedAt: true } },
-      },
-      orderBy: { session: { endedAt: 'desc' } },
-      take: 100,
+    const rows = await db.$queryRaw<
+      {
+        executionId: string;
+        exerciseId: string;
+        status: string;
+        endedAt: string;
+        id: string;
+        prescriptionSetId: string;
+        actualReps: number | null;
+        actualKg: string | null;
+        actualSeconds: number | null;
+        rpe: string | null;
+        rir: number | null;
+        completedAt: string;
+        position: number;
+      }[]
+    >`WITH candidates AS (
+      SELECT e.id, COALESCE(e.substituteId,p.exerciseId) exerciseId, e.status, s.endedAt,
+        ROW_NUMBER() OVER (PARTITION BY COALESCE(e.substituteId,p.exerciseId) ORDER BY s.endedAt DESC, s.id DESC, e.id DESC) rank
+      FROM WorkoutSessionExercise e
+      JOIN WorkoutSession s ON s.id=e.sessionId
+      JOIN WorkoutPrescriptionExercise p ON p.id=e.prescriptionExerciseId
+      WHERE s.studentId=${session.studentId} AND s.status='COMPLETED'
+        AND s.id<>${session.id} AND s.endedAt<=${session.startedAt}
+        AND e.status<>'SKIPPED'
+        AND COALESCE(e.substituteId,p.exerciseId) IN (SELECT value FROM json_each(${JSON.stringify(session.day.exercises.map((e) => e.exerciseId))}))
+        AND EXISTS (SELECT 1 FROM WorkoutSessionSet l WHERE l.sessionExerciseId=e.id AND l.completedAt IS NOT NULL)
+    ) SELECT c.id executionId,c.exerciseId,c.status,c.endedAt,
+      l.id,l.prescriptionSetId,l.actualReps,l.actualKg,l.actualSeconds,l.rpe,l.rir,l.completedAt,p.position
+      FROM candidates c JOIN WorkoutSessionSet l ON l.sessionExerciseId=c.id
+      JOIN WorkoutPrescriptionSet p ON p.id=l.prescriptionSetId
+      WHERE c.rank=1 AND l.completedAt IS NOT NULL ORDER BY c.exerciseId,p.position`;
+    const previous = [...new Set(rows.map((r) => r.executionId))].map((executionId) => {
+      const entries = rows.filter((r) => r.executionId === executionId),
+        first = entries[0];
+      return {
+        id: executionId,
+        status: first.status,
+        substituteId: null,
+        prescription: { exerciseId: first.exerciseId },
+        session: { endedAt: first.endedAt },
+        sets: entries.map((r) => ({
+          id: r.id,
+          prescriptionSetId: r.prescriptionSetId,
+          actualReps: r.actualReps,
+          actualKg: r.actualKg == null ? null : String(r.actualKg),
+          actualSeconds: r.actualSeconds,
+          rpe: r.rpe == null ? null : String(r.rpe),
+          rir: r.rir,
+          completedAt: r.completedAt,
+          prescription: { position: r.position },
+        })),
+      };
     });
-    return json({ ...session, previous });
+    const snapshot = (value: unknown) => {
+      const v = value as { name?: string; instructions?: string };
+      return { name: v?.name ?? '', instructions: v?.instructions ?? '' };
+    };
+    return json({
+      ...session,
+      viewer: { id: user.id, role: user.role },
+      previous,
+      day: {
+        ...session.day,
+        exercises: session.day.exercises.map((e) => ({ ...e, snapshot: snapshot(e.snapshot) })),
+      },
+      exercises: session.exercises.map((e) => ({
+        ...e,
+        substituteSnapshot: e.substituteSnapshot ? snapshot(e.substituteSnapshot) : null,
+      })),
+    });
   }
   if (path === 'progress') {
     const studentId = req.nextUrl.searchParams.get('studentId') ?? user.id;
@@ -541,15 +566,12 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
             assignments: { where: { studentId: user.id } },
           },
         },
-        exercises: true,
+        exercises: { select: { id: true } },
       },
     });
     if (!day?.version.publishedAt || day.version.program.removal || !day.version.assignments.length)
       throw new HttpError(404, 'Treino não atribuído.');
-    if (
-      day.version.program.authorId !== user.id &&
-      !(await canAccessStudent(db, day.version.program.authorId, user.id, 'TRAINING'))
-    )
+    if (day.version.program.authorId !== user.id)
       throw new HttpError(403, 'Vínculo encerrado ou habilitação indisponível.');
     if (
       (day.version.validFrom && day.version.validFrom > new Date()) ||
@@ -603,19 +625,12 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
   if (parts[0] === 'sessions' && parts.length === 3) {
     const session = await db.workoutSession.findUnique({
       where: { id: parts[1] },
-      include: sessionIncludes,
+      include: {
+        day: { include: { exercises: { select: { id: true, sets: { select: { id: true } } } } } },
+        exercises: { include: { sets: true } },
+      },
     });
     if (!session) throw new HttpError(404, 'Sessão não encontrada.');
-    if (parts[2] === 'reply') {
-      await studentAccess(db, user, session.studentId, 'TRAINING');
-      await professional(db, user, 'TRAINING');
-      const { text } = z
-        .object({ text: txt.min(1).max(2000) })
-        .strict()
-        .parse(body);
-      await db.workoutReply.create({ data: { sessionId: session.id, authorId: user.id, text } });
-      return json({ message: 'Orientação enviada.' });
-    }
     if (user.id !== session.studentId || user.role !== 'STUDENT')
       throw new HttpError(403, 'Somente o aluno pode registrar sua sessão.');
     if (parts[2] === 'sets') {
@@ -640,7 +655,7 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
       const { revision, prescriptionSetId, completed, ...values } = data;
       if (completed && values.actualReps == null && values.actualSeconds == null)
         throw new HttpError(400, 'Informe repetições ou duração executada.');
-      await db.$transaction(async (tx) => {
+      const saved = await db.$transaction(async (tx) => {
         if (
           !(
             await tx.workoutSession.updateMany({
@@ -654,7 +669,7 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
           where: { id: executed.id },
           data: { status: 'EXECUTED' },
         });
-        await tx.workoutSessionSet.upsert({
+        return tx.workoutSessionSet.upsert({
           where: {
             sessionExerciseId_prescriptionSetId: {
               sessionExerciseId: executed.id,
@@ -670,15 +685,19 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
           update: { ...values, completedAt: completed ? new Date() : null },
         });
       });
-      return json({ message: 'Série salva.', revision: revision + 1 });
+      return json({
+        message: 'Série salva.',
+        revision: revision + 1,
+        set: saved,
+        prescriptionExerciseId: prescribed!.id,
+      });
     }
     if (parts[2] === 'exercise') {
       const data = z
         .object({
           revision: z.number().int().min(0),
           prescriptionExerciseId: id,
-          status: z.enum(['PLANNED', 'SKIPPED', 'SUBSTITUTED']),
-          substituteId: id.nullable().optional(),
+          status: z.enum(['PLANNED', 'SKIPPED']),
           notes: txt.max(1000).default(''),
         })
         .strict()
@@ -687,14 +706,6 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
         (e) => e.prescriptionExerciseId === data.prescriptionExerciseId,
       );
       if (!executed) throw new HttpError(400, 'Exercício inválido.');
-      const substitute =
-        data.status === 'SUBSTITUTED'
-          ? await db.exercise.findFirst({
-              where: { id: data.substituteId ?? '', active: true, source: 'WGER' },
-            })
-          : null;
-      if (data.status === 'SUBSTITUTED' && !substitute)
-        throw new HttpError(400, 'Selecione uma substituição do catálogo global.');
       await db.$transaction(async (tx) => {
         if (
           !(
@@ -710,18 +721,14 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
           data: {
             status: data.status,
             notes: data.notes,
-            substituteId: substitute?.id ?? null,
-            substituteSnapshot: substitute
-              ? ({
-                  name: substitute.name,
-                  instructions: substitute.instructions,
-                  provenance: substitute.provenance,
-                } as Prisma.InputJsonValue)
-              : undefined,
           },
         });
       });
-      return json({ message: 'Exercício atualizado.', revision: data.revision + 1 });
+      return json({
+        message: 'Exercício atualizado.',
+        revision: data.revision + 1,
+        exercise: { id: executed.id, status: data.status },
+      });
     }
     if (parts[2] === 'finish') {
       const data = z
@@ -738,7 +745,17 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
         .strict()
         .parse(body);
       if (session.status !== 'IN_PROGRESS') {
-        if (session.status === data.status) return json({ message: 'Sessão já encerrada.' });
+        if (session.status === data.status)
+          return json({
+            message: 'Sessão já encerrada.',
+            session: {
+              status: session.status,
+              endedAt: session.endedAt,
+              feedback: session.feedback,
+              discomfort: session.discomfort,
+            },
+            revision: session.revision,
+          });
         throw conflict();
       }
       if (
@@ -779,7 +796,11 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
           data: { actorId: user.id, action: 'WORKOUT_SESSION_FINISHED', resourceId: session.id },
         });
       });
-      return json({ message: 'Sessão encerrada. Histórico preservado.' });
+      return json({
+        message: 'Sessão encerrada. Histórico preservado.',
+        session: { ...values, endedAt },
+        revision: revision + 1,
+      });
     }
   }
   throw new HttpError(404, 'Recurso não encontrado.');

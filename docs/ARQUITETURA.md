@@ -31,7 +31,7 @@ INSERTs são agrupados e limitados por tamanho. Catálogos/atribuições são co
 
 ## Identidade, escopos e privacidade
 
-User STUDENT/PROFESSIONAL/ADMIN; habilitações TRAINING/NUTRITION independentes. Convites têm hash, validade e consumo único. Consentimentos têm escopos mínimos; revogação/suspensão impede consultas novas, preservando o histórico do aluno.
+O produto ativo é exclusivamente o treino individual. Cadastro público aceita apenas STUDENT. `currentUser` apresenta contas PROFESSIONAL legadas como STUDENT para permitir uso pessoal sem alterar identidade/histórico; a função administrativa permanece restrita a ADMIN com MFA e permissões. Acesso a sessões, evolução e fotos exige o próprio titular. APIs de nutrição, convites, habilitações e consulta de alunos retornam 404. Relações antigas não concedem acesso. Os enums/tabelas legados permanecem para integridade e exportação histórica.
 
 PBKDF2 SHA-512/210 mil iterações, salt aleatório, sessão opaca de 256 bits com hash persistido e cookie HttpOnly/SameSite=Lax/Secure HTTPS. Origem APP_URL, JSON/tamanho e rate limit persistido. MFA TOTP RFC 6238, janela ±1, contador antirreplay e recuperação de uso único; segredo AES-GCM vinculado à senha/usuário. MFA obrigatório em operações administrativas.
 
@@ -39,9 +39,9 @@ Fotos PNG/JPEG até 150 KB/4 MP são sanitizadas, privadas e no-store. Exportaç
 
 ## Domínios preservados
 
-WorkoutProgram/Version/Day/PrescriptionExercise/Set: rascunhos com revisão, publicação/atribuição e revisões/cópias. Triggers impedem alterar, apagar ou acrescentar filhos de versões publicadas. WorkoutSession/Exercise/Set: UUID idempotente, uma sessão ativa por aluno, CAS de revisão, valores reais, última execução válida, descanso e feedback. Sessão finalizada e origens ficam imutáveis. Evolução usa até 1.000 sessões completas recentes, histórico até 100; exportação inclui os registros completos.
+WorkoutProgram/Version/Day/PrescriptionExercise/Set: rascunhos com revisão, publicação/atribuição e revisões/cópias. Triggers impedem alterar, apagar ou acrescentar filhos de versões publicadas. WorkoutSession/Exercise/Set: UUID idempotente, uma sessão ativa por aluno, CAS de revisão, valores reais, última execução válida e feedback. Não há cronômetro nem substituição durante execução. Sessão finalizada e origens ficam imutáveis. Evolução usa até 1.000 sessões completas recentes, histórico até 100; exportação inclui os registros completos.
 
-Food/Measure: rótulos/receitas privados, referência 100 g/100 ml e medidas próprias com fonte. Nutrientes ausentes permanecem desconhecidos; receitas conservam ingredientes/rendimento. NutritionPlan/Version/Meal/Item: publicação imutável, alternativas e atribuição nutricional. MealLog guarda consumo separado, uma refeição prescrita por data, diferenças e feedback com escopo correto.
+Domínio legado, sem APIs ou interface ativas: Food/Measure: rótulos/receitas privados, referência 100 g/100 ml e medidas próprias com fonte. Nutrientes ausentes permanecem desconhecidos; receitas conservam ingredientes/rendimento. NutritionPlan/Version/Meal/Item: publicação imutável, alternativas e atribuição nutricional. MealLog guarda consumo separado, uma refeição prescrita por data, diferenças e feedback com escopo correto.
 
 PWA guarda somente shell público. Fila cifrada de séries em IndexedDB exige consentimento e vincula usuário/registro como dados adicionais AES-GCM; chave não exportável e limpeza no logout. Não protege um navegador comprometido nem permite navegação completa de saúde offline. Finalização gera ActivityOutbox única, sem consumidor/check-in automático.
 
@@ -56,3 +56,11 @@ Local: migrations por arquivo em transação SQLite, checksums e exclusão mútu
 D1 exclusivo do Pulso Fit; banco de outro projeto não foi modificado. Token Cloudflare fica no ambiente seguro do operador, não no Worker ou no código. Produção usa DB, ASSETS e APP_URL HTTPS. Sem upgrade automático de plano ou contratação de PostgreSQL. Quotas gratuitas, contenção de escrita, backups/restauração e políticas legais exigem acompanhamento operacional.
 
 Compatibilidade de senha em Workers: a derivação nativa continua preferencial. Se WebCrypto recusar explicitamente 210.000 iterações por limite de PBKDF2, @noble/hashes 2.4.0 executa o mesmo PBKDF2 SHA-512, salt UTF-8 e saída de 32 bytes. O formato de hashes permanece idêntico e a mesma derivação atende a chave AES-GCM do MFA. Outros erros criptográficos são propagados. O fallback foi comparado a vetor independente e testado com hashes e MFA; CPU em produção precisa ser medida, pois a implementação em JavaScript é mais custosa e não garante caber no Workers Free.
+
+## Execução simplificada (15/10/2026)
+
+`workspace` retorna agenda compacta com nomes, dias da semana e quantidade de exercícios, sem snapshots; a navegação lateral é fixa e dispensa consultas. A tela inicial usa o dia local do dispositivo para priorizar a ficha marcada. Rotas de início usam navegação Next sem recarregar a aplicação inteira.
+
+O GET da sessão já inclui o titular autenticado, eliminando uma consulta `/me`. O histórico usa uma consulta SQL parametrizada com janela por exercício de catálogo: última sessão concluída até o início da sessão atual, exercício não ignorado e pelo menos uma série concluída. Retorna apenas séries concluídas, por posição, sem trazer snapshots antigos/proveniência nem truncar o histórico inteiro em 100 exercícios. A correspondência sobrevive à edição das fichas, que recria identificadores da prescrição. Valores próprios já registrados na sessão têm prioridade sobre sugestões anteriores.
+
+Uma confirmação de série envia um POST e recebe o registro confirmado e a revisão. O cliente aplica esse resultado localmente, preservando a fila cifrada e conflitos CAS; não refaz o GET da sessão a cada gravação. Leituras extras ficam reservadas à recuperação de conflitos ou descarte de pendências. Não há atualizações periódicas do executor. Campos são gravados explicitamente no botão de conclusão/ajuste, evitando perder cliques por reordenação da tela no blur.

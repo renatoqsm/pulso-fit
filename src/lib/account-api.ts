@@ -6,7 +6,6 @@ import { createSession, destroySession } from './auth';
 import { hashPassword, verifyPassword } from './crypto';
 import { encryptMfa, decryptMfa, newMfaSecret, matchingCounter, verifyMfa } from './mfa';
 import { randomToken, digest } from './crypto';
-import { canAccessStudent } from './access';
 function pngClean(data: Buffer) {
   if (data.length < 33 || data.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a')
     throw new HttpError(400, 'PNG inválido.');
@@ -131,19 +130,7 @@ export async function accountGet(db: PrismaClient, user: User, path: string) {
   if (path.startsWith('media/')) {
     const asset = await db.mediaAsset.findUnique({ where: { id: path.split('/')[1] } });
     if (!asset) throw new HttpError(404, 'Arquivo não encontrado.');
-    if (asset.ownerId !== user.id) {
-      let allowed = false;
-      for (const area of ['TRAINING', 'NUTRITION'] as const) {
-        if (
-          (await canAccessStudent(db, user.id, asset.ownerId, area)) ||
-          (await canAccessStudent(db, asset.ownerId, user.id, area))
-        ) {
-          allowed = true;
-          break;
-        }
-      }
-      if (!allowed) throw new HttpError(404, 'Arquivo não encontrado.');
-    }
+    if (asset.ownerId !== user.id) throw new HttpError(404, 'Arquivo não encontrado.');
     return new NextResponse(new Uint8Array(asset.data), {
       headers: {
         'Content-Type': asset.mimeType,

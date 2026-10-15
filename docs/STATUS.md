@@ -1,4 +1,23 @@
-# Estado da entrega — 15/10/2026
+# Estado atual — treino individual (15/10/2026)
+
+Esta seção substitui o escopo das entregas históricas abaixo.
+
+- Dieta removida da interface e das APIs. Telas antigas redirecionam para o painel; tabelas e exportação histórica foram preservadas, sem apagar dados de usuários.
+- Modo professor desativado. Cadastro público cria somente aluno; contas profissionais legadas usam o produto como aluno, sem acesso a outras pessoas. Vínculos/credenciais antigos não liberam sessões, evolução ou fotos.
+- Aluno cria/edita suas próprias fichas e marca os dias da semana, visíveis no editor. Meu dia oferece iniciar o treino agendado, continuar a sessão ativa ou treinar novamente. O padrão permanece em duas séries de trabalho de 6–10.
+- Removidos cronômetro/alertas de descanso, substituição e respostas profissionais na execução. Séries são gravadas ao tocar Concluir série/Salvar ajustes da série, sem gravação em blur que possa deslocar o botão e perder o toque.
+- Última execução por exercício e posição de série preenche cargas/repetições, incluindo zero, após editar a ficha. Séries não concluídas não são deslocadas para outra posição; sessões interrompidas não substituem a referência de uma sessão concluída. Valores já salvos na sessão atual têm prioridade.
+- Navegação lateral sem consulta de módulos, painel com agenda compacta, início via navegação Next e uma única leitura da execução com titular incluído. Gravações aplicam a resposta confirmada sem recarregar o treino/histórico; não há renderização periódica por cronômetro. Fila cifrada, recuperação, CAS e histórico imutável continuam ativos.
+
+Validação: **40 testes passaram em Node e 40 em workerd local**, sem falhas ou testes ignorados. Positivos dos módulos removidos foram substituídos por testes que comprovam sua indisponibilidade, inclusive com vínculo/credencial legados, e pelo fluxo de treino pessoal. Testes de persistência, concorrência, catálogo, privacidade e MFA permanecem. TypeScript e build OpenNext passaram.
+
+Chromium: fluxo completo passou em ambos os runtimes; 390×844 e 1440×1000 sem overflow e sem erros JavaScript. Verificados agendamento/início pelo painel, salvar/continuar, padrão 2 × 6–10, confirmação de séries sem GET adicional, fila cifrada recuperada após fechar offline, evolução, histórico após editar a ficha e exclusão. No workerd, também verificado treino anterior com apenas a segunda série concluída e carga zero: primeira série não recebe os valores da segunda. Falha HTML 503 do catálogo foi injetada deliberadamente para validar a nova tentativa. Abertura medida uma vez em **217 ms no navegador com workerd local**; não é medida de latência/CPU em produção.
+
+Publicação confirmada pela Cloudflare em **https://pulso-fit.renatoqsousam.workers.dev**, versão **`3fa754c6-1386-4ace-a84f-f2f54f1800f4`**, gzip 1312,76 KiB. DB continua sendo o D1 exclusivo pulso-fit. Nenhuma migration ou alteração dos registros de produção foi necessária. Consulta HTTPS pública deste ambiente retornou 403/code 1010; a causa desse acesso continua não determinada e os fluxos autenticados foram validados localmente, sem inserir fixtures em produção.
+
+---
+
+# Histórico das entregas anteriores
 
 ## Implementação
 

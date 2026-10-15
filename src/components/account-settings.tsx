@@ -165,8 +165,7 @@ export function AccountSettings() {
             />
           )}
           <p className="muted small">
-            A foto é privada, visível para você e em vínculos autorizados. Metadados adicionais são
-            removidos.
+            Sua foto é privada e visível somente para você. Metadados adicionais são removidos.
           </p>
           <label>
             Escolher uma foto
@@ -240,9 +239,8 @@ export function AccountSettings() {
         <section className="card">
           <h2>Encerrar conta e solicitar exclusão</h2>
           <p className="muted">
-            A conta será desativada, sessões encerradas e vínculos revogados. A exclusão definitiva
-            de registros profissionais depende de análise das obrigações de retenção. Exporte seus
-            dados antes de continuar.
+            A conta será desativada e as sessões de acesso serão encerradas. A exclusão definitiva
+            dos registros passa por análise de retenção. Exporte seus dados antes de continuar.
           </p>
           <form
             onSubmit={(e) => {

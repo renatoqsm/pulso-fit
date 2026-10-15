@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { readApiResponse } from '@/lib/read-api-response';
 import { lowVolumeSets } from '@/lib/workout-presets';
 import { WorkflowShell } from './workflow-shell';
@@ -113,6 +114,7 @@ function draftFrom(v: Version): Draft {
   };
 }
 export function WorkoutEditor() {
+  const router = useRouter();
   const [data, setData] = useState<Data>();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [catalogItems, setCatalogItems] = useState<Exercise[]>([]);
@@ -320,7 +322,7 @@ export function WorkoutEditor() {
           <p className="muted">
             {data.role === 'STUDENT'
               ? 'Crie treinos pessoais ou execute as fichas publicadas para você.'
-              : 'Monte fichas, preserve versões e acompanhe seus alunos.'}
+              : 'Monte suas fichas e escolha os dias de treino.'}
           </p>
           {data.enabled && !version && (
             <form
@@ -350,9 +352,7 @@ export function WorkoutEditor() {
               {data.own.map((p) => (
                 <article className="card" key={p.id}>
                   <h3>{p.name}</h3>
-                  <span className="badge">
-                    {p.template ? 'Modelo' : 'Programa pessoal/profissional'}
-                  </span>
+                  <span className="badge">{p.template ? 'Modelo' : 'Meu plano de treino'}</span>
                   {data.enabled && p.versions.length > 0 && (
                     <button
                       className="full"
@@ -429,7 +429,7 @@ export function WorkoutEditor() {
                             id: crypto.randomUUID(),
                             dayId: day.id,
                           });
-                          if (result?.id) location.assign(`/sessoes/${result.id}`);
+                          if (result?.id) router.push(`/sessoes/${result.id}`);
                         }}
                       >
                         Iniciar / recuperar sessão
@@ -483,7 +483,7 @@ export function WorkoutEditor() {
                     }
                     onClick={() => setPreview(!preview)}
                   >
-                    {preview ? 'Editar' : 'Visualizar como aluno'}
+                    {preview ? 'Editar' : 'Visualizar ficha'}
                   </button>
                   <button
                     className="secondary"
@@ -676,8 +676,12 @@ export function WorkoutEditor() {
                             Remover ficha
                           </button>
                         </div>
-                        <details className="editor-settings">
-                          <summary>Orientações e dias da semana</summary>
+                        <details className="editor-settings" open>
+                          <summary>Dias da semana e orientações</summary>
+                          <p className="small muted">
+                            Marque os dias desta ficha para iniciar o treino direto na tela Meu dia.
+                            Sem marcação, a ficha fica disponível em qualquer dia.
+                          </p>
                           <textarea
                             aria-label="Orientações da ficha"
                             style={{ marginTop: 12 }}
@@ -1141,27 +1145,6 @@ export function WorkoutEditor() {
                     ),
                   )}
                   <div className="card editor-savebar" style={{ marginTop: 24 }}>
-                    {data.role === 'PROFESSIONAL' && (
-                      <>
-                        <h3>Atribuir aos alunos vinculados</h3>
-                        {data.students.map((student) => (
-                          <label className="consent" key={student.id}>
-                            <input
-                              type="checkbox"
-                              checked={targets.includes(student.id)}
-                              onChange={(e) =>
-                                setTargets((v) =>
-                                  e.target.checked
-                                    ? [...v, student.id]
-                                    : v.filter((id) => id !== student.id),
-                                )
-                              }
-                            />
-                            {student.profile.name}
-                          </label>
-                        ))}
-                      </>
-                    )}
                     <div
                       className="row wrap"
                       style={{ justifyContent: 'flex-start', marginTop: 14 }}

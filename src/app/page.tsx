@@ -20,60 +20,57 @@ export default function Home() {
               acompanha você.
             </h1>
             <p className="muted">
-              O primeiro passo para cuidar da sua rotina de treinos e alimentação. Crie seu perfil e
-              conecte-se a profissionais com habilitações verificadas.
+              O primeiro passo para cuidar da sua rotina de treinos. Monte suas fichas, escolha os
+              dias da semana e acompanhe suas cargas e repetições.
             </p>
             <div className="row wrap" style={{ justifyContent: 'flex-start' }}>
               <Link className="button" href="/cadastro">
                 Criar minha conta <ArrowUpRight size={18} />
               </Link>
-              <Link className="button secondary" href="/cadastro?perfil=profissional">
-                Sou profissional
-              </Link>
             </div>
             <p className="small muted" style={{ marginTop: 22 }}>
-              Em desenvolvimento • Cadastro, perfis e vínculos disponíveis.
+              Treinos pessoais • Agenda semanal • Histórico de cargas
             </p>
           </div>
           <div className="hero-art">
             <div className="card">
               <span className="badge">COMECE PELO ESSENCIAL</span>
               <h2 style={{ marginTop: 20 }}>
-                Sua jornada começa
+                Seu próximo treino
                 <br />
-                com uma conexão.
+                começa aqui.
               </h2>
               <p className="muted">
-                Treinador e nutricionista, cada um com sua área de atuação e suas permissões.
+                Crie suas fichas e encontre o treino do dia pronto para iniciar.
               </p>
               <div className="row">
                 <span className="icon-tile" style={{ margin: 0 }}>
                   <Users />
                 </span>
-                <span className="small muted">Você escolhe o que compartilhar.</span>
+                <span className="small muted">Você escolhe como treinar.</span>
               </div>
             </div>
             <div className="card row">
               <ShieldCheck color="#206854" />
               <div>
                 <h3 style={{ marginBottom: 4 }}>Privacidade desde o início</h3>
-                <span className="small muted">Consentimento explícito. Controle de acesso.</span>
+                <span className="small muted">Seus registros protegidos na sua conta.</span>
               </div>
             </div>
           </div>
         </section>
         <section className="grid-features">
           {[
-            [Activity, 'Seu espaço', 'Comece com um perfil pessoal, mesmo sem profissional.'],
+            [Activity, 'Seu espaço', 'Monte e edite seus próprios treinos.'],
             [
               Users,
-              'Acompanhamento conectado',
-              'Aceite convites de profissionais e gerencie seus vínculos.',
+              'Agenda de treinos',
+              'Escolha os dias de cada ficha e inicie o treino pela tela inicial.',
             ],
             [
               ShieldCheck,
               'Você no controle',
-              'Autorize o acesso por área e encerre o vínculo quando precisar.',
+              'Retome seu treino e consulte suas cargas e repetições anteriores.',
             ],
           ].map(([Icon, title, text]) => {
             const Component = Icon as typeof Activity;

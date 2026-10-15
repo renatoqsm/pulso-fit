@@ -46,6 +46,7 @@ try {
     isMobile: true,
     hasTouch: true,
     locale: 'pt-BR',
+    timezoneId: 'America/Sao_Paulo',
   });
   page = await context.newPage();
   page.on('response', async (r) => {
@@ -153,6 +154,10 @@ try {
   await repetitions.first().fill('10');
   await page.getByRole('button', { name: 'Aplicar primeira série às demais', exact: true }).click();
   await page.screenshot({ path: 'test-results/mobile-workout-builder.png', fullPage: true });
+  const weekday = await page.evaluate(() => new Date().getDay());
+  await page
+    .getByLabel(['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'][weekday], { exact: true })
+    .check();
   await page.getByRole('button', { name: 'Salvar ficha', exact: true }).click();
   await page.getByText('Ficha salva e atualizada.', { exact: true }).waitFor();
   assert.equal(await page.getByLabel('Nome da ficha', { exact: true }).inputValue(), 'Treino 1');
@@ -171,16 +176,45 @@ try {
   assert.equal(await page.getByLabel('Nome da ficha', { exact: true }).inputValue(), 'Lower');
   await page.getByRole('button', { name: 'Voltar aos planos', exact: true }).click();
 
-  await page
-    .getByRole('button', { name: 'Iniciar / recuperar sessão', exact: true })
-    .first()
-    .click();
+  await page.goto(origin + '/painel');
+  await page.getByRole('heading', { name: 'Treino 1', exact: true }).waitFor();
+  assert.equal(
+    await page.getByRole('link', { name: /alimentar|vínculo|profissional/i }).count(),
+    0,
+  );
+  const executionRequests = [];
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname.startsWith('/api/'))
+      executionRequests.push({ path: new URL(request.url()).pathname, method: request.method() });
+  });
+  const opening = Date.now();
+  await page.getByRole('button', { name: 'Começar treino', exact: true }).click();
   await page.waitForURL('**/sessoes/**');
   const sessionUrl = page.url();
+  await page.getByLabel('Repetições feitas', { exact: true }).first().waitFor();
+  await page.waitForFunction(() => !document.querySelector('input[type=number]')?.disabled);
+  console.log('Abertura da execução (navegador local):', Date.now() - opening, 'ms');
+  assert.equal(
+    executionRequests.filter((r) => r.method === 'GET' && /^\/api\/sessions\/[^/]+$/.test(r.path))
+      .length,
+    1,
+  );
+  assert.equal(
+    executionRequests.filter((r) => r.path === '/api/me' || r.path === '/api/workspace').length,
+    0,
+  );
+  assert.equal(await page.getByText('Substituir no registro', { exact: true }).count(), 0);
+  assert.equal(await page.locator('.timer').count(), 0);
   await page.getByLabel('Repetições feitas', { exact: true }).first().fill('10');
   await page.getByLabel('Carga utilizada (kg)', { exact: true }).first().fill('25');
   await page.getByRole('button', { name: 'Concluir série', exact: true }).first().click();
   await page.getByText('Dados sincronizados.', { exact: true }).waitFor();
+  assert.equal(
+    executionRequests.filter((r) => r.method === 'GET' && /^\/api\/sessions\/[^/]+$/.test(r.path))
+      .length,
+    1,
+    'Salvar séries não deve recarregar todo o histórico',
+  );
   await page
     .getByLabel('Guardar pendências offline neste dispositivo pessoal', { exact: true })
     .check();
@@ -260,51 +294,9 @@ try {
   await page.getByText('Volume ao longo do tempo', { exact: true }).waitFor();
   await page.getByRole('img', { name: 'Volume calculado das sessões registradas' }).waitFor();
   await page.goto(origin + '/alimentacao');
-  await page.getByRole('button', { name: 'Alimentos', exact: true }).click();
-  await page.getByRole('button', { name: 'Cadastrar alimento / rótulo', exact: true }).click();
-  await page.getByLabel('Nome', { exact: true }).fill('Rótulo browser ' + tag);
-  await page.getByLabel('Energia (kcal)', { exact: true }).fill('111');
-  await page.getByLabel('Proteínas (g)', { exact: true }).fill('5.2');
-  await page
-    .getByLabel('Procedência (marca, rótulo, fonte e versão)', { exact: true })
-    .fill('Rótulo sintético, apenas teste de navegador');
-  const foodResponse = page.waitForResponse(
-    (r) => r.url().endsWith('/api/foods/create') && r.request().method() === 'POST',
-  );
-  await page.getByRole('button', { name: 'Salvar alimento', exact: true }).click();
-  const foodId = (await (await foodResponse).json()).id;
-  await page.getByRole('button', { name: 'Planos', exact: true }).click();
-  await page
-    .getByLabel('Nome do plano / planejamento', { exact: true })
-    .fill('Plano browser ' + tag);
-  await page.getByRole('button', { name: 'Criar planejamento', exact: true }).click();
-  assert.equal(
-    await page.locator('#app-navigation a[aria-current="page"]').textContent(),
-    'Planos alimentares',
-  );
-  await page.getByRole('button', { name: 'Café da manhã', exact: true }).click();
-  await page.getByRole('button', { name: 'Duplicar refeição', exact: true }).click();
-  assert.equal(await page.getByRole('tab', { name: /Café da manhã/ }).count(), 2);
-  await page.getByRole('button', { name: 'Remover refeição', exact: true }).click();
-  await page.getByLabel('Horário sugerido', { exact: true }).fill('08:30');
-  await page.getByRole('button', { name: 'Adicionar alimento', exact: true }).first().click();
-  await page.getByLabel('Alimento', { exact: true }).first().selectOption(foodId);
-  await page.getByLabel('Quantidade', { exact: true }).first().fill('50');
-  await page.getByRole('button', { name: 'Salvar e publicar', exact: true }).click();
-  await page.getByRole('button', { name: 'Criar revisão', exact: true }).waitFor();
-  await page.screenshot({ path: 'test-results/mobile-nutrition-plan.png', fullPage: true });
-  await page.goto(origin + '/painel');
-  await page.getByRole('heading', { name: 'Café da manhã', exact: true }).waitFor();
-  await page.getByRole('button', { name: 'Começar treino', exact: true }).waitFor();
+  await page.waitForURL('**/painel');
+  await page.getByRole('button', { name: 'Treinar novamente', exact: true }).waitFor();
   await page.screenshot({ path: 'test-results/mobile-dashboard-with-plan.png', fullPage: true });
-  await page.getByRole('link', { name: 'Registrar refeição', exact: true }).click();
-  await page.waitForURL('**/alimentacao#diary');
-  await page
-    .getByRole('button', { name: 'Marcar realizada / registrar consumo', exact: true })
-    .click();
-  await page.getByRole('button', { name: 'Salvar consumo', exact: true }).click();
-  await page.getByRole('heading', { name: 'Alimentação registrada', exact: true }).waitFor();
-  await page.getByRole('button', { name: 'Editar registro', exact: true }).waitFor();
   const own = await context.request.get(origin + '/api/me');
   assert.ok((await own.json()).id);
   const captured = await context.request.get(
@@ -318,7 +310,7 @@ try {
   assert.ok(scroll.scroll <= scroll.width + 2, `Overflow no mobile: ${JSON.stringify(scroll)}`);
   await mkdir('/workspace/pulso-fit/test-results', { recursive: true });
   await page.screenshot({
-    path: '/workspace/pulso-fit/test-results/mobile-nutrition.png',
+    path: '/workspace/pulso-fit/test-results/mobile-workout-dashboard.png',
     fullPage: true,
   });
   await page.goto(origin + '/treinos');
@@ -373,6 +365,83 @@ try {
     'Ficha editada',
   );
   await page.getByRole('button', { name: 'Voltar aos planos', exact: true }).click();
+  await page.goto(origin + '/painel');
+  await page.getByRole('button', { name: 'Começar treino', exact: true }).click();
+  await page.waitForURL('**/sessoes/**');
+  await page.waitForFunction(
+    () =>
+      [...document.querySelectorAll('label')]
+        .find((l) => l.textContent.includes('Carga utilizada (kg)'))
+        ?.querySelector('input')?.value === '25',
+  );
+  assert.equal(
+    await page.getByLabel('Repetições feitas', { exact: true }).first().inputValue(),
+    '10',
+  );
+  assert.equal(
+    await page.getByLabel('Repetições feitas', { exact: true }).nth(1).inputValue(),
+    '12',
+  );
+  assert.equal(
+    await page.getByLabel('Carga utilizada (kg)', { exact: true }).nth(1).inputValue(),
+    '25',
+  );
+  await page.screenshot({
+    path: 'test-results/desktop-execution-previous-loads.png',
+    fullPage: true,
+  });
+  await page.getByLabel('Encerramento', { exact: true }).selectOption('INTERRUPTED');
+  await page.getByRole('button', { name: 'Encerrar sessão', exact: true }).click();
+  await page.getByRole('heading', { name: 'Feedback registrado', exact: true }).waitFor();
+  // A partial completed workout must not shift series 2 into series 1; zero kg remains valid.
+  const partialId = crypto.randomUUID();
+  const post = (path, data) =>
+    context.request.post(origin + '/api/' + path, { data, headers: { Origin: origin } });
+  assert.equal(
+    (await post('sessions/start', { id: partialId, dayId: current.days[0].id })).status(),
+    200,
+  );
+  assert.equal(
+    (
+      await post(`sessions/${partialId}/sets`, {
+        revision: 0,
+        prescriptionSetId: current.days[0].exercises[0].sets[1].id,
+        actualReps: 9,
+        actualKg: 0,
+        completed: true,
+      })
+    ).status(),
+    200,
+  );
+  assert.equal(
+    (await post(`sessions/${partialId}/finish`, { revision: 1, status: 'COMPLETED' })).status(),
+    200,
+  );
+  await page.goto(origin + '/painel');
+  await page.getByRole('button', { name: 'Treinar novamente', exact: true }).click();
+  await page.waitForURL('**/sessoes/**');
+  await page.waitForFunction(
+    () =>
+      [...document.querySelectorAll('label')]
+        .filter((l) => l.textContent.includes('Repetições feitas'))[1]
+        ?.querySelector('input')?.value === '9',
+  );
+  assert.equal(
+    await page.getByLabel('Repetições feitas', { exact: true }).first().inputValue(),
+    '',
+  );
+  assert.equal(
+    await page.getByLabel('Carga utilizada (kg)', { exact: true }).first().inputValue(),
+    '',
+  );
+  assert.equal(
+    await page.getByLabel('Carga utilizada (kg)', { exact: true }).nth(1).inputValue(),
+    '0',
+  );
+  await page.getByLabel('Encerramento', { exact: true }).selectOption('INTERRUPTED');
+  await page.getByRole('button', { name: 'Encerrar sessão', exact: true }).click();
+  await page.getByRole('heading', { name: 'Feedback registrado', exact: true }).waitFor();
+  await page.goto(origin + '/treinos#programas');
   const remove = page.getByRole('button', {
     name: 'Excluir plano Programa browser ' + tag,
     exact: true,
@@ -403,7 +472,7 @@ try {
   );
   assert.equal(pageErrors.length, 0, JSON.stringify(pageErrors));
   console.log(
-    'Browser: cadastro, prescrição, séries, fila criptografada offline, recuperação, evolução, plano e diário passaram; mobile sem overflow; sem erros JS.',
+    'Browser: cadastro somente aluno, agenda do dia, edição, séries sem recarga, cargas/repetições anteriores após edição, fila criptografada offline, evolução e exclusão passaram; mobile e desktop sem overflow; sem erros JS.',
   );
   await context.close();
 } catch (error) {

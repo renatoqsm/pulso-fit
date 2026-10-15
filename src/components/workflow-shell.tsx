@@ -6,14 +6,12 @@ import {
   LayoutDashboard,
   Dumbbell,
   CalendarDays,
-  Utensils,
   BookOpen,
   TrendingUp,
   Settings,
   Menu,
   X,
   LogOut,
-  Users,
 } from 'lucide-react';
 import { Logo } from './logo';
 import { clearOffline } from '@/lib/session-queue';
@@ -28,7 +26,7 @@ export function WorkflowShell({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [modules, setModules] = useState<string[]>([]);
+  const modules = ['TRAINING'];
   const [open, setOpen] = useState(false);
   const [hash, setHash] = useState('');
   const [error, setError] = useState('');
@@ -41,17 +39,6 @@ export function WorkflowShell({
       ),
     [],
   );
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch('/api/workspace', { signal: controller.signal })
-      .then(async (r) => {
-        if (!r.ok) return;
-        const data = await r.json();
-        setModules(data.modules ?? []);
-      })
-      .catch(() => {});
-    return () => controller.abort();
-  }, []);
   useEffect(() => {
     const update = () => setHash(window.location.hash);
     update();
@@ -85,13 +72,7 @@ export function WorkflowShell({
           { href: '/evolucao', label: 'Minha evolução', icon: TrendingUp },
         ]
       : []),
-    ...(modules.includes('NUTRITION')
-      ? [
-          { href: '/alimentacao#plans', label: 'Planos alimentares', icon: Utensils },
-          { href: '/alimentacao#diary', label: 'Diário alimentar', icon: CalendarDays },
-        ]
-      : []),
-    { href: '/painel#vinculos', label: 'Perfil e vínculos', icon: Users },
+    { href: '/painel#perfil', label: 'Meu perfil', icon: Settings },
     { href: '/conta', label: 'Conta e privacidade', icon: Settings },
   ];
   async function logout() {

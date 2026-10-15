@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { WorkflowShell } from './workflow-shell';
+import { readApiResponse } from '@/lib/read-api-response';
 import { deletePending, loadPending, savePending, type Pending } from '@/lib/session-queue';
 type SetSpec = {
   id: string;
@@ -47,6 +48,7 @@ type Exec = {
 };
 type Session = {
   id: string;
+  viewer: { id: string; role: string };
   studentId: string;
   revision: number;
   status: string;
@@ -69,7 +71,6 @@ type Input = {
   rpe: number | null;
   rir: number | null;
 };
-type Rest = { sessionId: string; end: number; paused: number | null; duration: number };
 export function SessionRunner({ id }: { id: string }) {
   const [data, setData] = useState<Session>();
   const [viewer, setViewer] = useState<{ id: string; role: string }>();
@@ -77,20 +78,18 @@ export function SessionRunner({ id }: { id: string }) {
   const [message, setMessage] = useState('');
   const [pending, setPending] = useState(0);
   const [offlineConsent, setOfflineConsent] = useState(false);
-  const [rest, setRest] = useState<Rest>();
-  const [tick, setTick] = useState(Date.now());
   const [busy, setBusy] = useState(false);
-  const [catalog, setCatalog] = useState<{ id: string; name: string }[]>([]);
   const queue = useRef<Pending[]>([]);
   const persistence = useRef(new Map<string, Promise<void>>());
   const revision = useRef(0);
   const current = useRef<Session | undefined>(undefined);
   const consent = useRef(false);
   const flushing = useRef(false);
-  const hydrated = useRef(false);
+  const lastSaved = useRef(new Map<string, string>());
+  const initialRead = useRef<{ id: string; promise: Promise<Session> } | null>(null);
   async function read() {
     const res = await fetch(`/api/sessions/${id}`);
-    const value = await res.json();
+    const value = await readApiResponse(res);
     if (!res.ok) throw new Error(value.error);
     current.current = value;
     setData(value);
@@ -101,9 +100,10 @@ export function SessionRunner({ id }: { id: string }) {
     let active = true;
     async function start() {
       try {
-        const s = await read();
+        if (initialRead.current?.id !== id) initialRead.current = { id, promise: read() };
+        const s = await initialRead.current.promise;
         if (!active) return;
-        const actor = await (await fetch('/api/me')).json();
+        const actor = s.viewer;
         const stored =
           actor.id === s.studentId ? await loadPending(s.studentId, id).catch(() => []) : [];
         queue.current = stored;
@@ -126,9 +126,7 @@ export function SessionRunner({ id }: { id: string }) {
           );
           for (const set of exercise.sets) {
             const existing = execution?.sets.find((v) => v.prescriptionSetId === set.id);
-            const previous =
-              last?.sets.find((v) => v.prescription?.position === set.position) ??
-              last?.sets[set.position];
+            const previous = last?.sets.find((v) => v.prescription?.position === set.position);
             const v = existing ?? previous;
             values[set.id] = {
               actualReps: v?.actualReps ?? null,
@@ -149,14 +147,20 @@ export function SessionRunner({ id }: { id: string }) {
               rir: q.body.rir as number | null,
             };
         setInputs(values);
+        for (const exercise of s.exercises)
+          for (const set of exercise.sets)
+            lastSaved.current.set(
+              set.prescriptionSetId,
+              JSON.stringify({
+                actualReps: set.actualReps,
+                actualKg: set.actualKg == null ? null : Number(set.actualKg),
+                actualSeconds: set.actualSeconds,
+                rpe: set.rpe == null ? null : Number(set.rpe),
+                rir: set.rir,
+                completed: !!set.completedAt,
+              }),
+            );
         setViewer(actor);
-        const saved =
-          actor.id === s.studentId ? localStorage.getItem('pulso-rest:' + s.studentId) : null;
-        if (saved) {
-          const value = JSON.parse(saved) as Rest;
-          if (value.sessionId === id) setRest(value);
-        }
-        hydrated.current = true;
         void flush();
       } catch (e) {
         setMessage(e instanceof Error ? e.message : 'Falha ao carregar.');
@@ -165,7 +169,6 @@ export function SessionRunner({ id }: { id: string }) {
     void start();
     const online = () => void flush();
     window.addEventListener('online', online);
-    const timer = setInterval(() => setTick(Date.now()), 500);
     const prevent = (e: BeforeUnloadEvent) => {
       if (queue.current.length) {
         e.preventDefault();
@@ -175,29 +178,16 @@ export function SessionRunner({ id }: { id: string }) {
     window.addEventListener('beforeunload', prevent);
     return () => {
       active = false;
-      clearInterval(timer);
       window.removeEventListener('online', online);
       window.removeEventListener('beforeunload', prevent);
     };
   }, [id]);
-  useEffect(() => {
-    if (rest && data) localStorage.setItem('pulso-rest:' + data.studentId, JSON.stringify(rest));
-  }, [rest, data]);
-  const remaining = rest ? (rest.paused ?? Math.max(0, Math.ceil((rest.end - tick) / 1000))) : 0;
-  useEffect(() => {
-    if (rest && remaining === 0 && rest.paused === null) {
-      setMessage('Descanso concluído.');
-      if ('Notification' in window && Notification.permission === 'granted')
-        new Notification('Pulso Fit', { body: 'Seu descanso terminou.' });
-      setRest(undefined);
-      if (data) localStorage.removeItem('pulso-rest:' + data.studentId);
-    }
-  }, [remaining, rest, data]);
   async function flush() {
-    if (flushing.current || !current.current || !navigator.onLine) return;
+    if (flushing.current || !current.current || !navigator.onLine || !queue.current.length) return;
     flushing.current = true;
     setBusy(true);
     let synced = false;
+    let changed = false;
     try {
       while (queue.current.length) {
         const entry = queue.current[0];
@@ -207,7 +197,7 @@ export function SessionRunner({ id }: { id: string }) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(entry.body),
         });
-        const result = await res.json();
+        const result = await readApiResponse(res);
         if (!res.ok) {
           if (res.status === 409) {
             const server = await read();
@@ -234,18 +224,46 @@ export function SessionRunner({ id }: { id: string }) {
               );
           } else throw new Error(result.error);
         }
+        if (res.ok && current.current) {
+          const before = current.current;
+          const next: Session = {
+            ...before,
+            ...(result.session ?? {}),
+            revision: result.revision ?? before.revision,
+          };
+          if (result.set)
+            next.exercises = before.exercises.map((e) =>
+              e.prescriptionExerciseId === result.prescriptionExerciseId
+                ? {
+                    ...e,
+                    status: 'EXECUTED',
+                    sets: [
+                      ...e.sets.filter((s) => s.prescriptionSetId !== result.set.prescriptionSetId),
+                      result.set,
+                    ],
+                  }
+                : e,
+            );
+          if (result.exercise)
+            next.exercises = before.exercises.map((e) =>
+              e.id === result.exercise.id ? { ...e, ...result.exercise } : e,
+            );
+          current.current = next;
+          changed = true;
+        }
         queue.current.shift();
         persistence.current.delete(entry.key);
         await deletePending(entry.key).catch(() => {});
         setPending(queue.current.length);
       }
-      const refreshed = await read();
-      if (!queue.current.length) revision.current = refreshed.revision;
+      if (changed && current.current) setData(current.current);
+      if (!queue.current.length && current.current) revision.current = current.current.revision;
       synced = true;
       setMessage(queue.current.length ? 'Sincronizando registros…' : 'Dados sincronizados.');
     } catch (e) {
       setMessage(e instanceof Error ? e.message : 'Sem conexão. Pendências mantidas.');
     } finally {
+      if (changed && current.current) setData(current.current);
       flushing.current = false;
       setBusy(false);
       if (synced && queue.current.length) void flush();
@@ -283,14 +301,10 @@ export function SessionRunner({ id }: { id: string }) {
       setMessage('Informe repetições ou duração executada.');
       return;
     }
+    const signature = JSON.stringify({ ...input, completed });
+    if (lastSaved.current.get(set.id) === signature) return;
+    lastSaved.current.set(set.id, signature);
     await enqueue('sets', { prescriptionSetId: set.id, ...input, completed });
-    if (completed && set.restSeconds > 0)
-      setRest({
-        sessionId: id,
-        end: Date.now() + set.restSeconds * 1000,
-        paused: null,
-        duration: set.restSeconds,
-      });
   }
   if (!data)
     return (
@@ -308,7 +322,7 @@ export function SessionRunner({ id }: { id: string }) {
   return (
     <WorkflowShell title={data.day.name}>
       <p className="muted">
-        {data.version.program.name} • versão {data.version.number} •{' '}
+        {data.version.program.name} •{' '}
         {writable ? 'Em andamento' : data.status === 'COMPLETED' ? 'Concluído' : 'Interrompido'}
       </p>
       <p>{data.day.notes}</p>
@@ -342,10 +356,12 @@ export function SessionRunner({ id }: { id: string }) {
               </button>
               <button
                 className="danger"
+                disabled={busy}
                 style={{ marginLeft: 10 }}
                 onClick={async () => {
                   for (const q of queue.current) await deletePending(q.key).catch(() => {});
                   queue.current = [];
+                  lastSaved.current.clear();
                   setPending(0);
                   await read();
                   setMessage('Pendências descartadas; confira o histórico no servidor.');
@@ -477,10 +493,6 @@ export function SessionRunner({ id }: { id: string }) {
                                 },
                               }))
                             }
-                            onBlur={() => {
-                              if (writable && hydrated.current)
-                                void saveSet(set, !!logged?.completedAt);
-                            }}
                           />
                         </label>
                       ))}
@@ -489,7 +501,6 @@ export function SessionRunner({ id }: { id: string }) {
                       <button
                         className={logged?.completedAt ? 'secondary' : ''}
                         style={{ marginTop: 14 }}
-                        disabled={busy}
                         onClick={() => void saveSet(set, true)}
                       >
                         {logged?.completedAt ? 'Salvar ajustes da série' : 'Concluir série'}
@@ -513,34 +524,6 @@ export function SessionRunner({ id }: { id: string }) {
                 >
                   {execution?.status === 'SKIPPED' ? 'Retomar exercício' : 'Ignorar exercício'}
                 </button>
-                <label>
-                  Substituir no registro
-                  <select
-                    value=""
-                    onFocus={() => {
-                      if (!catalog.length)
-                        fetch('/api/exercises')
-                          .then((r) => r.json())
-                          .then((v) => setCatalog(v.items ?? []));
-                    }}
-                    onChange={(e) => {
-                      if (e.target.value)
-                        void enqueue('exercise', {
-                          prescriptionExerciseId: exercise.id,
-                          status: 'SUBSTITUTED',
-                          substituteId: e.target.value,
-                          notes: '',
-                        });
-                    }}
-                  >
-                    <option value="">Selecione uma alternativa</option>
-                    {catalog.map((e) => (
-                      <option value={e.id} key={e.id}>
-                        {e.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
               </div>
             )}
           </section>
@@ -589,7 +572,7 @@ export function SessionRunner({ id }: { id: string }) {
             </label>
             <label>
               Encerramento
-              <select name="status">
+              <select name="status" aria-label="Encerramento">
                 <option value="COMPLETED">Treino concluído</option>
                 <option value="INTERRUPTED">Treino interrompido</option>
               </select>
@@ -609,105 +592,6 @@ export function SessionRunner({ id }: { id: string }) {
             Consultar evolução
           </Link>
         </section>
-      )}
-      {viewer?.role === 'PROFESSIONAL' && (
-        <section className="card" style={{ marginTop: 20 }}>
-          <h2>Responder ao aluno</h2>
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              const text = String(new FormData(e.currentTarget).get('text'));
-              const res = await fetch(`/api/sessions/${id}/reply`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text }),
-              });
-              const result = await res.json();
-              setMessage(result.message ?? result.error);
-              if (res.ok) await read();
-            }}
-          >
-            <label>
-              Orientação
-              <textarea name="text" required maxLength={2000} />
-            </label>
-            <button style={{ marginTop: 12 }}>Enviar orientação</button>
-          </form>
-        </section>
-      )}
-      {data.feedbackReplies.length > 0 && (
-        <section className="card" style={{ marginTop: 20 }}>
-          <h2>Orientações profissionais</h2>
-          {data.feedbackReplies.map((r) => (
-            <p key={r.id}>
-              {r.text}{' '}
-              <span className="muted small">
-                {new Date(r.createdAt).toLocaleDateString('pt-BR')}
-              </span>
-            </p>
-          ))}
-        </section>
-      )}
-      {rest && (
-        <div className="timer row wrap" role="status">
-          <div>
-            <span className="eyebrow">Descanso</span>
-            <br />
-            <strong>
-              {Math.floor(remaining / 60)}:{String(remaining % 60).padStart(2, '0')}
-            </strong>
-          </div>
-          <button
-            className="secondary"
-            onClick={() =>
-              setRest((v) =>
-                v
-                  ? {
-                      ...v,
-                      paused: v.paused === null ? remaining : null,
-                      end: v.paused === null ? v.end : Date.now() + v.paused * 1000,
-                    }
-                  : undefined,
-              )
-            }
-          >
-            {rest.paused === null ? 'Pausar' : 'Continuar'}
-          </button>
-          <button
-            className="secondary"
-            onClick={() => {
-              setRest(undefined);
-              localStorage.removeItem('pulso-rest:' + data.studentId);
-            }}
-          >
-            Encerrar descanso
-          </button>
-          <label>
-            Tempo (s)
-            <input
-              type="number"
-              min="0"
-              max="3600"
-              defaultValue={rest.duration}
-              onChange={(e) =>
-                setRest({
-                  sessionId: id,
-                  duration: Number(e.target.value),
-                  paused: null,
-                  end: Date.now() + Number(e.target.value) * 1000,
-                })
-              }
-            />
-          </label>
-          <button
-            className="secondary"
-            onClick={() => {
-              if ('Notification' in window) void Notification.requestPermission();
-            }}
-          >
-            Ativar alertas
-          </button>
-        </div>
       )}
     </WorkflowShell>
   );

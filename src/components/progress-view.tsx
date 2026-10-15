@@ -15,8 +15,6 @@ type Entry = {
 };
 export function ProgressView() {
   const [role, setRole] = useState('');
-  const [students, setStudents] = useState<{ id: string; profile: { name: string } }[]>([]);
-  const [student, setStudent] = useState('');
   const [entries, setEntries] = useState<Entry[]>([]);
   const [sessions, setSessions] = useState<
     { id: string; status: string; startedAt: string; day: { name: string } }[]
@@ -29,25 +27,14 @@ export function ProgressView() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch('/api/workouts');
+        const res = await fetch('/api/workspace');
         const value = await res.json();
         if (!res.ok) throw new Error(value.error);
         setRole(value.role);
-        setStudents(value.students);
-        const latest = value.assigned.filter(
-          (
-            a: { version: { programId: string; number: number } },
-            _: number,
-            all: { version: { programId: string; number: number } }[],
-          ) =>
-            !all.some(
-              (b) =>
-                b.version.programId === a.version.programId && b.version.number > a.version.number,
-            ),
+        const suggested = value.days.reduce(
+          (sum: number, day: { suggestedDays: number[] }) => sum + day.suggestedDays.length,
+          0,
         );
-        const suggested = latest
-          .flatMap((a: { version: { days: { suggestedDays: number[] }[] } }) => a.version.days)
-          .reduce((sum: number, d: { suggestedDays: number[] }) => sum + d.suggestedDays.length, 0);
         setPlanned(suggested || null);
       } catch (e) {
         setMessage(e instanceof Error ? e.message : 'Falha na conexão.');
@@ -56,11 +43,11 @@ export function ProgressView() {
     void load();
   }, []);
   useEffect(() => {
-    if (!role || (role === 'PROFESSIONAL' && !student)) return;
+    if (!role) return;
     const controller = new AbortController();
     async function load() {
       try {
-        const params = student ? '?studentId=' + student : '';
+        const params = '';
         const [res, history] = await Promise.all([
           fetch('/api/progress' + params, { signal: controller.signal }),
           fetch('/api/sessions' + params, { signal: controller.signal }),
@@ -78,7 +65,7 @@ export function ProgressView() {
     }
     void load();
     return () => controller.abort();
-  }, [role, student]);
+  }, [role]);
   const localDate = (value: string) => {
     const d = new Date(value);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -118,26 +105,6 @@ export function ProgressView() {
         <p className="message" role="status">
           {message}
         </p>
-      )}
-      {role === 'PROFESSIONAL' && (
-        <label className="card">
-          Aluno vinculado
-          <select
-            value={student}
-            onChange={(e) => {
-              setStudent(e.target.value);
-              setEntries([]);
-              setSessions([]);
-            }}
-          >
-            <option value="">Selecione um aluno autorizado</option>
-            {students.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.profile.name}
-              </option>
-            ))}
-          </select>
-        </label>
       )}
       <div className="stats" style={{ marginTop: 24 }}>
         <div className="card stat">

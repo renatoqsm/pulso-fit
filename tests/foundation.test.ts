@@ -14,7 +14,7 @@ assert.ok(
 );
 
 test(
-  'Fluxos integrados: identidade, treinos, nutrição e privacidade',
+  'Fluxos integrados: identidade, treino individual e privacidade',
   { timeout: 120000 },
   async (t) => {
     assert.ok(
@@ -124,8 +124,8 @@ test(
       for (const [client, role, label] of [
         [student, 'STUDENT', 'Aluno'],
         [student2, 'STUDENT', 'Aluno Dois'],
-        [pro, 'PROFESSIONAL', 'Treinadora'],
-        [outsider, 'PROFESSIONAL', 'Outro profissional'],
+        [pro, 'STUDENT', 'Ex Professora'],
+        [outsider, 'STUDENT', 'Outro aluno'],
       ] as const) {
         assert.equal(
           (
@@ -185,205 +185,106 @@ test(
       );
     });
     const studentId = (await student.request('me')).data.id;
-    let credentialId = '',
-      inviteToken = '',
-      linkId = '';
     await t.test(
-      'Habilitação pendente não autoriza convites; somente administrador revisa',
+      'Dieta e professor estão desativados, inclusive para vínculos antigos',
       async () => {
         assert.equal(
           (
-            await student.request('credentials', {
-              area: 'TRAINING',
-              registration: 'CREF 123',
-              region: 'SP',
+            await anon.request('auth/register', {
+              email: `pro-blocked-${suffix}@example.test`,
+              password,
+              name: 'Professor',
+              role: 'PROFESSIONAL',
             })
           ).status,
-          403,
+          400,
         );
-        assert.equal(
-          (
-            await pro.request('credentials', {
-              area: 'TRAINING',
-              registration: 'CREF 123',
-              region: 'SP',
-            })
-          ).status,
-          200,
-        );
-        assert.equal((await pro.request('invitations', { area: 'TRAINING' })).status, 403);
-        const panel = await pro.request('dashboard');
-        credentialId = panel.data.credentials[0].id;
-        assert.equal(
-          (
-            await pro.request('admin/review', {
-              id: credentialId,
-              status: 'VERIFIED',
-              confirmed: true,
-            })
-          ).status,
-          403,
-        );
+        const legacyId = (await pro.request('me')).data.id;
+        await db.user.update({ where: { id: legacyId }, data: { role: 'PROFESSIONAL' } });
+        assert.equal((await pro.request('me')).data.role, 'STUDENT');
+        await db.professionalCredential.create({
+          data: {
+            professionalId: legacyId,
+            area: 'TRAINING',
+            registration: 'CREF fixture legado',
+            region: 'SP',
+            status: 'VERIFIED',
+          },
+        });
+        const legacyInvite = await db.invitation.create({
+          data: {
+            professionalId: legacyId,
+            area: 'TRAINING',
+            tokenHash: crypto.randomUUID(),
+            expiresAt: new Date(Date.now() + 86400000),
+            consumedAt: new Date(),
+          },
+        });
+        const legacyLink = await db.professionalStudentLink.create({
+          data: {
+            professionalId: legacyId,
+            studentId,
+            area: 'TRAINING',
+            invitationId: legacyInvite.id,
+          },
+        });
+        await db.accessConsent.create({
+          data: { linkId: legacyLink.id, scope: 'TRAINING_HISTORY' },
+        });
+        for (const client of [student, pro]) {
+          for (const path of [
+            'foods',
+            'nutrition',
+            'meals',
+            'invitations/test',
+            'students/' + studentId,
+          ])
+            assert.equal((await client.request(path)).status, 404);
+          for (const path of [
+            'foods/create',
+            'nutrition/create',
+            'meals/save',
+            'credentials',
+            'invitations',
+            'links/accept',
+            'admin/review',
+          ])
+            assert.equal((await client.request(path, {})).status, 404);
+          assert.equal(
+            (
+              await client.request(
+                'progress?studentId=' + (client === student ? legacyId : studentId),
+              )
+            ).status,
+            403,
+          );
+          assert.deepEqual((await client.request('workspace')).data.modules, ['TRAINING']);
+        }
         const adminEmail = `admin-${suffix}@example.test`;
-        const adminRecord = await db.user.create({
+        const record = await db.user.create({
           data: {
             email: adminEmail,
             passwordHash: await hashPassword(password),
             role: 'ADMIN',
+            adminPermissions: ['MANAGE_CATALOG'],
             profile: { create: { name: 'Operador teste' } },
           },
         });
-        const testSecret = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ';
+        const secret = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ';
         await db.user.update({
-          where: { id: adminRecord.id },
-          data: { mfaEnabled: true, ...(await encryptMfa(testSecret, password, adminRecord.id)) },
+          where: { id: record.id },
+          data: { mfaEnabled: true, ...(await encryptMfa(secret, password, record.id)) },
         });
         assert.equal(
           (
             await admin.request('auth/login', {
               email: adminEmail,
               password,
-              code: await totp(testSecret, Math.floor(Date.now() / 30000)),
+              code: await totp(secret, Math.floor(Date.now() / 30000)),
             })
           ).status,
           200,
         );
-        assert.equal(
-          (
-            await admin.request('admin/review', {
-              id: credentialId,
-              status: 'VERIFIED',
-              confirmed: true,
-            })
-          ).status,
-          200,
-        );
-        assert.equal(
-          (
-            await admin.request('admin/review', {
-              id: credentialId,
-              status: 'VERIFIED',
-              confirmed: true,
-            })
-          ).status,
-          409,
-        );
-        assert.equal((await pro.request('invitations', { area: 'NUTRITION' })).status, 403);
-        const invite = await pro.request('invitations', { area: 'TRAINING' });
-        assert.equal(invite.status, 200);
-        inviteToken = invite.data.token;
-        assert.match(inviteToken, /^[a-f0-9]{64}$/);
-        assert.equal(
-          (await db.invitation.findFirst({ where: { professionalId: panel.data.user.id } }))
-            ?.tokenHash === inviteToken,
-          false,
-        );
-      },
-    );
-    await t.test(
-      'Aceite exige consentimento específico; vínculo e auditoria persistem',
-      async () => {
-        assert.equal((await student.request(`invitations/${inviteToken}`)).data.area, 'TRAINING');
-        assert.equal(
-          (
-            await student.request('links/accept', {
-              token: inviteToken,
-              scope: 'NUTRITION_HISTORY',
-              consent: true,
-            })
-          ).status,
-          400,
-        );
-        assert.equal(
-          (
-            await student.request('links/accept', {
-              token: inviteToken,
-              scope: 'TRAINING_HISTORY',
-              consent: false,
-            })
-          ).status,
-          400,
-        );
-        assert.equal(
-          (
-            await student.request('links/accept', {
-              token: inviteToken,
-              scope: 'TRAINING_HISTORY',
-              consent: true,
-            })
-          ).status,
-          200,
-        );
-        const panel = await student.request('dashboard');
-        linkId = panel.data.links[0].id;
-        assert.equal(panel.data.links[0].consents[0].scope, 'TRAINING_HISTORY');
-        assert.equal(
-          (
-            await student2.request('links/accept', {
-              token: inviteToken,
-              scope: 'TRAINING_HISTORY',
-              consent: true,
-            })
-          ).status,
-          404,
-        );
-        assert.ok((await db.auditLog.count({ where: { resourceId: linkId } })) > 0);
-      },
-    );
-    await t.test(
-      'Isolamento: área errada, profissional sem vínculo e administrador sem acesso',
-      async () => {
-        assert.equal((await pro.request(`students/${studentId}?area=TRAINING`)).status, 200);
-        assert.equal((await pro.request(`students/${studentId}?area=NUTRITION`)).status, 403);
-        assert.equal((await outsider.request(`students/${studentId}?area=TRAINING`)).status, 403);
-        assert.equal((await admin.request(`students/${studentId}?area=TRAINING`)).status, 403);
-        assert.equal((await student2.request('links/revoke', { id: linkId })).status, 404);
-      },
-    );
-    await t.test('Revogação remove acesso e preserva vínculo e auditoria', async () => {
-      assert.equal((await student.request('links/revoke', { id: linkId })).status, 200);
-      assert.equal((await pro.request(`students/${studentId}?area=TRAINING`)).status, 403);
-      assert.equal(
-        (await db.professionalStudentLink.findUnique({ where: { id: linkId } }))?.status,
-        'ENDED',
-      );
-      assert.ok((await db.accessConsent.findFirst({ where: { linkId } }))?.revokedAt);
-      assert.ok((await db.auditLog.count({ where: { resourceId: linkId } })) >= 2);
-    });
-    await t.test(
-      'Convite expirado e consumo concorrente não criam vínculos duplicados',
-      async () => {
-        const expired = await pro.request('invitations', { area: 'TRAINING' });
-        const { digest } = await import('../src/lib/crypto');
-        await db.invitation.update({
-          where: { tokenHash: await digest(expired.data.token) },
-          data: { expiresAt: new Date(Date.now() - 1000) },
-        });
-        assert.equal(
-          (
-            await student2.request('links/accept', {
-              token: expired.data.token,
-              scope: 'TRAINING_HISTORY',
-              consent: true,
-            })
-          ).status,
-          404,
-        );
-        const invite = await pro.request('invitations', { area: 'TRAINING' });
-        const results = await Promise.all([
-          student.request('links/accept', {
-            token: invite.data.token,
-            scope: 'TRAINING_HISTORY',
-            consent: true,
-          }),
-          student2.request('links/accept', {
-            token: invite.data.token,
-            scope: 'TRAINING_HISTORY',
-            consent: true,
-          }),
-        ]);
-        assert.equal(results.filter((r) => r.status === 200).length, 1);
-        assert.ok(results.some((r) => r.status === 404 || r.status === 409));
       },
     );
     await t.test('Importação real é idempotente e mantém procedência/licenças', async () => {
@@ -498,8 +399,8 @@ test(
         secondaryMuscleIds: [],
         equipmentIds: ['3'],
       };
-      assert.equal((await student.request('exercises/create', data)).status, 403);
-      assert.equal((await outsider.request('exercises/create', data)).status, 403);
+      assert.equal((await student.request('exercises/create', data)).status, 200);
+      assert.equal((await outsider.request('exercises/create', data)).status, 200);
       assert.equal(
         (await pro.request('exercises/create', { ...data, source: 'WGER' })).status,
         400,
@@ -541,33 +442,11 @@ test(
       );
     });
     let trainingVersion = '',
-      trainingSession = '',
-      nutritionVersion = '',
-      nutritionMeal = '',
-      nutFood = '',
-      mealLogId = '';
-    const nutritionist = new Client();
+      trainingSession = '';
     await t.test(
-      'Prescrições reais: vínculo, publicação, autoria e imutabilidade no banco',
+      'Prescrições reais: publicação pessoal, autoria e imutabilidade no banco',
       async () => {
-        if ((await pro.request(`students/${studentId}?area=TRAINING`)).status !== 200) {
-          const invite = await pro.request('invitations', { area: 'TRAINING' });
-          assert.equal(
-            (
-              await student.request('links/accept', {
-                token: invite.data.token,
-                scope: 'TRAINING_HISTORY',
-                consent: true,
-              })
-            ).status,
-            200,
-          );
-        }
-        assert.equal(
-          (await outsider.request('workouts/create', { name: 'Sem habilitação' })).status,
-          403,
-        );
-        const created = await pro.request('workouts/create', {
+        const created = await student.request('workouts/create', {
           name: `Programa ${suffix}`,
           template: true,
         });
@@ -604,19 +483,27 @@ test(
           ],
         };
         assert.equal(
-          (await pro.request(`workouts/${trainingVersion}/save`, { revision: 0, data: payload }))
-            .status,
+          (
+            await student.request(`workouts/${trainingVersion}/save`, {
+              revision: 0,
+              data: payload,
+            })
+          ).status,
           200,
         );
         assert.equal(
-          (await pro.request(`workouts/${trainingVersion}/save`, { revision: 0, data: payload }))
-            .status,
+          (
+            await student.request(`workouts/${trainingVersion}/save`, {
+              revision: 0,
+              data: payload,
+            })
+          ).status,
           409,
         );
-        assert.equal((await student.request(`workouts/version/${trainingVersion}`)).status, 404);
+        assert.equal((await student2.request(`workouts/version/${trainingVersion}`)).status, 404);
         assert.equal(
           (
-            await pro.request(`workouts/${trainingVersion}/publish`, {
+            await student.request(`workouts/${trainingVersion}/publish`, {
               revision: 1,
               studentIds: [studentId],
             })
@@ -624,18 +511,28 @@ test(
           200,
         );
         assert.equal((await student.request(`workouts/version/${trainingVersion}`)).status, 200);
+        const agenda = (await student.request('workspace')).data;
+        assert.deepEqual(agenda.days.find((d: { id: string }) => d.id).suggestedDays, [1, 3]);
+        assert.equal(agenda.days[0].exerciseCount, 1);
+        assert.equal(agenda.days[0].exercises, undefined);
         assert.equal((await outsider.request(`workouts/version/${trainingVersion}`)).status, 404);
         assert.equal(
-          (await pro.request(`workouts/${trainingVersion}/save`, { revision: 1, data: payload }))
-            .status,
+          (
+            await student.request(`workouts/${trainingVersion}/save`, {
+              revision: 1,
+              data: payload,
+            })
+          ).status,
           409,
         );
         assert.equal(
-          (await student.request(`workouts/${trainingVersion}/delete`, { confirmed: true })).status,
+          (await student2.request(`workouts/${trainingVersion}/delete`, { confirmed: true }))
+            .status,
           404,
         );
         assert.equal(
-          (await pro.request(`workouts/${trainingVersion}/delete`, { confirmed: false })).status,
+          (await student.request(`workouts/${trainingVersion}/delete`, { confirmed: false }))
+            .status,
           400,
         );
         const published = (await student.request(`workouts/version/${trainingVersion}`)).data;
@@ -650,7 +547,7 @@ test(
             data: { versionId: trainingVersion, name: 'Invasão', position: 99 },
           }),
         );
-        const copy = await pro.request(`workouts/${trainingVersion}/duplicate`, {});
+        const copy = await student.request(`workouts/${trainingVersion}/duplicate`, {});
         assert.equal(copy.status, 200);
         assert.notEqual(copy.data.versionId, trainingVersion);
       },
@@ -662,7 +559,7 @@ test(
       trainingSession = crypto.randomUUID();
       assert.equal(
         (await pro.request('sessions/start', { id: crypto.randomUUID(), dayId: day.id })).status,
-        403,
+        404,
       );
       const start = await student.request('sessions/start', { id: trainingSession, dayId: day.id });
       assert.equal(start.status, 200);
@@ -684,7 +581,22 @@ test(
         (await student2.request(`sessions/${trainingSession}/sets`, record)).status,
         403,
       );
-      assert.equal((await student.request(`sessions/${trainingSession}/sets`, record)).status, 200);
+      const saved = await student.request(`sessions/${trainingSession}/sets`, record);
+      assert.equal(saved.status, 200);
+      assert.equal(saved.data.set.actualReps, 10);
+      assert.equal(saved.data.set.actualKg, '25');
+      assert.equal(saved.data.revision, 1);
+      assert.equal(
+        (
+          await student.request(`sessions/${trainingSession}/exercise`, {
+            revision: 1,
+            prescriptionExerciseId: day.exercises[0].id,
+            status: 'SUBSTITUTED',
+            substituteId: globalId,
+          })
+        ).status,
+        400,
+      );
       assert.equal((await student.request(`sessions/${trainingSession}/sets`, record)).status, 409);
       const logged = (await student.request(`sessions/${trainingSession}`)).data;
       assert.equal(logged.exercises[0].sets.length, 1);
@@ -734,19 +646,23 @@ test(
             text: 'Orientação profissional de teste',
           })
         ).status,
-        200,
+        404,
       );
     });
     await t.test(
       'Revisões preservam sessões antigas e exibem a última execução válida',
       async () => {
-        const revised = await pro.request(`workouts/${trainingVersion}/revise`, {});
+        const revised = await student.request(`workouts/${trainingVersion}/revise`, {});
         assert.equal(revised.status, 200);
-        const v = (await pro.request(`workouts/version/${revised.data.versionId}`)).data;
+        const v = (await student.request(`workouts/version/${revised.data.versionId}`)).data;
         assert.equal(v.number, 2);
         assert.equal(
-          (await pro.request(`workouts/${v.id}/publish`, { revision: 0, studentIds: [studentId] }))
-            .status,
+          (
+            await student.request(`workouts/${v.id}/publish`, {
+              revision: 0,
+              studentIds: [studentId],
+            })
+          ).status,
           200,
         );
         const started = await student.request('sessions/start', {
@@ -772,298 +688,6 @@ test(
         assert.equal((await pro.request(`workouts/version/${own.data.versionId}`)).status, 404);
       },
     );
-    await t.test('Nutrição exige habilitação e consentimento independentes', async () => {
-      assert.equal((await pro.request('nutrition/create', { name: 'Plano indevido' })).status, 403);
-      assert.equal(
-        (
-          await nutritionist.request('auth/register', {
-            email: `nutri-${suffix}@example.test`,
-            password,
-            name: 'Nutricionista teste',
-            role: 'PROFESSIONAL',
-          })
-        ).status,
-        200,
-      );
-      assert.equal(
-        (
-          await nutritionist.request('credentials', {
-            area: 'NUTRITION',
-            registration: 'CRN Teste',
-            region: 'SP',
-          })
-        ).status,
-        200,
-      );
-      const credential = (await nutritionist.request('dashboard')).data.credentials[0];
-      assert.equal(
-        (
-          await admin.request('admin/review', {
-            id: credential.id,
-            status: 'VERIFIED',
-            confirmed: true,
-          })
-        ).status,
-        200,
-      );
-      const invitation = await nutritionist.request('invitations', { area: 'NUTRITION' });
-      assert.equal(
-        (
-          await student.request('links/accept', {
-            token: invitation.data.token,
-            scope: 'NUTRITION_HISTORY',
-            consent: true,
-          })
-        ).status,
-        200,
-      );
-      assert.equal((await nutritionist.request(`progress?studentId=${studentId}`)).status, 403);
-      const food = await nutritionist.request('foods/create', {
-        name: `Alimento de teste ${suffix}`,
-        referenceUnit: 'g',
-        nutrients: {
-          energy_kcal: '110.1234',
-          protein_g: '5.2',
-          carbohydrate_g: '15.4',
-          fat_g: '1.2',
-          fiber_g: null,
-        },
-        provenance: 'Rótulo sintético exclusivo do banco de testes',
-        measures: [
-          {
-            name: 'Porção de teste',
-            quantity: '50',
-            unit: 'g',
-            provenance: 'Quantidade informada no teste',
-          },
-        ],
-      });
-      assert.equal(food.status, 200);
-      nutFood = food.data.id;
-      const measured = await nutritionist.request('foods/recipe', {
-        name: 'Porção decimal de teste',
-        yieldQuantity: '100',
-        yieldUnit: 'g',
-        ingredients: [
-          {
-            foodId: nutFood,
-            quantity: '1.5',
-            unit: 'g',
-            measureId:
-              food.data.measures?.[0]?.id ??
-              (await nutritionist.request(`foods/${nutFood}`)).data.measures[0].id,
-          },
-        ],
-        provenance: 'Medida específica de teste',
-      });
-      assert.equal(measured.status, 200);
-      assert.equal(
-        (await nutritionist.request(`foods/${measured.data.id}`)).data.nutrients.energy_kcal,
-        '82.59255',
-      );
-
-      assert.equal((await student.request(`foods/${nutFood}`)).status, 404);
-      assert.equal(
-        (
-          await pro.request('foods/create', {
-            name: 'Alimento indevido',
-            referenceUnit: 'g',
-            nutrients: {},
-            provenance: 'Teste',
-          })
-        ).status,
-        403,
-      );
-      const recipe = await nutritionist.request('foods/recipe', {
-        name: 'Receita de teste',
-        yieldQuantity: '100',
-        yieldUnit: 'g',
-        ingredients: [{ foodId: nutFood, quantity: '50', unit: 'g' }],
-        provenance: 'Ingredientes e rendimento de teste',
-      });
-      assert.equal(recipe.status, 200);
-      assert.equal(
-        (await nutritionist.request(`foods/${recipe.data.id}`)).data.nutrients.energy_kcal,
-        '55.0617',
-      );
-      assert.equal(
-        (
-          await nutritionist.request('foods/recipe', {
-            name: 'Conversão indevida',
-            yieldQuantity: '100',
-            yieldUnit: 'g',
-            ingredients: [{ foodId: nutFood, quantity: '50', unit: 'ml' }],
-            provenance: 'Teste',
-          })
-        ).status,
-        400,
-      );
-    });
-    await t.test(
-      'Planos alimentares versionados calculam quantidades sem alterar registros antigos',
-      async () => {
-        const created = await nutritionist.request('nutrition/create', { name: 'Plano de teste' });
-        assert.equal(created.status, 200);
-        nutritionVersion = created.data.versionId;
-        const plan = {
-          objective: 'Objetivo definido pelo profissional de teste',
-          notes: 'Orientação de teste',
-          meals: [
-            {
-              name: 'Almoço',
-              time: '12:00',
-              notes: 'Orientação',
-              items: [
-                {
-                  foodId: nutFood,
-                  quantity: '50',
-                  unit: 'g',
-                  substitutions: [{ foodId: nutFood, quantity: '100', unit: 'g' }],
-                },
-              ],
-            },
-          ],
-        };
-        assert.equal(
-          (
-            await nutritionist.request(`nutrition/${nutritionVersion}/save`, {
-              revision: 0,
-              data: plan,
-            })
-          ).status,
-          200,
-        );
-        assert.equal(
-          (
-            await nutritionist.request(`nutrition/${nutritionVersion}/publish`, {
-              revision: 1,
-              studentIds: [studentId],
-            })
-          ).status,
-          200,
-        );
-        const v = (await student.request(`nutrition/version/${nutritionVersion}`)).data;
-        nutritionMeal = v.meals[0].id;
-        assert.equal(v.totals.energy_kcal, '55.0617');
-        assert.equal(v.totals.fiber_g, null);
-        assert.equal((await outsider.request(`nutrition/version/${nutritionVersion}`)).status, 404);
-        await assert.rejects(
-          db.nutritionMealItem.update({
-            where: { id: v.meals[0].items[0].id },
-            data: { quantity: 999 },
-          }),
-        );
-        assert.equal(
-          (
-            await nutritionist.request(`nutrition/${nutritionVersion}/save`, {
-              revision: 1,
-              data: plan,
-            })
-          ).status,
-          409,
-        );
-        assert.equal(
-          (await nutritionist.request(`nutrition/${nutritionVersion}/revise`, {})).status,
-          200,
-        );
-        assert.equal(
-          (
-            await nutritionist.request(`foods/${nutFood}/update`, {
-              name: 'Rótulo revisado de teste',
-              referenceUnit: 'g',
-              nutrients: { energy_kcal: '999', protein_g: '50', carbohydrate_g: '20', fat_g: '10' },
-              provenance: 'Revisão posterior de teste',
-            })
-          ).status,
-          200,
-        );
-        assert.equal(
-          (await student.request(`nutrition/version/${nutritionVersion}`)).data.totals.energy_kcal,
-          '55.0617',
-        );
-      },
-    );
-    await t.test(
-      'Diário preserva a prescrição, evita duplicidades e isola as áreas profissionais',
-      async () => {
-        mealLogId = crypto.randomUUID();
-        const entry = {
-          id: mealLogId,
-          revision: 0,
-          date: '2026-10-14',
-          mealName: 'Almoço real de teste',
-          prescribedMealId: nutritionMeal,
-          consumed: true,
-          notes: 'Quantidade consumida',
-          items: [{ foodId: nutFood, quantity: '50', unit: 'g' }],
-        };
-        assert.equal((await student.request('meals/save', entry)).status, 200);
-        assert.equal((await student.request('meals/save', entry)).status, 409);
-        const daily = await student.request('meals?date=2026-10-14');
-        assert.equal(daily.data.logs.length, 1);
-        assert.equal(daily.data.totals.energy_kcal, '55.0617');
-        assert.equal(daily.data.totals.fiber_g, null);
-        assert.equal(
-          (
-            await student.request('meals/save', {
-              ...entry,
-              revision: 1,
-              items: [{ foodId: nutFood, quantity: '100', unit: 'g' }],
-            })
-          ).status,
-          200,
-        );
-        assert.equal(
-          (await student.request('meals?date=2026-10-14')).data.totals.energy_kcal,
-          '110.1234',
-        );
-        assert.equal(
-          (await student.request(`nutrition/version/${nutritionVersion}`)).data.meals[0].items[0]
-            .quantity,
-          '50',
-        );
-        assert.equal(
-          (await pro.request(`meals?date=2026-10-14&studentId=${studentId}`)).status,
-          403,
-        );
-        assert.equal(
-          (await nutritionist.request(`meals?date=2026-10-14&studentId=${studentId}`)).status,
-          200,
-        );
-        assert.equal(
-          (await pro.request(`meals/${mealLogId}/reply`, { text: 'Comentário indevido' })).status,
-          403,
-        );
-        assert.equal(
-          (
-            await nutritionist.request(`meals/${mealLogId}/reply`, {
-              text: 'Feedback nutricional de teste',
-            })
-          ).status,
-          200,
-        );
-        assert.equal(
-          (
-            await student.request('meals/save', {
-              ...entry,
-              id: crypto.randomUUID(),
-              date: '2026-99-99',
-            })
-          ).status,
-          400,
-        );
-        const panel = (await student.request('dashboard')).data;
-        const link = panel.links.find(
-          (l: { area: string; status: string }) => l.area === 'NUTRITION' && l.status === 'ACTIVE',
-        );
-        assert.equal((await student.request('links/revoke', { id: link.id })).status, 200);
-        assert.equal(
-          (await nutritionist.request(`meals?date=2026-10-14&studentId=${studentId}`)).status,
-          403,
-        );
-        assert.equal((await student.request('meals?date=2026-10-14')).status, 200);
-      },
-    );
     await t.test(
       'Foto privada, exportação própria e alteração de senha protegem a conta',
       async () => {
@@ -1079,6 +703,11 @@ test(
         assert.equal(owned.status, 200);
         assert.equal(owned.headers.get('content-type'), 'image/png');
         assert.equal((await outsider.request(`media/${photo.data.photoId}`)).status, 404);
+        assert.equal(
+          (await pro.request(`media/${photo.data.photoId}`)).status,
+          404,
+          'Vínculo legado não libera fotos',
+        );
         assert.equal((await admin.request(`media/${photo.data.photoId}`)).status, 404);
         assert.equal(
           (
@@ -1093,7 +722,10 @@ test(
         assert.equal(exported.status, 200);
         assert.equal(exported.data.user.id, studentId);
         assert.ok(exported.data.workoutSessions.length);
-        assert.ok(exported.data.mealLogs.length);
+        assert.ok(
+          Array.isArray(exported.data.mealLogs),
+          'Exportação mantém compatibilidade com dados históricos',
+        );
         assert.equal(JSON.stringify(exported.data).includes('passwordHash'), false);
         assert.equal(JSON.stringify(exported.data).includes('tokenHash'), false);
         const old = new Client();

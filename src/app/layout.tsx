@@ -3,8 +3,8 @@ import './globals.css';
 import { PwaRegistration } from '@/components/pwa-registration';
 export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
-  title: 'Pulso Fit | Treino e nutrição',
-  description: 'Sua rotina, com acompanhamento profissional e autonomia.',
+  title: 'Pulso Fit | Seu treino',
+  description: 'Monte seus treinos, escolha os dias e acompanhe sua evolução.',
 };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

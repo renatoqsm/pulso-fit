@@ -13,9 +13,9 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
             <br />
             Uma nova rotina amanhã.
           </h1>
-          <p>Seu espaço para conectar saúde, movimento e acompanhamento profissional.</p>
+          <p>Monte seu treino e acompanhe cada conquista.</p>
         </div>
-        <p className="small">Pulso Fit • Treino e nutrição com você no controle.</p>
+        <p className="small">Pulso Fit • Seus treinos, no seu ritmo.</p>
       </aside>
       <section className="auth-main">{children}</section>
     </main>

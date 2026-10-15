@@ -2,13 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-export function AuthForm({
-  mode,
-  professional = false,
-}: {
-  mode: 'login' | 'register';
-  professional?: boolean;
-}) {
+export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -39,7 +33,7 @@ export function AuthForm({
       <h1>{mode === 'login' ? 'Bom ter você de volta.' : 'Vamos começar?'}</h1>
       <p className="muted">
         {mode === 'login'
-          ? 'Entre para acompanhar suas conexões.'
+          ? 'Entre para acompanhar seus treinos.'
           : 'Crie sua conta e construa sua rotina.'}
       </p>
       {mode === 'register' && (
@@ -55,13 +49,7 @@ export function AuthForm({
               autoComplete="name"
             />
           </div>
-          <div className="field">
-            <label htmlFor="role">Como você vai usar o Pulso Fit?</label>
-            <select id="role" name="role" defaultValue={professional ? 'PROFESSIONAL' : 'STUDENT'}>
-              <option value="STUDENT">Sou aluno / uso por conta própria</option>
-              <option value="PROFESSIONAL">Sou profissional</option>
-            </select>
-          </div>
+          <input type="hidden" name="role" value="STUDENT" />
         </>
       )}
       <div className="field">

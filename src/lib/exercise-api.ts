@@ -35,14 +35,8 @@ const relations = (userId: string) => ({
   equipment: { include: { equipment: true } },
   favorites: { where: { userId }, select: { userId: true } },
 });
-async function trainer(db: PrismaClient, user: User) {
-  if (
-    user.role !== 'PROFESSIONAL' ||
-    !(await db.professionalCredential.findFirst({
-      where: { professionalId: user.id, area: 'TRAINING', status: 'VERIFIED' },
-    }))
-  )
-    throw new HttpError(403, 'Uma habilitação de treinamento verificada é necessária.');
+async function trainer(_db: PrismaClient, user: User) {
+  if (user.role !== 'STUDENT') throw new HttpError(403, 'Crie exercícios na sua conta de aluno.');
 }
 export async function exerciseGet(db: PrismaClient, user: User, path: string, req: NextRequest) {
   if (path === 'exercises/meta') {
@@ -51,11 +45,7 @@ export async function exerciseGet(db: PrismaClient, user: User, path: string, re
       db.muscle.findMany({ orderBy: { name: 'asc' } }),
       db.equipment.findMany({ orderBy: { name: 'asc' } }),
     ]);
-    const trainerEnabled =
-      user.role === 'PROFESSIONAL' &&
-      !!(await db.professionalCredential.findFirst({
-        where: { professionalId: user.id, area: 'TRAINING', status: 'VERIFIED' },
-      }));
+    const trainerEnabled = user.role === 'STUDENT';
     return json({
       muscles,
       equipment,
@@ -176,7 +166,7 @@ export async function exercisePost(db: PrismaClient, user: User, path: string, b
   }
   if (exercise.source === 'CUSTOM') {
     await trainer(db, user);
-    if (exercise.ownerId !== user.id) throw new HttpError(403, 'Exercício de outro profissional.');
+    if (exercise.ownerId !== user.id) throw new HttpError(403, 'Exercício de outro usuário.');
   } else requireAdmin(user, 'MANAGE_CATALOG');
   if (action === 'status') {
     const { active } = z.object({ active: z.boolean() }).strict().parse(body);

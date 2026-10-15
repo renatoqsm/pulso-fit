@@ -3,20 +3,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { withDb } from '@/lib/db';
 import { currentUser, createSession, destroySession } from '@/lib/auth';
-import { digest, hashPassword, randomToken, verifyPassword } from '@/lib/crypto';
-import { scopeForArea, canAccessStudent } from '@/lib/access';
+import { digest, hashPassword, verifyPassword } from '@/lib/crypto';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 import { HttpError } from '@/lib/http-error';
 import { adminGet, adminPost } from '@/lib/admin-api';
-import { requireAdmin } from '@/lib/admin-permissions';
 import { accountGet, accountPost } from '@/lib/account-api';
 import { workspace } from '@/lib/workspace';
 import { workoutGet, workoutPost } from '@/lib/workout-api';
-import { nutritionGet, nutritionPost } from '@/lib/nutrition-api';
 import { exerciseGet, exercisePost } from '@/lib/exercise-api';
-const areaSchema = z.enum(['TRAINING', 'NUTRITION']);
 const identity = z.object({
   email: z
     .email()
@@ -26,12 +22,22 @@ const identity = z.object({
 });
 const register = identity.extend({
   name: z.string().trim().min(2).max(100),
-  role: z.enum(['STUDENT', 'PROFESSIONAL']),
+  role: z.literal('STUDENT').default('STUDENT'),
 });
 const ok = (data: unknown) => NextResponse.json(data, { headers: { 'Cache-Control': 'no-store' } });
 async function handle(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   try {
     const path = (await params).path.join('/');
+    if (
+      /^(foods|nutrition|meals|credentials|invitations|links|students)(\/|$)/.test(path) ||
+      path === 'admin/review' ||
+      path.startsWith('admin/credentials/') ||
+      /^sessions\/[^/]+\/reply$/.test(path)
+    )
+      throw new HttpError(
+        404,
+        'Recurso indisponível. O Pulso Fit agora é dedicado ao treino individual.',
+      );
     if (process.env.NODE_ENV === 'production' && !process.env.APP_URL)
       throw new HttpError(503, 'Origem da aplicação não configurada.');
     if (req.method === 'POST') {
@@ -115,8 +121,6 @@ async function handle(req: NextRequest, { params }: { params: Promise<{ path: st
         if (path.startsWith('account/')) return accountPost(db, user, path, body);
         if (path.startsWith('workouts/') || path.startsWith('sessions/'))
           return workoutPost(db, user, path, body);
-        if (path.startsWith('foods/') || path.startsWith('nutrition/') || path.startsWith('meals/'))
-          return nutritionPost(db, user, path, body);
         if (path.startsWith('exercises/') || path === 'admin/import-exercises')
           return exercisePost(db, user, path, body);
         if (path === 'profile') {
@@ -136,178 +140,6 @@ async function handle(req: NextRequest, { params }: { params: Promise<{ path: st
           });
           return ok({ message: 'Perfil atualizado.' });
         }
-        if (path === 'credentials') {
-          if (user.role !== 'PROFESSIONAL')
-            throw new HttpError(403, 'Recurso exclusivo de profissionais.');
-          const data = z
-            .object({
-              area: areaSchema,
-              registration: z.string().trim().min(3).max(80),
-              region: z.string().trim().min(2).max(40),
-            })
-            .parse(body);
-          // Already-reviewed records cannot be silently replaced.
-          await db.$transaction(async (tx) => {
-            const rejected = await tx.professionalCredential.findFirst({
-              where: { professionalId: user.id, area: data.area, status: 'REJECTED' },
-            });
-            let credential;
-            if (rejected) {
-              const changed = await tx.professionalCredential.updateMany({
-                where: { id: rejected.id, status: 'REJECTED' },
-                data: { ...data, status: 'PENDING', reviewerId: null, reviewedAt: null },
-              });
-              if (!changed.count) throw new HttpError(409, 'Registro alterado; recarregue.');
-              credential = rejected;
-            } else
-              credential = await tx.professionalCredential.create({
-                data: { ...data, professionalId: user.id },
-              });
-            await tx.auditLog.create({
-              data: { actorId: user.id, action: 'CREDENTIAL_SUBMITTED', resourceId: credential.id },
-            });
-          });
-          return ok({ message: 'Registro enviado para verificação.' });
-        }
-        if (path === 'admin/review') {
-          requireAdmin(user, 'VERIFY_CREDENTIALS');
-          const data = z
-            .object({
-              id: z.string().min(1),
-              status: z.enum(['VERIFIED', 'REJECTED']),
-              confirmed: z.literal(true),
-            })
-            .parse(body);
-          await db.$transaction(async (tx) => {
-            const result = await tx.professionalCredential.updateMany({
-              where: { id: data.id, status: 'PENDING' },
-              data: { status: data.status, reviewerId: user.id, reviewedAt: new Date() },
-            });
-            if (!result.count) throw new HttpError(409, 'Registro já revisado ou indisponível.');
-            await tx.auditLog.create({
-              data: { actorId: user.id, action: `CREDENTIAL_${data.status}`, resourceId: data.id },
-            });
-          });
-          return ok({ message: 'Verificação registrada.' });
-        }
-        if (path === 'invitations') {
-          if (user.role !== 'PROFESSIONAL')
-            throw new HttpError(403, 'Recurso exclusivo de profissionais.');
-          const { area } = z.object({ area: areaSchema }).parse(body);
-          const credential = await db.professionalCredential.findUnique({
-            where: { professionalId_area: { professionalId: user.id, area } },
-          });
-          if (credential?.status !== 'VERIFIED')
-            throw new HttpError(403, 'Esta habilitação ainda não foi verificada.');
-          const token = randomToken();
-          await db.$transaction(async (tx) => {
-            const invite = await tx.invitation.create({
-              data: {
-                professionalId: user.id,
-                area,
-                tokenHash: await digest(token),
-                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-              },
-            });
-            await tx.auditLog.create({
-              data: { actorId: user.id, action: 'INVITATION_CREATED', resourceId: invite.id },
-            });
-          });
-          return ok({
-            token,
-            url: `${process.env.APP_URL ?? new URL(req.url).origin}/convite/${token}`,
-            message: 'Convite válido por 7 dias, para um único aluno.',
-          });
-        }
-        if (path === 'links/accept') {
-          if (user.role !== 'STUDENT')
-            throw new HttpError(403, 'Somente alunos podem aceitar convites.');
-          const data = z
-            .object({
-              token: z.string().regex(/^[a-f0-9]{64}$/),
-              scope: z.enum(['TRAINING_HISTORY', 'NUTRITION_HISTORY']),
-              consent: z.literal(true),
-            })
-            .parse(body);
-          await db.$transaction(async (tx) => {
-            const invite = await tx.invitation.findUnique({
-              where: { tokenHash: await digest(data.token) },
-            });
-            if (!invite || invite.consumedAt || invite.expiresAt <= new Date())
-              throw new HttpError(404, 'Convite inválido, expirado ou utilizado.');
-            if (data.scope !== scopeForArea(invite.area))
-              throw new HttpError(400, 'Consentimento incompatível com a área.');
-            const credential = await tx.professionalCredential.findUnique({
-              where: {
-                professionalId_area: { professionalId: invite.professionalId, area: invite.area },
-              },
-            });
-            if (credential?.status !== 'VERIFIED')
-              throw new HttpError(403, 'Habilitação indisponível.');
-            const consumed = await tx.invitation.updateMany({
-              where: { id: invite.id, consumedAt: null, expiresAt: { gt: new Date() } },
-              data: { consumedAt: new Date() },
-            });
-            if (!consumed.count) throw new HttpError(409, 'Convite já utilizado.');
-            const existing = await tx.professionalStudentLink.findUnique({
-              where: {
-                studentId_professionalId_area: {
-                  studentId: user.id,
-                  professionalId: invite.professionalId,
-                  area: invite.area,
-                },
-              },
-            });
-            if (existing?.status === 'ACTIVE')
-              throw new HttpError(409, 'Este vínculo já está ativo.');
-            const link = await tx.professionalStudentLink.upsert({
-              where: {
-                studentId_professionalId_area: {
-                  studentId: user.id,
-                  professionalId: invite.professionalId,
-                  area: invite.area,
-                },
-              },
-              create: {
-                studentId: user.id,
-                professionalId: invite.professionalId,
-                area: invite.area,
-                invitationId: invite.id,
-              },
-              update: {
-                status: 'ACTIVE',
-                startedAt: new Date(),
-                endedAt: null,
-                invitationId: invite.id,
-              },
-            });
-            await tx.accessConsent.create({ data: { linkId: link.id, scope: data.scope } });
-            await tx.auditLog.create({
-              data: { actorId: user.id, action: 'LINK_CONSENT_GRANTED', resourceId: link.id },
-            });
-          });
-          return ok({ message: 'Vínculo ativado com seu consentimento.' });
-        }
-        if (path === 'links/revoke') {
-          const { id } = z.object({ id: z.string().min(1) }).parse(body);
-          await db.$transaction(async (tx) => {
-            const link = await tx.professionalStudentLink.findUnique({ where: { id } });
-            if (!link || (link.studentId !== user.id && link.professionalId !== user.id))
-              throw new HttpError(404, 'Vínculo não encontrado.');
-            await tx.professionalStudentLink.update({
-              where: { id },
-              data: { status: 'ENDED', endedAt: new Date() },
-            });
-            await tx.accessConsent.updateMany({
-              where: { linkId: id, revokedAt: null },
-              data: { revokedAt: new Date() },
-            });
-            await tx.auditLog.create({
-              data: { actorId: user.id, action: 'LINK_REVOKED', resourceId: id },
-            });
-          });
-          return ok({ message: 'Vínculo encerrado. Seu histórico é preservado.' });
-        }
         throw new HttpError(404, 'Recurso não encontrado.');
       });
     }
@@ -324,12 +156,6 @@ async function handle(req: NextRequest, { params }: { params: Promise<{ path: st
         path.startsWith('sessions/')
       )
         return workoutGet(db, user, path, req);
-      if (
-        ['foods', 'nutrition', 'meals'].includes(path) ||
-        path.startsWith('nutrition/') ||
-        path.startsWith('foods/')
-      )
-        return nutritionGet(db, user, path, req);
       if (path === 'exercises' || path.startsWith('exercises/'))
         return exerciseGet(db, user, path, req);
       if (path === 'me')
@@ -340,77 +166,10 @@ async function handle(req: NextRequest, { params }: { params: Promise<{ path: st
           mfaEnabled: user.mfaEnabled,
           profile: user.profile,
         });
-      if (path === 'dashboard') {
-        const credentials =
-          user.role === 'PROFESSIONAL'
-            ? await db.professionalCredential.findMany({
-                where: { professionalId: user.id },
-                select: { id: true, area: true, registration: true, region: true, status: true },
-              })
-            : [];
-        const links = await db.professionalStudentLink.findMany({
-          where:
-            user.role === 'STUDENT'
-              ? { studentId: user.id }
-              : user.role === 'PROFESSIONAL'
-                ? { professionalId: user.id }
-                : { id: 'none' },
-          include: {
-            student: { select: { id: true, profile: { select: { name: true } } } },
-            professional: { select: { id: true, profile: { select: { name: true } } } },
-            consents: { where: { revokedAt: null }, select: { scope: true } },
-          },
-          orderBy: { startedAt: 'desc' },
-        });
-        const pending =
-          user.role === 'ADMIN' &&
-          user.mfaEnabled &&
-          user.adminPermissions.includes('VERIFY_CREDENTIALS')
-            ? await db.professionalCredential.findMany({
-                where: { status: 'PENDING' },
-                include: { professional: { select: { profile: { select: { name: true } } } } },
-              })
-            : [];
+      if (path === 'dashboard')
         return ok({
-          user: {
-            id: user.id,
-            email: user.email,
-            role: user.role,
-            adminPermissions: user.adminPermissions,
-            profile: user.profile,
-          },
-          credentials,
-          links,
-          pending,
+          user: { id: user.id, email: user.email, role: user.role, profile: user.profile },
         });
-      }
-      if (path.startsWith('invitations/')) {
-        const token = path.split('/')[1];
-        if (!/^[a-f0-9]{64}$/.test(token)) throw new HttpError(404, 'Convite inválido.');
-        const invite = await db.invitation.findUnique({
-          where: { tokenHash: await digest(token) },
-          include: { professional: { select: { profile: { select: { name: true } } } } },
-        });
-        if (!invite || invite.consumedAt || invite.expiresAt <= new Date())
-          throw new HttpError(404, 'Convite inválido, expirado ou utilizado.');
-        return ok({
-          area: invite.area,
-          scope: scopeForArea(invite.area),
-          professional: invite.professional.profile?.name,
-          expiresAt: invite.expiresAt,
-        });
-      }
-      if (path.startsWith('students/')) {
-        const studentId = path.split('/')[1];
-        const area = areaSchema.parse(req.nextUrl.searchParams.get('area'));
-        if (user.role !== 'PROFESSIONAL' || !(await canAccessStudent(db, user.id, studentId, area)))
-          throw new HttpError(403, 'Você não possui acesso autorizado nesta área.');
-        const student = await db.user.findUnique({
-          where: { id: studentId },
-          select: { id: true, profile: { select: { name: true } } },
-        });
-        return ok({ student, area });
-      }
       throw new HttpError(404, 'Recurso não encontrado.');
     });
   } catch (error) {
