@@ -2884,6 +2884,23 @@
           "relationToFields": [],
           "isGenerated": false,
           "isUpdatedAt": false
+        },
+        {
+          "name": "removal",
+          "kind": "object",
+          "isList": false,
+          "isRequired": false,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "WorkoutProgramRemoval",
+          "nativeType": null,
+          "relationName": "WorkoutProgramToWorkoutProgramRemoval",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isGenerated": false,
+          "isUpdatedAt": false
         }
       ],
       "primaryKey": null,
@@ -6617,6 +6634,70 @@
       "uniqueFields": [],
       "uniqueIndexes": [],
       "isGenerated": false
+    },
+    {
+      "name": "WorkoutProgramRemoval",
+      "dbName": null,
+      "schema": null,
+      "fields": [
+        {
+          "name": "programId",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": true,
+          "hasDefaultValue": false,
+          "type": "String",
+          "nativeType": null,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "program",
+          "kind": "object",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "WorkoutProgram",
+          "nativeType": null,
+          "relationName": "WorkoutProgramToWorkoutProgramRemoval",
+          "relationFromFields": [
+            "programId"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "removedAt",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": true,
+          "type": "DateTime",
+          "nativeType": null,
+          "default": {
+            "name": "now",
+            "args": []
+          },
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": [],
+      "isGenerated": false
     }
   ],
   "types": [],
@@ -7506,6 +7587,16 @@
         },
         {
           "name": "status"
+        }
+      ]
+    },
+    {
+      "model": "WorkoutProgramRemoval",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "programId"
         }
       ]
     }

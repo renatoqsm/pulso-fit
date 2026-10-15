@@ -256,6 +256,7 @@ model WorkoutProgram {
   template Boolean @default(false)
   createdAt DateTime @default(now())
   versions WorkoutVersion[]
+  removal WorkoutProgramRemoval?
   @@index([authorId])
 }
 model WorkoutVersion {
@@ -523,4 +524,10 @@ model DeletionRequest {
   status String @default("PENDING_RETENTION_REVIEW")
   createdAt DateTime @default(now())
   @@index([userId,status])
+}
+
+model WorkoutProgramRemoval {
+  programId String @id
+  program WorkoutProgram @relation(fields:[programId],references:[id])
+  removedAt DateTime @default(now())
 }

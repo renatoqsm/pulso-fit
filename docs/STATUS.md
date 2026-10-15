@@ -121,3 +121,17 @@ Chromium em Node confirmou edição, persistência do nome da ficha, retomada pe
 Build OpenNext/TypeScript passou, e o fluxo de navegador também foi validado no workerd local. Os cenários de retomada e preservação da versão anterior passaram em ambos os runtimes. Nenhuma alteração da API ou migração de banco foi necessária.
 
 Publicação confirmada pela Cloudflare: versão `2c351b83-0b0b-4504-a3ff-cdcac5e74983` em `https://pulso-fit.renatoqsousam.workers.dev`.
+
+## Ficha atual única e exclusão de plano
+
+Conforme a preferência posterior do usuário, a interface de treinos não apresenta mais números, listas de versões ou prescrições anteriores. O botão único **Salvar ficha** salva as alterações e atualiza a prescrição corrente para os próximos treinos. A biblioteca mostra um plano atual, com editar, visualizar e excluir; rascunhos de edição existentes são retomados automaticamente. Os registros imutáveis usados por sessões anteriores são mantidos internamente para não reescrever o histórico, sem exigir gestão de versões pelo usuário.
+
+**Excluir plano** pede confirmação e retira o plano e suas fichas da biblioteca e das atribuições disponíveis. Bloqueia novas sessões nesse plano, enquanto sessões já registradas ou iniciadas continuam acessíveis ao respectivo usuário. A remoção é registrada separadamente na tabela WorkoutProgramRemoval (migration 0005), respeitando autoria, auditoria, atomicidade e guarda de revisão. Nenhuma prescrição histórica ou log de saúde é apagado pela remoção.
+
+A edição mantém como destino os alunos ainda autorizados da prescrição atual, em vez de exigir selecionar novamente todas as atribuições. Não há ampliação das permissões existentes.
+
+Validação local em Node: 46 testes passaram, incluindo negação de exclusão por outro usuário e exigência de confirmação. Chromium confirmou salvar e usar a ficha atualizada, ausência de controles de versões, cancelamento e confirmação da exclusão, desaparecimento do plano da lista, bloqueio de nova sessão e preservação do acesso à sessão antiga. Migrations locais aplicadas, TypeScript/build OpenNext passaram.
+
+Os 46 testes e o Chromium também passaram no workerd local. A migration 0005 foi aplicada no D1 remoto; a verificação de chaves estrangeiras não apontou violações e a nova tabela estava vazia, sem exclusão de planos de usuários durante a entrega.
+
+Publicação confirmada pela Cloudflare: versão `d34cfdc7-32be-4011-9c78-b38ea7d2a85b` em `https://pulso-fit.renatoqsousam.workers.dev`.

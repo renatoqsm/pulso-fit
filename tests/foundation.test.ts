@@ -627,6 +627,14 @@ test(
             .status,
           409,
         );
+        assert.equal(
+          (await student.request(`workouts/${trainingVersion}/delete`, { confirmed: true })).status,
+          404,
+        );
+        assert.equal(
+          (await pro.request(`workouts/${trainingVersion}/delete`, { confirmed: false })).status,
+          400,
+        );
         const published = (await student.request(`workouts/version/${trainingVersion}`)).data;
         await assert.rejects(
           db.workoutPrescriptionSet.update({

@@ -40,6 +40,8 @@ type Exercise = { id: string; name: string };
 type Version = {
   id: string;
   number: number;
+  programId?: string;
+  assignments?: { studentId: string }[];
   draftRevision: number;
   publishedAt: string | null;
   program?: { name: string };
@@ -215,7 +217,18 @@ export function WorkoutEditor() {
       return [...byId.values()];
     });
     setPreview(!!v.publishedAt);
-    setTargets([]);
+    const program = data?.own.find(
+      (p) => p.id === v.programId || p.versions.some((item) => item.id === v.id),
+    );
+    const previous = program?.versions
+      .filter((item) => item.publishedAt)
+      .sort((a, b) => b.number - a.number)[0];
+    setTargets(
+      (v.assignments?.length ? v.assignments : (previous?.assignments ?? []))
+        .map((assignment) => assignment.studentId)
+        .filter((studentId) => data?.students.some((student) => student.id === studentId)),
+    );
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   async function editFichas(selected: Version) {
@@ -226,11 +239,20 @@ export function WorkoutEditor() {
       .sort((a, b) => b.number - a.number)[0];
     if (draft) {
       select(draft);
-      setMessage('Edite suas fichas e salve as alterações. Publique quando estiver pronto.');
+      setMessage('Edite a ficha e salve para atualizar seu treino.');
     } else {
       const result = await action(`workouts/${selected.id}/revise`, {});
-      if (result) setMessage('Ficha aberta para edição. O histórico anterior será preservado.');
+      if (result) setMessage('Ficha aberta para edição. Salve para atualizar seu treino.');
     }
+  }
+  async function removePlan(selected: Version) {
+    if (
+      !window.confirm(
+        'Excluir este plano e suas fichas? Ele deixará de aparecer nos próximos treinos. O histórico dos treinos realizados será preservado.',
+      )
+    )
+      return;
+    await action(`workouts/${selected.id}/delete`, { confirmed: true });
   }
   async function action(path: string, body: unknown) {
     setBusy(true);
@@ -247,11 +269,11 @@ export function WorkoutEditor() {
       if (result.versionId) {
         const response = await fetch(`/api/workouts/version/${result.versionId}`);
         select(await response.json());
-      } else if (version) {
+      } else if (version && !result.removed) {
         const response = await fetch(`/api/workouts/version/${version.id}`);
         if (response.ok) select(await response.json());
       }
-      if (path.endsWith('/publish')) {
+      if (path.endsWith('/publish') || result.removed) {
         setVersion(undefined);
         setDirty(false);
       }
@@ -337,16 +359,32 @@ export function WorkoutEditor() {
                       Editar fichas
                     </button>
                   )}
-                  {p.versions.map((v) => (
+                  {p.versions.some((v) => v.publishedAt) && (
                     <button
                       className="secondary full"
-                      style={{ marginTop: 12 }}
-                      key={v.id}
-                      onClick={() => select(v)}
+                      style={{ marginTop: 10 }}
+                      onClick={() =>
+                        select(
+                          [...p.versions]
+                            .filter((v) => v.publishedAt)
+                            .sort((a, b) => b.number - a.number)[0],
+                        )
+                      }
                     >
-                      Versão {v.number} • {v.publishedAt ? 'Publicada' : 'Rascunho'}
+                      Visualizar plano
                     </button>
-                  ))}
+                  )}
+                  {data.enabled && p.versions.length > 0 && (
+                    <button
+                      className="danger full"
+                      style={{ marginTop: 10 }}
+                      disabled={busy}
+                      aria-label={'Excluir plano ' + p.name}
+                      onClick={() => void removePlan(p.versions[0])}
+                    >
+                      Excluir plano
+                    </button>
+                  )}
                 </article>
               ))}
             </div>
@@ -359,9 +397,7 @@ export function WorkoutEditor() {
               )}
               {data.assigned.map((a) => (
                 <div className="card" key={a.version.id} style={{ marginBottom: 16 }}>
-                  <h3>
-                    {a.version.program?.name} • v{a.version.number}
-                  </h3>
+                  <h3>{a.version.program?.name}</h3>
                   <p className="muted">{a.version.notes}</p>
                   {data.enabled &&
                     data.own.some((p) => p.versions.some((v) => v.id === a.version.id)) && (
@@ -397,16 +433,6 @@ export function WorkoutEditor() {
               ))}
             </section>
           )}
-          {data.archived?.length ? (
-            <section className="card" style={{ marginTop: 24 }}>
-              <h2>Prescrições anteriores</h2>
-              {data.archived.map((a) => (
-                <button className="secondary" key={a.version.id} onClick={() => select(a.version)}>
-                  {a.version.program?.name} • v{a.version.number}
-                </button>
-              ))}
-            </section>
-          ) : null}
           {version && (
             <section className="card workout-builder" style={{ marginTop: 24 }}>
               <div className="editor-context">
@@ -422,11 +448,11 @@ export function WorkoutEditor() {
                   <ArrowLeft size={16} /> Voltar aos planos
                 </button>
                 <span className="badge">
-                  {version.publishedAt
-                    ? 'Versão publicada'
-                    : dirty
-                      ? 'Alterações não salvas'
-                      : 'Rascunho salvo'}
+                  {dirty
+                    ? 'Alterações não salvas'
+                    : version.publishedAt
+                      ? 'Ficha atual'
+                      : 'Em edição'}
                 </span>
               </div>
               <h2 className="editor-title">
@@ -435,9 +461,7 @@ export function WorkoutEditor() {
                   'Seu plano de treino'}
               </h2>
               <div className="row wrap">
-                <h2>
-                  Versão {version.number} • {version.publishedAt ? 'Publicada' : 'Rascunho'}
-                </h2>
+                <h2>{version.publishedAt ? 'Sua ficha atual' : 'Editar suas fichas'}</h2>
                 <div className="row wrap">
                   <button
                     className="secondary"
@@ -472,8 +496,8 @@ export function WorkoutEditor() {
               </div>
               {!version.publishedAt && (
                 <p className="small muted">
-                  Edite exercícios, séries e dias abaixo. Salve o rascunho ou publique para usar a
-                  ficha atualizada nos próximos treinos.
+                  Edite exercícios, séries e dias abaixo. Ao salvar, esta passa a ser a ficha atual
+                  dos próximos treinos.
                 </p>
               )}
               {preview || version.publishedAt ? (
@@ -1132,18 +1156,6 @@ export function WorkoutEditor() {
                     >
                       <button
                         disabled={busy}
-                        onClick={() =>
-                          action(`workouts/${version.id}/save`, {
-                            revision: version.draftRevision,
-                            data: draft,
-                          })
-                        }
-                      >
-                        Salvar rascunho
-                      </button>
-                      <button
-                        className="secondary"
-                        disabled={busy}
                         onClick={async () => {
                           const saved = await action(`workouts/${version.id}/save`, {
                             revision: version.draftRevision,
@@ -1156,7 +1168,7 @@ export function WorkoutEditor() {
                             });
                         }}
                       >
-                        Salvar e publicar
+                        Salvar ficha
                       </button>
                     </div>
                   </div>

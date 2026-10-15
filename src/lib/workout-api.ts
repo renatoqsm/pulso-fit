@@ -89,14 +89,16 @@ export async function workoutGet(db: PrismaClient, user: User, path: string, req
   const parts = path.split('/');
   if (path === 'workouts') {
     const own = await db.workoutProgram.findMany({
-      where: { authorId: user.id },
-      include: { versions: { orderBy: { number: 'desc' }, include: ordered } },
+      where: { authorId: user.id, removal: null },
+      include: {
+        versions: { orderBy: { number: 'desc' }, include: { ...ordered, assignments: true } },
+      },
       orderBy: { createdAt: 'desc' },
     });
     const assigned =
       user.role === 'STUDENT'
         ? await db.workoutAssignment.findMany({
-            where: { studentId: user.id },
+            where: { studentId: user.id, version: { program: { removal: null } } },
             include: { version: { include: { ...ordered, program: true } } },
           })
         : [];
@@ -149,10 +151,15 @@ export async function workoutGet(db: PrismaClient, user: User, path: string, req
   if (path.startsWith('workouts/version/')) {
     const version = await db.workoutVersion.findUnique({
       where: { id: parts[2] },
-      include: { ...ordered, program: true, assignments: { where: { studentId: user.id } } },
+      include: {
+        ...ordered,
+        program: { include: { removal: true } },
+        assignments: { where: { studentId: user.id } },
+      },
     });
     if (
       !version ||
+      version.program.removal ||
       (version.program.authorId !== user.id &&
         !(user.role === 'STUDENT' && version.publishedAt && version.assignments.length))
     )
@@ -306,13 +313,32 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
     await authorship(db, user, 'TRAINING');
     const version = await db.workoutVersion.findUnique({
       where: { id: parts[1] },
-      include: { program: true, ...ordered },
+      include: { program: { include: { removal: true } }, ...ordered },
     });
-    if (!version || version.program.authorId !== user.id)
-      throw new HttpError(404, 'Rascunho não encontrado.');
+    if (!version || version.program.removal || version.program.authorId !== user.id)
+      throw new HttpError(404, 'Ficha não encontrada.');
+    if (parts[2] === 'delete') {
+      const { confirmed } = z
+        .object({ confirmed: z.literal(true) })
+        .strict()
+        .parse(body);
+      if (!confirmed) throw new HttpError(400, 'Confirme a exclusão.');
+      await db.workoutProgramRemoval.create({ data: { programId: version.programId } });
+      await db.auditLog.create({
+        data: {
+          actorId: user.id,
+          action: 'WORKOUT_PROGRAM_REMOVED',
+          resourceId: version.programId,
+        },
+      });
+      return json({
+        message: 'Plano excluído. O histórico dos treinos realizados foi preservado.',
+        removed: true,
+      });
+    }
     if (parts[2] === 'save') {
       if (version.publishedAt)
-        throw new HttpError(409, 'Ficha publicada é imutável. Crie uma revisão.');
+        throw new HttpError(409, 'Abra a ficha para editar antes de salvar.');
       const { revision, data } = z
         .object({ revision: z.number().int().min(0), data: workoutInput })
         .strict()
@@ -336,7 +362,7 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
           data: { days: { create: days } },
         });
       });
-      return json({ message: 'Rascunho salvo.', revision: revision + 1 });
+      return json({ message: 'Alterações salvas.', revision: revision + 1 });
     }
     if (parts[2] === 'publish') {
       const { studentIds, revision } = z
@@ -359,7 +385,7 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
           data: { actorId: user.id, action: 'WORKOUT_PUBLISHED', resourceId: version.id },
         });
       });
-      return json({ message: 'Ficha publicada com histórico preservado.' });
+      return json({ message: 'Ficha atualizada.' });
     }
     if (parts[2] === 'revise' || parts[2] === 'duplicate') {
       z.object({}).strict().parse(body);
@@ -424,7 +450,10 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
           },
         });
       });
-      return json({ message: 'Nova cópia em rascunho.', versionId: result.id });
+      return json({
+        message: parts[2] === 'duplicate' ? 'Cópia criada.' : 'Ficha aberta para edição.',
+        versionId: result.id,
+      });
     }
   }
   if (path === 'sessions/start') {
@@ -438,11 +467,16 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
     const day = await db.workoutDay.findUnique({
       where: { id: data.dayId },
       include: {
-        version: { include: { program: true, assignments: { where: { studentId: user.id } } } },
+        version: {
+          include: {
+            program: { include: { removal: true } },
+            assignments: { where: { studentId: user.id } },
+          },
+        },
         exercises: true,
       },
     });
-    if (!day?.version.publishedAt || !day.version.assignments.length)
+    if (!day?.version.publishedAt || day.version.program.removal || !day.version.assignments.length)
       throw new HttpError(404, 'Treino não atribuído.');
     if (
       day.version.program.authorId !== user.id &&
@@ -459,6 +493,7 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
         studentId: user.id,
         version: {
           programId: day.version.programId,
+          program: { removal: null },
           number: { gt: day.version.number },
           publishedAt: { not: null },
           AND: [

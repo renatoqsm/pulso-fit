@@ -1,6 +1,6 @@
 # Pulso Fit
 
-Plataforma de treinos e alimentação em português, hospedada com **Cloudflare Workers + D1 (SQLite)**. Inclui contas e habilitações por área, consentimento/vínculos, fichas e planos versionados, execução de séries, evolução, diário alimentar, comentários, MFA, privacidade e PWA.
+Plataforma de treinos e alimentação em português, hospedada com **Cloudflare Workers + D1 (SQLite)**. Inclui contas e habilitações por área, consentimento/vínculos, fichas e planos editáveis com histórico preservado, execução de séries, evolução, diário alimentar, comentários, MFA, privacidade e PWA.
 
 Catálogos reais: 934 exercícios do wger em português e 7.793 alimentos USDA SR Legacy 2018-04. Os nomes dos exercícios usam terminologia brasileira; os textos traduzidos automaticamente têm original e créditos preservados. Nutrientes por 100 g, fonte/versão e licença preservadas. Os alimentos mantêm nomes originais em inglês; tradução PT permanece pendente. Não há históricos ou alimentos fictícios em desenvolvimento/produção; fixtures são exclusivas dos bancos de testes.
 
