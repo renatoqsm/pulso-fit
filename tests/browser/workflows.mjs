@@ -300,7 +300,7 @@ try {
     fullPage: true,
   });
   await page.getByRole('button', { name: 'Versão 1 • Publicada', exact: true }).click();
-  await page.getByRole('button', { name: 'Criar revisão', exact: true }).click();
+  await page.getByRole('button', { name: 'Editar fichas', exact: true }).click();
   await page.getByRole('tab', { name: /Treino 1/ }).waitFor();
   const results = page.getByRole('list', { name: 'Exercícios encontrados', exact: true });
   await results.getByRole('button').first().waitFor();
@@ -313,6 +313,34 @@ try {
     'Planos de treino',
   );
   await page.screenshot({ path: 'test-results/desktop-workout-builder.png', fullPage: true });
+  await page.getByLabel('Nome da ficha', { exact: true }).fill('Ficha editada');
+  await page.getByRole('button', { name: 'Salvar rascunho', exact: true }).click();
+  await page.getByText('Rascunho salvo', { exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Voltar aos planos', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Editar fichas de Programa browser ' + tag, exact: true })
+    .click();
+  assert.equal(
+    await page.getByLabel('Nome da ficha', { exact: true }).inputValue(),
+    'Ficha editada',
+  );
+  await page.getByRole('heading', { name: 'Versão 2 • Rascunho', exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Voltar aos planos', exact: true }).click();
+  await page.getByRole('button', { name: 'Versão 1 • Publicada', exact: true }).click();
+  await page.getByRole('button', { name: 'Editar fichas', exact: true }).click();
+  await page.getByRole('heading', { name: 'Versão 2 • Rascunho', exact: true }).waitFor();
+  assert.equal(
+    await page.getByLabel('Nome da ficha', { exact: true }).inputValue(),
+    'Ficha editada',
+  );
+  const programs = await (await context.request.get(origin + '/api/workouts')).json();
+  const editedProgram = programs.own.find((program) => program.name === 'Programa browser ' + tag);
+  assert.equal(
+    editedProgram.versions.length,
+    2,
+    'Retomar edição não deve criar revisões duplicadas',
+  );
+  assert.equal(editedProgram.versions.find((v) => v.number === 1).days[0].name, 'Treino 1');
   assert.equal(pageErrors.length, 0, JSON.stringify(pageErrors));
   console.log(
     'Browser: cadastro, prescrição, séries, fila criptografada offline, recuperação, evolução, plano e diário passaram; mobile sem overflow; sem erros JS.',

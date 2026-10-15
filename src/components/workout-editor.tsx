@@ -218,6 +218,20 @@ export function WorkoutEditor() {
     setTargets([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+  async function editFichas(selected: Version) {
+    const program = data?.own.find((p) => p.versions.some((v) => v.id === selected.id));
+    if (!program || !data?.enabled) return;
+    const draft = [...program.versions]
+      .filter((v) => !v.publishedAt && v.number >= selected.number)
+      .sort((a, b) => b.number - a.number)[0];
+    if (draft) {
+      select(draft);
+      setMessage('Edite suas fichas e salve as alterações. Publique quando estiver pronto.');
+    } else {
+      const result = await action(`workouts/${selected.id}/revise`, {});
+      if (result) setMessage('Ficha aberta para edição. O histórico anterior será preservado.');
+    }
+  }
   async function action(path: string, body: unknown) {
     setBusy(true);
     try {
@@ -310,6 +324,19 @@ export function WorkoutEditor() {
                   <span className="badge">
                     {p.template ? 'Modelo' : 'Programa pessoal/profissional'}
                   </span>
+                  {data.enabled && p.versions.length > 0 && (
+                    <button
+                      className="full"
+                      style={{ marginTop: 14 }}
+                      disabled={busy}
+                      aria-label={'Editar fichas de ' + p.name}
+                      onClick={() =>
+                        void editFichas([...p.versions].sort((a, b) => b.number - a.number)[0])
+                      }
+                    >
+                      Editar fichas
+                    </button>
+                  )}
                   {p.versions.map((v) => (
                     <button
                       className="secondary full"
@@ -336,6 +363,17 @@ export function WorkoutEditor() {
                     {a.version.program?.name} • v{a.version.number}
                   </h3>
                   <p className="muted">{a.version.notes}</p>
+                  {data.enabled &&
+                    data.own.some((p) => p.versions.some((v) => v.id === a.version.id)) && (
+                      <button
+                        className="secondary"
+                        disabled={busy}
+                        onClick={() => void editFichas(a.version)}
+                      >
+                        Editar minhas fichas
+                      </button>
+                    )}
+
                   {a.version.days.map((day) => (
                     <div className="row wrap" key={day.id} style={{ marginTop: 14 }}>
                       <span>
@@ -426,15 +464,18 @@ export function WorkoutEditor() {
                   {version.publishedAt &&
                     data.enabled &&
                     data.own.some((p) => p.versions.some((v) => v.id === version.id)) && (
-                      <button
-                        disabled={busy}
-                        onClick={() => action(`workouts/${version.id}/revise`, {})}
-                      >
-                        Criar revisão
+                      <button disabled={busy} onClick={() => void editFichas(version)}>
+                        Editar fichas
                       </button>
                     )}
                 </div>
               </div>
+              {!version.publishedAt && (
+                <p className="small muted">
+                  Edite exercícios, séries e dias abaixo. Salve o rascunho ou publique para usar a
+                  ficha atualizada nos próximos treinos.
+                </p>
+              )}
               {preview || version.publishedAt ? (
                 <>
                   <p>{draft.objective}</p>

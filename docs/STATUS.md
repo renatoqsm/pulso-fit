@@ -109,3 +109,15 @@ TypeScript, build OpenNext e 46 testes em Node passaram. Chromium confirmou o pa
 Os 46 testes e o fluxo Chromium também passaram no workerd local. A captura móvel confirmou os campos compactos com as faixas Low volume originais.
 
 Atualização publicada na Cloudflare: versão `9e53cde0-ac64-4b7b-99f5-fb3a088c4756` em `https://pulso-fit.renatoqsousam.workers.dev`. Publicação confirmada pelo Wrangler; pacote de aproximadamente 1.32 MiB gzip. Não houve migração ou carga de dados em produção nesta atualização.
+
+## Edição direta das fichas existentes
+
+A biblioteca de programas agora oferece **Editar fichas**, e as fichas próprias disponíveis para execução oferecem **Editar minhas fichas**. Na visualização de uma versão publicada, o botão antes chamado Criar revisão também passou a ser Editar fichas. Os controles respeitam a autoria e a habilitação já existentes; prescrições de terceiros não ganham permissão de edição.
+
+Ao editar, um rascunho existente é retomado. Se não houver rascunho, a revisão editável é criada pelo fluxo já existente, mantendo a versão publicada e os registros de execução anteriores. O editor explica como salvar ou publicar as alterações para os próximos treinos. Não há mudança de schema ou de autorização da API.
+
+Chromium em Node confirmou edição, persistência do nome da ficha, retomada pelo botão da biblioteca e pelo botão da versão publicada, manutenção de apenas duas versões e preservação do nome original na versão anterior. O restante do fluxo completo de treinos, nutrição e offline também passou, sem erros JavaScript ou overflow nos viewports verificados.
+
+Build OpenNext/TypeScript passou, e o fluxo de navegador também foi validado no workerd local. Os cenários de retomada e preservação da versão anterior passaram em ambos os runtimes. Nenhuma alteração da API ou migração de banco foi necessária.
+
+Publicação confirmada pela Cloudflare: versão `2c351b83-0b0b-4504-a3ff-cdcac5e74983` em `https://pulso-fit.renatoqsousam.workers.dev`.
