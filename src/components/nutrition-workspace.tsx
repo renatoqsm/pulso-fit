@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { WorkflowShell } from './workflow-shell';
+import { useUnsavedChanges } from '@/lib/use-unsaved-changes';
+import { ArrowLeft, Search, Utensils, Plus } from 'lucide-react';
 import {
   scaleNutrients,
   totalNutrients,
@@ -103,6 +105,9 @@ export function NutritionWorkspace() {
   const [foods, setFoods] = useState<Food[]>([]);
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState('diary');
+  const [activeMeal, setActiveMeal] = useState(0);
+  const [dirty, setDirty] = useState(false);
+  const [foodMatches, setFoodMatches] = useState<string[]>([]);
   const [version, setVersion] = useState<Version>();
   const [draft, setDraft] = useState<{
     objective: string;
@@ -143,7 +148,11 @@ export function NutritionWorkspace() {
     const res = await fetch(`/api/foods?q=${encodeURIComponent(search)}`);
     const result = await res.json();
     if (!res.ok) throw new Error(result.error);
-    setFoods(result.items);
+    setFoodMatches(result.items.map((food: Food) => food.id));
+    setFoods((previous) => [
+      ...previous.filter((food) => !result.items.some((next: Food) => next.id === food.id)),
+      ...result.items,
+    ]);
   }
   async function loadDiary() {
     const res = await fetch(`/api/meals?date=${date}${studentId ? '&studentId=' + studentId : ''}`);
@@ -154,7 +163,9 @@ export function NutritionWorkspace() {
   useEffect(() => {
     void load()
       .then((v) => {
-        if (v.role === 'PROFESSIONAL') setTab('plans');
+        const requested = window.location.hash.slice(1);
+        if (['plans', 'diary', 'foods', 'recipes'].includes(requested)) setTab(requested);
+        else if (v.role === 'PROFESSIONAL') setTab('plans');
       })
       .catch((e) => setMessage(e.message));
   }, []);
@@ -165,6 +176,15 @@ export function NutritionWorkspace() {
   useEffect(() => {
     if (data?.role === 'STUDENT' || studentId) void loadDiary().catch((e) => setMessage(e.message));
   }, [date, studentId, data?.role]);
+  useEffect(() => {
+    const change = () => {
+      const value = window.location.hash.slice(1);
+      if (['plans', 'diary', 'foods', 'recipes'].includes(value)) setTab(value);
+    };
+    window.addEventListener('hashchange', change);
+    return () => window.removeEventListener('hashchange', change);
+  }, []);
+  useUnsavedChanges(dirty);
   async function action(path: string, body: unknown) {
     setBusy(true);
     try {
@@ -195,6 +215,8 @@ export function NutritionWorkspace() {
   }
   function select(v: Version) {
     setVersion(v);
+    setActiveMeal(0);
+    setDirty(false);
     setDraft({
       objective: v.objective,
       notes: v.notes,
@@ -209,6 +231,7 @@ export function NutritionWorkspace() {
     setTab('plans');
   }
   function mutate(fn: (v: typeof draft) => void) {
+    setDirty(true);
     setDraft((v) => {
       const n = structuredClone(v);
       fn(n);
@@ -247,7 +270,10 @@ export function NutritionWorkspace() {
         ),
     ) ?? [];
   return (
-    <WorkflowShell title="Alimentação">
+    <WorkflowShell
+      title="Alimentação"
+      activeHref={tab === 'diary' ? '/alimentacao#diary' : '/alimentacao#plans'}
+    >
       {message && (
         <p className="message" role="status">
           {message}
@@ -258,14 +284,21 @@ export function NutritionWorkspace() {
           ? 'Planejamento pessoal, planos profissionais e consumo real separados.'
           : 'Prescrições alimentares e registros dos alunos vinculados na sua área.'}
       </p>
-      <nav className="row wrap" style={{ justifyContent: 'flex-start', marginBottom: 24 }}>
+      <nav className="builder-tabs" aria-label="Áreas de alimentação">
         {[
           ['diary', 'Diário'],
           ['plans', 'Planos'],
           ['foods', 'Alimentos'],
           ['recipes', 'Receitas'],
         ].map(([key, label]) => (
-          <button key={key} className={tab === key ? '' : 'secondary'} onClick={() => setTab(key)}>
+          <button
+            key={key}
+            className={tab === key ? 'selected' : 'secondary'}
+            onClick={() => {
+              setTab(key);
+              window.history.replaceState(null, '', '#' + key);
+            }}
+          >
             {label}
           </button>
         ))}
@@ -577,7 +610,7 @@ export function NutritionWorkspace() {
                   </article>
                 ))}
               </div>
-              {!foods.length && (
+              {!foodMatches.length && (
                 <p className="muted" style={{ marginTop: 20 }}>
                   Nenhum alimento encontrado. Cadastre um rótulo real para começar.
                 </p>
@@ -655,7 +688,7 @@ export function NutritionWorkspace() {
           )}
           {tab === 'plans' && (
             <>
-              {data.enabled && (
+              {data.enabled && !version && (
                 <form
                   className="card row wrap"
                   onSubmit={(e) => {
@@ -672,23 +705,25 @@ export function NutritionWorkspace() {
                   <button disabled={busy}>Criar planejamento</button>
                 </form>
               )}
-              <div className="exercise-grid" style={{ marginTop: 24 }}>
-                {data.own.map((p) => (
-                  <section className="card" key={p.id}>
-                    <h3>{p.name}</h3>
-                    {p.versions.map((v) => (
-                      <button
-                        key={v.id}
-                        className="secondary full"
-                        style={{ marginTop: 10 }}
-                        onClick={() => select(v)}
-                      >
-                        Versão {v.number} • {v.publishedAt ? 'Publicada' : 'Rascunho'}
-                      </button>
-                    ))}
-                  </section>
-                ))}
-              </div>
+              {!version && (
+                <div className="exercise-grid program-library" style={{ marginTop: 24 }}>
+                  {data.own.map((p) => (
+                    <section className="card" key={p.id}>
+                      <h3>{p.name}</h3>
+                      {p.versions.map((v) => (
+                        <button
+                          key={v.id}
+                          className="secondary full"
+                          style={{ marginTop: 10 }}
+                          onClick={() => select(v)}
+                        >
+                          Versão {v.number} • {v.publishedAt ? 'Publicada' : 'Rascunho'}
+                        </button>
+                      ))}
+                    </section>
+                  ))}
+                </div>
+              )}
               {data.archived?.length ? (
                 <section className="card" style={{ marginTop: 24 }}>
                   <h2>Planos anteriores</h2>
@@ -704,9 +739,34 @@ export function NutritionWorkspace() {
                 </section>
               ) : null}
               {version && (
-                <section className="card" style={{ marginTop: 24 }}>
+                <section className="card nutrition-builder" style={{ marginTop: 24 }}>
+                  <div className="editor-context">
+                    <button
+                      className="secondary"
+                      onClick={() => {
+                        if (!dirty || window.confirm('Sair sem salvar as alterações?')) {
+                          setVersion(undefined);
+                          setDirty(false);
+                        }
+                      }}
+                    >
+                      <ArrowLeft size={16} /> Voltar aos planos
+                    </button>
+                    <span className="badge">
+                      {version.publishedAt
+                        ? 'Publicado'
+                        : dirty
+                          ? 'Alterações não salvas'
+                          : 'Rascunho salvo'}
+                    </span>
+                  </div>
+                  <h2 className="editor-title">
+                    {data.own.find((p) => p.versions.some((v) => v.id === version.id))?.name ??
+                      version.plan?.name ??
+                      'Plano alimentar'}
+                  </h2>
                   <div className="row wrap">
-                    <h2>Versão {version.number}</h2>
+                    <h3>Versão {version.number}</h3>
                     {version.publishedAt &&
                       data.enabled &&
                       data.own.some((p) => p.versions.some((v) => v.id === version.id)) && (
@@ -769,93 +829,167 @@ export function NutritionWorkspace() {
                           }
                         />
                       </label>
-                      {draft.meals.map((meal, mi) => (
-                        <section
-                          className="card"
-                          key={mi}
-                          style={{ marginTop: 20, background: '#f6f8f4' }}
-                        >
-                          <div className="row wrap">
-                            <label>
-                              Refeição
-                              <input
-                                value={meal.name}
-                                maxLength={100}
+                      <div className="quick-meals">
+                        <span className="muted small">Adicionar refeição rápida</span>
+                        {['Café da manhã', 'Almoço', 'Lanche', 'Jantar'].map((name) => (
+                          <button
+                            key={name}
+                            className="secondary"
+                            onClick={() => {
+                              mutate((v) => {
+                                v.meals.push({ name, time: null, notes: '', items: [] });
+                              });
+                              setActiveMeal(draft.meals.length);
+                            }}
+                          >
+                            <Plus size={14} />
+                            {name}
+                          </button>
+                        ))}
+                      </div>
+                      <label className="plan-food-search">
+                        <Search size={16} /> Buscar alimento no catálogo
+                        <input
+                          placeholder="Digite um alimento para buscar…"
+                          value={search}
+                          onChange={(event) => setSearch(event.target.value)}
+                        />
+                      </label>
+                      <div className="builder-tabs" role="tablist" aria-label="Refeições do plano">
+                        {draft.meals.map((meal, i) => (
+                          <button
+                            key={i}
+                            role="tab"
+                            aria-selected={i === activeMeal}
+                            aria-controls={'meal-panel-' + i}
+                            id={'meal-tab-' + i}
+                            className={activeMeal === i ? 'selected' : 'secondary'}
+                            onClick={() => setActiveMeal(i)}
+                          >
+                            <Utensils size={16} />
+                            {meal.name}
+                            <span>{meal.time ?? 'Sem horário'}</span>
+                          </button>
+                        ))}
+                      </div>
+                      {!draft.meals.length && (
+                        <div className="builder-empty">
+                          <Utensils size={26} />
+                          <h3>Como será seu dia?</h3>
+                          <p>
+                            Adicione uma refeição acima ou crie uma personalizada abaixo. Depois
+                            escolha os alimentos e quantidades.
+                          </p>
+                        </div>
+                      )}
+                      {draft.meals.map((meal, mi) =>
+                        mi !== activeMeal ? null : (
+                          <section
+                            className="card meal-builder-panel"
+                            key={mi}
+                            role="tabpanel"
+                            id={'meal-panel-' + mi}
+                            aria-labelledby={'meal-tab-' + mi}
+                            style={{ marginTop: 20 }}
+                          >
+                            <div className="row wrap">
+                              <label>
+                                Refeição
+                                <input
+                                  value={meal.name}
+                                  maxLength={100}
+                                  onChange={(e) =>
+                                    mutate((v) => {
+                                      v.meals[mi].name = e.target.value;
+                                    })
+                                  }
+                                />
+                              </label>
+                              <label>
+                                Horário sugerido
+                                <input
+                                  type="time"
+                                  value={meal.time ?? ''}
+                                  onChange={(e) =>
+                                    mutate((v) => {
+                                      v.meals[mi].time = e.target.value || null;
+                                    })
+                                  }
+                                />
+                              </label>
+                              <button
+                                className="secondary"
+                                onClick={() => {
+                                  mutate((v) => {
+                                    v.meals.push(structuredClone(meal));
+                                  });
+                                  setActiveMeal(draft.meals.length);
+                                }}
+                              >
+                                Duplicar refeição
+                              </button>
+                              <button
+                                className="danger"
+                                onClick={() => {
+                                  mutate((v) => {
+                                    v.meals.splice(mi, 1);
+                                  });
+                                  setActiveMeal(Math.max(0, mi - 1));
+                                }}
+                              >
+                                Remover refeição
+                              </button>
+                            </div>
+                            <label style={{ marginTop: 16 }}>
+                              Observações
+                              <textarea
+                                value={meal.notes}
+                                maxLength={1000}
                                 onChange={(e) =>
                                   mutate((v) => {
-                                    v.meals[mi].name = e.target.value;
+                                    v.meals[mi].notes = e.target.value;
                                   })
                                 }
                               />
                             </label>
-                            <label>
-                              Horário sugerido
-                              <input
-                                type="time"
-                                value={meal.time ?? ''}
-                                onChange={(e) =>
-                                  mutate((v) => {
-                                    v.meals[mi].time = e.target.value || null;
-                                  })
-                                }
-                              />
-                            </label>
-                            <button
-                              className="danger"
-                              onClick={() =>
+                            <ItemRows
+                              foods={foods}
+                              matchingIds={foodMatches}
+                              items={meal.items}
+                              onChange={(items) =>
                                 mutate((v) => {
-                                  v.meals.splice(mi, 1);
-                                })
-                              }
-                            >
-                              Remover refeição
-                            </button>
-                          </div>
-                          <label style={{ marginTop: 16 }}>
-                            Observações
-                            <textarea
-                              value={meal.notes}
-                              maxLength={1000}
-                              onChange={(e) =>
-                                mutate((v) => {
-                                  v.meals[mi].notes = e.target.value;
+                                  v.meals[mi].items = items;
                                 })
                               }
                             />
-                          </label>
-                          <ItemRows
-                            foods={foods}
-                            items={meal.items}
-                            onChange={(items) =>
-                              mutate((v) => {
-                                v.meals[mi].items = items;
-                              })
-                            }
-                          />
-                          {meal.items.map((item, ii) => (
-                            <details key={ii}>
-                              <summary>
-                                Substituições orientadas:{' '}
-                                {foods.find((f) => f.id === item.foodId)?.name}
-                              </summary>
-                              <ItemRows
-                                foods={foods}
-                                items={item.substitutions.map((i) => ({ ...i, substitutions: [] }))}
-                                onChange={(items) =>
-                                  mutate((v) => {
-                                    v.meals[mi].items[ii].substitutions = items.map(simple);
-                                  })
-                                }
-                              />
-                            </details>
-                          ))}
-                          <NutrientSummary values={total(meal.items)} />
-                        </section>
-                      ))}
+                            {meal.items.map((item, ii) => (
+                              <details key={ii}>
+                                <summary>
+                                  Substituições orientadas:{' '}
+                                  {foods.find((f) => f.id === item.foodId)?.name}
+                                </summary>
+                                <ItemRows
+                                  foods={foods}
+                                  items={item.substitutions.map((i) => ({
+                                    ...i,
+                                    substitutions: [],
+                                  }))}
+                                  onChange={(items) =>
+                                    mutate((v) => {
+                                      v.meals[mi].items[ii].substitutions = items.map(simple);
+                                    })
+                                  }
+                                />
+                              </details>
+                            ))}
+                            <NutrientSummary values={total(meal.items)} />
+                          </section>
+                        ),
+                      )}
                       <button
                         className="secondary"
                         style={{ marginTop: 20 }}
-                        onClick={() =>
+                        onClick={() => {
                           mutate((v) => {
                             v.meals.push({
                               name: `Refeição ${v.meals.length + 1}`,
@@ -863,12 +997,13 @@ export function NutritionWorkspace() {
                               notes: '',
                               items: [],
                             });
-                          })
-                        }
+                          });
+                          setActiveMeal(draft.meals.length);
+                        }}
                       >
                         Adicionar refeição
                       </button>
-                      <div style={{ marginTop: 24 }}>
+                      <div className="editor-savebar" style={{ marginTop: 24 }}>
                         {data.role === 'PROFESSIONAL' && (
                           <>
                             <h3>Atribuir a pacientes vinculados</h3>
@@ -1225,13 +1360,21 @@ function ItemRows({
   items,
   foods,
   onChange,
+  matchingIds,
 }: {
+  matchingIds?: string[];
   items: Item[];
   foods: Pick<Food, 'id' | 'name' | 'referenceUnit' | 'measures'>[];
   onChange: (items: Item[]) => void;
 }) {
+  const options = matchingIds
+    ? foods.filter(
+        (food) => matchingIds.includes(food.id) || items.some((item) => item.foodId === food.id),
+      )
+    : foods;
+  const newFood = matchingIds ? foods.find((food) => matchingIds.includes(food.id)) : foods[0];
   return (
-    <div style={{ margin: '18px 0' }}>
+    <div className="food-item-rows" style={{ margin: '18px 0' }}>
       {items.map((item, index) => (
         <div className="set-grid" key={index} style={{ marginBottom: 14 }}>
           <label>
@@ -1255,7 +1398,7 @@ function ItemRows({
                 )
               }
             >
-              {foods.map((f) => (
+              {options.map((f) => (
                 <option key={f.id} value={f.id}>
                   {f.name}
                 </option>
@@ -1321,9 +1464,9 @@ function ItemRows({
       <button
         type="button"
         className="secondary"
-        disabled={!foods.length}
+        disabled={!newFood}
         onClick={() => {
-          const f = foods[0];
+          const f = newFood!;
           onChange([
             ...items,
             { foodId: f.id, quantity: '100', unit: f.referenceUnit, substitutions: [] },

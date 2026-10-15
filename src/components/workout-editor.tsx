@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { WorkflowShell } from './workflow-shell';
+import { useUnsavedChanges } from '@/lib/use-unsaved-changes';
+import { ChevronDown, GripVertical, Plus, Search, ArrowLeft, Dumbbell } from 'lucide-react';
 type SetInput = {
   repsMin: number | null;
   repsMax: number | null;
@@ -115,6 +117,10 @@ export function WorkoutEditor() {
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState(false);
+  const [activeDay, setActiveDay] = useState(0);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [dirty, setDirty] = useState(false);
+  const [exerciseSearch, setExerciseSearch] = useState('');
   const [drag, setDrag] = useState<{ day: number; index: number }>();
   async function load() {
     try {
@@ -143,11 +149,29 @@ export function WorkoutEditor() {
     }
     void catalog();
   }, []);
+  useEffect(() => {
+    const navigate = () => {
+      if (
+        ['#atuais', '#programas'].includes(window.location.hash) &&
+        version &&
+        (!dirty || window.confirm('Sair sem salvar as alterações?'))
+      ) {
+        setVersion(undefined);
+        setDirty(false);
+      }
+    };
+    window.addEventListener('hashchange', navigate);
+    return () => window.removeEventListener('hashchange', navigate);
+  }, [version, dirty]);
   function select(v: Version) {
     setVersion(v);
+    setActiveDay(0);
+    setExpanded({});
+    setDirty(false);
     setDraft(draftFrom(v));
     setPreview(!!v.publishedAt);
     setTargets([]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   async function action(path: string, body: unknown) {
     setBusy(true);
@@ -168,6 +192,10 @@ export function WorkoutEditor() {
         const response = await fetch(`/api/workouts/version/${version.id}`);
         if (response.ok) select(await response.json());
       }
+      if (path.endsWith('/publish')) {
+        setVersion(undefined);
+        setDirty(false);
+      }
       return result;
     } catch (e) {
       setMessage(e instanceof Error ? e.message : 'Falha na conexão.');
@@ -176,6 +204,7 @@ export function WorkoutEditor() {
     }
   }
   function mutate(fn: (value: Draft) => void) {
+    setDirty(true);
     setDraft((v) => {
       const copy = structuredClone(v);
       fn(copy);
@@ -188,8 +217,9 @@ export function WorkoutEditor() {
       v.days[day].exercises.splice(to, 0, e);
     });
   }
+  useUnsavedChanges(dirty);
   return (
-    <WorkflowShell title="Seus treinos">
+    <WorkflowShell title="Seus treinos" activeHref={version ? '/treinos#programas' : undefined}>
       {message && (
         <p className="message" role="status">
           {message}
@@ -204,7 +234,7 @@ export function WorkoutEditor() {
               ? 'Crie treinos pessoais ou execute as fichas publicadas para você.'
               : 'Monte fichas, preserve versões e acompanhe seus alunos.'}
           </p>
-          {data.enabled && (
+          {data.enabled && !version && (
             <form
               className="card row wrap"
               style={{ marginBottom: 24 }}
@@ -227,28 +257,30 @@ export function WorkoutEditor() {
               <button disabled={busy}>Criar programa</button>
             </form>
           )}
-          <div className="exercise-grid">
-            {data.own.map((p) => (
-              <article className="card" key={p.id}>
-                <h3>{p.name}</h3>
-                <span className="badge">
-                  {p.template ? 'Modelo' : 'Programa pessoal/profissional'}
-                </span>
-                {p.versions.map((v) => (
-                  <button
-                    className="secondary full"
-                    style={{ marginTop: 12 }}
-                    key={v.id}
-                    onClick={() => select(v)}
-                  >
-                    Versão {v.number} • {v.publishedAt ? 'Publicada' : 'Rascunho'}
-                  </button>
-                ))}
-              </article>
-            ))}
-          </div>
-          {data.role === 'STUDENT' && (
-            <section style={{ marginTop: 30 }}>
+          {!version && (
+            <div id="programas" className="exercise-grid program-library">
+              {data.own.map((p) => (
+                <article className="card" key={p.id}>
+                  <h3>{p.name}</h3>
+                  <span className="badge">
+                    {p.template ? 'Modelo' : 'Programa pessoal/profissional'}
+                  </span>
+                  {p.versions.map((v) => (
+                    <button
+                      className="secondary full"
+                      style={{ marginTop: 12 }}
+                      key={v.id}
+                      onClick={() => select(v)}
+                    >
+                      Versão {v.number} • {v.publishedAt ? 'Publicada' : 'Rascunho'}
+                    </button>
+                  ))}
+                </article>
+              ))}
+            </div>
+          )}
+          {data.role === 'STUDENT' && !version && (
+            <section id="atuais" style={{ marginTop: 30 }}>
               <h2>Fichas disponíveis</h2>
               {!data.assigned.length && (
                 <p className="muted">Nenhuma ficha publicada disponível.</p>
@@ -293,7 +325,32 @@ export function WorkoutEditor() {
             </section>
           ) : null}
           {version && (
-            <section className="card" style={{ marginTop: 30 }}>
+            <section className="card workout-builder" style={{ marginTop: 24 }}>
+              <div className="editor-context">
+                <button
+                  className="secondary"
+                  onClick={() => {
+                    if (!dirty || window.confirm('Sair sem salvar as alterações?')) {
+                      setVersion(undefined);
+                      setDirty(false);
+                    }
+                  }}
+                >
+                  <ArrowLeft size={16} /> Voltar aos planos
+                </button>
+                <span className="badge">
+                  {version.publishedAt
+                    ? 'Versão publicada'
+                    : dirty
+                      ? 'Alterações não salvas'
+                      : 'Rascunho salvo'}
+                </span>
+              </div>
+              <h2 className="editor-title">
+                {data.own.find((p) => p.versions.some((v) => v.id === version.id))?.name ??
+                  version.program?.name ??
+                  'Seu plano de treino'}
+              </h2>
               <div className="row wrap">
                 <h2>
                   Versão {version.number} • {version.publishedAt ? 'Publicada' : 'Rascunho'}
@@ -368,372 +425,58 @@ export function WorkoutEditor() {
                 </>
               ) : (
                 <>
-                  <div className="field">
-                    <label htmlFor="objective">Objetivo</label>
-                    <input
-                      id="objective"
-                      value={draft.objective}
-                      maxLength={1000}
-                      onChange={(e) =>
-                        mutate((v) => {
-                          v.objective = e.target.value;
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="field">
-                    <label htmlFor="notes">Orientações gerais</label>
-                    <textarea
-                      id="notes"
-                      value={draft.notes}
-                      maxLength={3000}
-                      onChange={(e) =>
-                        mutate((v) => {
-                          v.notes = e.target.value;
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="dashboard-grid">
-                    {(['validFrom', 'validUntil'] as const).map((key, i) => (
-                      <div className="field" key={key}>
-                        <label htmlFor={key}>{i ? 'Validade até' : 'Validade a partir de'}</label>
-                        <input
-                          id={key}
-                          type="date"
-                          value={draft[key]?.slice(0, 10) ?? ''}
-                          onChange={(e) =>
-                            mutate((v) => {
-                              v[key] = e.target.value
-                                ? new Date(e.target.value + 'T00:00:00').toISOString()
-                                : null;
-                            })
-                          }
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  {draft.days.map((day, di) => (
-                    <section
-                      className="card"
-                      key={di}
-                      style={{ marginTop: 20, background: '#f6f8f4' }}
-                    >
-                      <div className="row wrap">
-                        <input
-                          aria-label="Nome da ficha"
-                          value={day.name}
-                          maxLength={100}
-                          onChange={(e) =>
-                            mutate((v) => {
-                              v.days[di].name = e.target.value;
-                            })
-                          }
-                        />
-                        <button
-                          className="secondary"
-                          onClick={() =>
-                            mutate((v) => {
-                              v.days.push(structuredClone(v.days[di]));
-                            })
-                          }
-                        >
-                          Duplicar ficha
-                        </button>
-                        <button
-                          className="danger"
-                          disabled={draft.days.length === 1}
-                          onClick={() =>
-                            mutate((v) => {
-                              v.days.splice(di, 1);
-                            })
-                          }
-                        >
-                          Remover ficha
-                        </button>
-                      </div>
-                      <textarea
-                        aria-label="Orientações da ficha"
-                        style={{ marginTop: 12 }}
-                        value={day.notes}
+                  <details className="editor-settings">
+                    <summary>Objetivo, orientações e validade</summary>
+                    <div className="field">
+                      <label htmlFor="objective">Objetivo</label>
+                      <input
+                        id="objective"
+                        value={draft.objective}
                         maxLength={1000}
                         onChange={(e) =>
                           mutate((v) => {
-                            v.days[di].notes = e.target.value;
+                            v.objective = e.target.value;
                           })
                         }
                       />
-                      <div className="row wrap" style={{ marginTop: 12 }}>
-                        {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((label, weekday) => (
-                          <label className="consent" key={label}>
-                            <input
-                              type="checkbox"
-                              checked={day.suggestedDays.includes(weekday)}
-                              onChange={(e) =>
-                                mutate((v) => {
-                                  v.days[di].suggestedDays = e.target.checked
-                                    ? [...day.suggestedDays, weekday]
-                                    : day.suggestedDays.filter((n) => n !== weekday);
-                                })
-                              }
-                            />
-                            {label}
-                          </label>
-                        ))}
-                      </div>
-                      {day.exercises.map((exercise, ei) => (
-                        <article
-                          className="card"
-                          key={ei}
-                          draggable
-                          onDragStart={() => setDrag({ day: di, index: ei })}
-                          onDragOver={(e) => e.preventDefault()}
-                          onDrop={() => {
-                            if (drag?.day === di) reorder(di, drag.index, ei);
-                            setDrag(undefined);
-                          }}
-                          style={{ marginTop: 18 }}
-                        >
-                          <div className="row wrap">
-                            <h3>
-                              {exercises.find((e) => e.id === exercise.exerciseId)?.name ??
-                                'Exercício'}
-                            </h3>
-                            <div className="row wrap">
-                              <button
-                                className="secondary"
-                                disabled={ei === 0}
-                                onClick={() => reorder(di, ei, ei - 1)}
-                                aria-label="Mover exercício para cima"
-                              >
-                                ↑
-                              </button>
-                              <button
-                                className="secondary"
-                                disabled={ei === day.exercises.length - 1}
-                                onClick={() => reorder(di, ei, ei + 1)}
-                                aria-label="Mover exercício para baixo"
-                              >
-                                ↓
-                              </button>
-                              <button
-                                className="secondary"
-                                onClick={() =>
-                                  mutate((v) => {
-                                    v.days[di].exercises.splice(
-                                      ei + 1,
-                                      0,
-                                      structuredClone(exercise),
-                                    );
-                                  })
-                                }
-                              >
-                                Duplicar
-                              </button>
-                              <button
-                                className="danger"
-                                onClick={() =>
-                                  mutate((v) => {
-                                    v.days[di].exercises.splice(ei, 1);
-                                  })
-                                }
-                              >
-                                Remover
-                              </button>
-                            </div>
-                          </div>
+                    </div>
+                    <div className="field">
+                      <label htmlFor="notes">Orientações gerais</label>
+                      <textarea
+                        id="notes"
+                        value={draft.notes}
+                        maxLength={3000}
+                        onChange={(e) =>
+                          mutate((v) => {
+                            v.notes = e.target.value;
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="dashboard-grid">
+                      {(['validFrom', 'validUntil'] as const).map((key, i) => (
+                        <div className="field" key={key}>
+                          <label htmlFor={key}>{i ? 'Validade até' : 'Validade a partir de'}</label>
                           <input
-                            aria-label="Observações do exercício"
-                            value={exercise.notes}
-                            maxLength={1000}
+                            id={key}
+                            type="date"
+                            value={draft[key]?.slice(0, 10) ?? ''}
                             onChange={(e) =>
                               mutate((v) => {
-                                v.days[di].exercises[ei].notes = e.target.value;
+                                v[key] = e.target.value
+                                  ? new Date(e.target.value + 'T00:00:00').toISOString()
+                                  : null;
                               })
                             }
                           />
-                          <input
-                            aria-label="Grupo de supersérie, opcional"
-                            placeholder="Grupo de supersérie (opcional)"
-                            value={exercise.groupKey ?? ''}
-                            maxLength={60}
-                            style={{ marginTop: 10 }}
-                            onChange={(e) =>
-                              mutate((v) => {
-                                v.days[di].exercises[ei].groupKey = e.target.value || null;
-                              })
-                            }
-                          />
-                          {exercise.sets.map((set, si) => (
-                            <div key={si} className="link-card">
-                              <p className="eyebrow">Série {si + 1}</p>
-                              <div className="set-grid">
-                                {(
-                                  [
-                                    ['repsMin', 'Repetições mín.'],
-                                    ['repsMax', 'Repetições máx.'],
-                                    ['targetKg', 'Carga alvo (kg)'],
-                                    ['restSeconds', 'Descanso (s)'],
-                                  ] as const
-                                ).map(([key, label]) => (
-                                  <label key={key}>
-                                    {label}
-                                    <input
-                                      type="number"
-                                      min="0"
-                                      max={key === 'restSeconds' ? 3600 : 10000}
-                                      step={key === 'targetKg' ? '0.001' : '1'}
-                                      value={set[key] ?? ''}
-                                      onChange={(e) =>
-                                        mutate((v) => {
-                                          const val =
-                                            e.target.value === '' ? null : Number(e.target.value);
-                                          v.days[di].exercises[ei].sets[si] = {
-                                            ...set,
-                                            [key]: key === 'restSeconds' ? (val ?? 0) : val,
-                                          };
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                ))}
-                              </div>
-                              <details style={{ marginTop: 12 }}>
-                                <summary>Parâmetros avançados</summary>
-                                <div className="set-grid" style={{ marginTop: 12 }}>
-                                  <label>
-                                    Tipo
-                                    <select
-                                      value={set.kind}
-                                      onChange={(e) =>
-                                        mutate((v) => {
-                                          v.days[di].exercises[ei].sets[si].kind = e.target
-                                            .value as SetInput['kind'];
-                                        })
-                                      }
-                                    >
-                                      <option value="WORKING">Série válida</option>
-                                      <option value="WARMUP">Aquecimento</option>
-                                      <option value="TIMED">Temporizada</option>
-                                      <option value="FAILURE">Até a falha</option>
-                                    </select>
-                                  </label>
-                                  {(['durationSeconds', 'rpe', 'rir'] as const).map((k) => (
-                                    <label key={k}>
-                                      {k === 'durationSeconds' ? 'Duração (s)' : k.toUpperCase()}
-                                      <input
-                                        type="number"
-                                        min="0"
-                                        max={k === 'rpe' ? 10 : k === 'rir' ? 20 : 10000}
-                                        step={k === 'rpe' ? '0.1' : '1'}
-                                        value={set[k] ?? ''}
-                                        onChange={(e) =>
-                                          mutate((v) => {
-                                            v.days[di].exercises[ei].sets[si] = {
-                                              ...set,
-                                              [k]:
-                                                e.target.value === ''
-                                                  ? null
-                                                  : Number(e.target.value),
-                                            };
-                                          })
-                                        }
-                                      />
-                                    </label>
-                                  ))}
-                                </div>
-                                <div className="set-grid" style={{ marginTop: 12 }}>
-                                  {(['cadence', 'technique'] as const).map((k) => (
-                                    <label key={k}>
-                                      {k === 'cadence'
-                                        ? 'Cadência'
-                                        : 'Técnica (drop-set, rest-pause etc.)'}
-                                      <input
-                                        value={set[k] ?? ''}
-                                        maxLength={k === 'cadence' ? 80 : 120}
-                                        onChange={(e) =>
-                                          mutate((v) => {
-                                            v.days[di].exercises[ei].sets[si] = {
-                                              ...set,
-                                              [k]: e.target.value || null,
-                                            };
-                                          })
-                                        }
-                                      />
-                                    </label>
-                                  ))}
-                                  <label className="consent">
-                                    <input
-                                      type="checkbox"
-                                      checked={set.unilateral}
-                                      onChange={(e) =>
-                                        mutate((v) => {
-                                          v.days[di].exercises[ei].sets[si].unilateral =
-                                            e.target.checked;
-                                        })
-                                      }
-                                    />{' '}
-                                    Unilateral
-                                  </label>
-                                </div>
-                              </details>
-                              <button
-                                className="danger"
-                                style={{ marginTop: 10 }}
-                                disabled={exercise.sets.length === 1}
-                                onClick={() =>
-                                  mutate((v) => {
-                                    v.days[di].exercises[ei].sets.splice(si, 1);
-                                  })
-                                }
-                              >
-                                Remover série
-                              </button>
-                            </div>
-                          ))}
-                          <button
-                            className="secondary"
-                            onClick={() =>
-                              mutate((v) => {
-                                v.days[di].exercises[ei].sets.push(series());
-                              })
-                            }
-                          >
-                            Adicionar série
-                          </button>
-                        </article>
+                        </div>
                       ))}
-                      <label style={{ marginTop: 18 }}>
-                        Adicionar exercício
-                        <select
-                          aria-label="Adicionar exercício"
-                          value=""
-                          onChange={(e) => {
-                            if (e.target.value)
-                              mutate((v) => {
-                                v.days[di].exercises.push({
-                                  exerciseId: e.target.value,
-                                  notes: '',
-                                  groupKey: null,
-                                  sets: [series(), series(), series()],
-                                });
-                              });
-                          }}
-                        >
-                          <option value="">Selecione no catálogo</option>
-                          {exercises.map((e) => (
-                            <option value={e.id} key={e.id}>
-                              {e.name}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    </section>
-                  ))}
+                    </div>
+                  </details>
                   <button
                     className="secondary"
                     style={{ marginTop: 20 }}
-                    onClick={() =>
+                    onClick={() => {
                       mutate((v) => {
                         v.days.push({
                           name: `Treino ${v.days.length + 1}`,
@@ -741,12 +484,481 @@ export function WorkoutEditor() {
                           suggestedDays: [],
                           exercises: [],
                         });
-                      })
-                    }
+                      });
+                      setActiveDay(draft.days.length);
+                    }}
                   >
                     Adicionar ficha
                   </button>
-                  <div className="card" style={{ marginTop: 24 }}>
+                  <div className="builder-tabs" role="tablist" aria-label="Fichas do plano">
+                    {draft.days.map((day, i) => (
+                      <button
+                        key={i}
+                        role="tab"
+                        aria-selected={activeDay === i}
+                        aria-controls={'workout-day-' + i}
+                        id={'day-tab-' + i}
+                        className={activeDay === i ? 'selected' : 'secondary'}
+                        onClick={() => {
+                          setActiveDay(i);
+                          setExerciseSearch('');
+                        }}
+                      >
+                        <Dumbbell size={16} />
+                        {day.name}
+                        <span>{day.exercises.length}</span>
+                      </button>
+                    ))}
+                  </div>
+                  {draft.days.map((day, di) =>
+                    di !== activeDay ? null : (
+                      <section
+                        className="card workout-day"
+                        role="tabpanel"
+                        id={'workout-day-' + di}
+                        aria-labelledby={'day-tab-' + di}
+                        key={di}
+                        style={{ marginTop: 20 }}
+                      >
+                        <div className="row wrap">
+                          <input
+                            aria-label="Nome da ficha"
+                            value={day.name}
+                            maxLength={100}
+                            onChange={(e) =>
+                              mutate((v) => {
+                                v.days[di].name = e.target.value;
+                              })
+                            }
+                          />
+                          <button
+                            className="secondary"
+                            onClick={() =>
+                              mutate((v) => {
+                                v.days.push(structuredClone(v.days[di]));
+                              })
+                            }
+                          >
+                            Duplicar ficha
+                          </button>
+                          <button
+                            className="danger"
+                            disabled={draft.days.length === 1}
+                            onClick={() => {
+                              mutate((v) => {
+                                v.days.splice(di, 1);
+                              });
+                              setActiveDay(Math.max(0, di - 1));
+                            }}
+                          >
+                            Remover ficha
+                          </button>
+                        </div>
+                        <details className="editor-settings">
+                          <summary>Orientações e dias da semana</summary>
+                          <textarea
+                            aria-label="Orientações da ficha"
+                            style={{ marginTop: 12 }}
+                            value={day.notes}
+                            maxLength={1000}
+                            onChange={(e) =>
+                              mutate((v) => {
+                                v.days[di].notes = e.target.value;
+                              })
+                            }
+                          />
+                          <div className="row wrap" style={{ marginTop: 12 }}>
+                            {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(
+                              (label, weekday) => (
+                                <label className="consent" key={label}>
+                                  <input
+                                    type="checkbox"
+                                    checked={day.suggestedDays.includes(weekday)}
+                                    onChange={(e) =>
+                                      mutate((v) => {
+                                        v.days[di].suggestedDays = e.target.checked
+                                          ? [...day.suggestedDays, weekday]
+                                          : day.suggestedDays.filter((n) => n !== weekday);
+                                      })
+                                    }
+                                  />
+                                  {label}
+                                </label>
+                              ),
+                            )}
+                          </div>
+                        </details>
+                        <div className="exercise-picker">
+                          <label>
+                            <Search size={16} /> Buscar exercício
+                            <input
+                              placeholder="Digite o nome do exercício…"
+                              value={exerciseSearch}
+                              onChange={(e) => setExerciseSearch(e.target.value)}
+                            />
+                          </label>
+                          <label style={{ marginTop: 18 }}>
+                            Adicionar exercício
+                            <select
+                              aria-label="Adicionar exercício"
+                              value=""
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  mutate((v) => {
+                                    v.days[di].exercises.push({
+                                      exerciseId: e.target.value,
+                                      notes: '',
+                                      groupKey: null,
+                                      sets: [series(), series(), series()],
+                                    });
+                                  });
+                                  setExpanded((old) => ({
+                                    ...old,
+                                    [di + ':' + day.exercises.length]: true,
+                                  }));
+                                }
+                              }}
+                            >
+                              <option value="">Selecione no catálogo</option>
+                              {exercises
+                                .filter((e) =>
+                                  e.name
+                                    .normalize('NFD')
+                                    .replace(/[\u0300-\u036f]/g, '')
+                                    .toLowerCase()
+                                    .includes(
+                                      exerciseSearch
+                                        .normalize('NFD')
+                                        .replace(/[\u0300-\u036f]/g, '')
+                                        .toLowerCase(),
+                                    ),
+                                )
+                                .map((e) => (
+                                  <option value={e.id} key={e.id}>
+                                    {e.name}
+                                  </option>
+                                ))}
+                            </select>
+                          </label>
+                        </div>
+                        <div className="exercise-list-toolbar">
+                          <span className="muted small">
+                            {day.exercises.length} exercícios ·{' '}
+                            {day.exercises.reduce((n, e) => n + e.sets.length, 0)} séries
+                          </span>
+                          <button
+                            className="secondary"
+                            onClick={() => {
+                              const allOpen = day.exercises.every((_, i) => expanded[di + ':' + i]);
+                              setExpanded((old) => ({
+                                ...old,
+                                ...Object.fromEntries(
+                                  day.exercises.map((_, i) => [di + ':' + i, !allOpen]),
+                                ),
+                              }));
+                            }}
+                          >
+                            {day.exercises.length > 0 &&
+                            day.exercises.every((_, i) => expanded[di + ':' + i])
+                              ? 'Recolher todos'
+                              : 'Expandir todos'}
+                          </button>
+                        </div>
+                        {!day.exercises.length && (
+                          <div className="builder-empty">
+                            <Dumbbell size={26} />
+                            <h3>Vamos montar esta ficha?</h3>
+                            <p>
+                              Busque um exercício abaixo e ajuste as séries. Você pode duplicar e
+                              reordenar depois.
+                            </p>
+                          </div>
+                        )}
+                        {day.exercises.map((exercise, ei) => (
+                          <details
+                            className="exercise-row"
+                            open={!!expanded[di + ':' + ei]}
+                            onToggle={(event) => {
+                              const open = event.currentTarget.open;
+                              setExpanded((old) =>
+                                old[di + ':' + ei] === open
+                                  ? old
+                                  : { ...old, [di + ':' + ei]: open },
+                              );
+                            }}
+                            key={ei}
+                            draggable
+                            onDragStart={() => setDrag({ day: di, index: ei })}
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={() => {
+                              if (drag?.day === di) reorder(di, drag.index, ei);
+                              setDrag(undefined);
+                            }}
+                          >
+                            <summary className="exercise-summary">
+                              <GripVertical size={17} />
+                              <span className="exercise-number">
+                                {String(ei + 1).padStart(2, '0')}
+                              </span>
+                              <strong>
+                                {exercises.find((e) => e.id === exercise.exerciseId)?.name ??
+                                  'Exercício'}
+                              </strong>
+                              <span className="exercise-prescription">
+                                {exercise.sets.length} séries · {exercise.sets[0]?.repsMin ?? '—'}
+                                {exercise.sets[0]?.repsMax &&
+                                exercise.sets[0].repsMax !== exercise.sets[0].repsMin
+                                  ? '–' + exercise.sets[0].repsMax
+                                  : ''}{' '}
+                                rep.
+                              </span>
+                              <ChevronDown size={18} />
+                            </summary>
+                            <div className="exercise-row-body">
+                              <div className="row wrap">
+                                <h3>
+                                  {exercises.find((e) => e.id === exercise.exerciseId)?.name ??
+                                    'Exercício'}
+                                </h3>
+                                <div className="row wrap">
+                                  <button
+                                    className="secondary"
+                                    disabled={ei === 0}
+                                    onClick={() => reorder(di, ei, ei - 1)}
+                                    aria-label="Mover exercício para cima"
+                                  >
+                                    ↑
+                                  </button>
+                                  <button
+                                    className="secondary"
+                                    disabled={ei === day.exercises.length - 1}
+                                    onClick={() => reorder(di, ei, ei + 1)}
+                                    aria-label="Mover exercício para baixo"
+                                  >
+                                    ↓
+                                  </button>
+                                  <button
+                                    className="secondary"
+                                    onClick={() =>
+                                      mutate((v) => {
+                                        v.days[di].exercises.splice(
+                                          ei + 1,
+                                          0,
+                                          structuredClone(exercise),
+                                        );
+                                      })
+                                    }
+                                  >
+                                    Duplicar
+                                  </button>
+                                  <button
+                                    className="danger"
+                                    onClick={() =>
+                                      mutate((v) => {
+                                        v.days[di].exercises.splice(ei, 1);
+                                      })
+                                    }
+                                  >
+                                    Remover
+                                  </button>
+                                </div>
+                              </div>
+                              <details className="editor-settings">
+                                <summary>Observações e supersérie</summary>
+                                <input
+                                  aria-label="Observações do exercício"
+                                  value={exercise.notes}
+                                  maxLength={1000}
+                                  onChange={(e) =>
+                                    mutate((v) => {
+                                      v.days[di].exercises[ei].notes = e.target.value;
+                                    })
+                                  }
+                                />
+                                <input
+                                  aria-label="Grupo de supersérie, opcional"
+                                  placeholder="Grupo de supersérie (opcional)"
+                                  value={exercise.groupKey ?? ''}
+                                  maxLength={60}
+                                  style={{ marginTop: 10 }}
+                                  onChange={(e) =>
+                                    mutate((v) => {
+                                      v.days[di].exercises[ei].groupKey = e.target.value || null;
+                                    })
+                                  }
+                                />
+                              </details>
+                              <button
+                                className="secondary copy-series"
+                                onClick={() =>
+                                  mutate((v) => {
+                                    const target = v.days[di].exercises[ei];
+                                    target.sets = target.sets.map(() =>
+                                      structuredClone(target.sets[0]),
+                                    );
+                                  })
+                                }
+                              >
+                                Aplicar primeira série às demais
+                              </button>
+                              {exercise.sets.map((set, si) => (
+                                <details key={si} className="link-card set-editor" open={si === 0}>
+                                  <summary>
+                                    Série {si + 1}
+                                    <span>
+                                      {set.repsMin ?? '—'}
+                                      {set.repsMax && set.repsMax !== set.repsMin
+                                        ? '–' + set.repsMax
+                                        : ''}{' '}
+                                      rep. · {set.targetKg ?? '—'} kg · {set.restSeconds}s de
+                                      descanso
+                                    </span>
+                                  </summary>
+                                  <div className="set-grid">
+                                    {(
+                                      [
+                                        ['repsMin', 'Repetições mín.'],
+                                        ['repsMax', 'Repetições máx.'],
+                                        ['targetKg', 'Carga alvo (kg)'],
+                                        ['restSeconds', 'Descanso (s)'],
+                                      ] as const
+                                    ).map(([key, label]) => (
+                                      <label key={key}>
+                                        {label}
+                                        <input
+                                          type="number"
+                                          min="0"
+                                          max={key === 'restSeconds' ? 3600 : 10000}
+                                          step={key === 'targetKg' ? '0.001' : '1'}
+                                          value={set[key] ?? ''}
+                                          onChange={(e) =>
+                                            mutate((v) => {
+                                              const val =
+                                                e.target.value === ''
+                                                  ? null
+                                                  : Number(e.target.value);
+                                              v.days[di].exercises[ei].sets[si] = {
+                                                ...set,
+                                                [key]: key === 'restSeconds' ? (val ?? 0) : val,
+                                              };
+                                            })
+                                          }
+                                        />
+                                      </label>
+                                    ))}
+                                  </div>
+                                  <details style={{ marginTop: 12 }}>
+                                    <summary>Parâmetros avançados</summary>
+                                    <div className="set-grid" style={{ marginTop: 12 }}>
+                                      <label>
+                                        Tipo
+                                        <select
+                                          value={set.kind}
+                                          onChange={(e) =>
+                                            mutate((v) => {
+                                              v.days[di].exercises[ei].sets[si].kind = e.target
+                                                .value as SetInput['kind'];
+                                            })
+                                          }
+                                        >
+                                          <option value="WORKING">Série válida</option>
+                                          <option value="WARMUP">Aquecimento</option>
+                                          <option value="TIMED">Temporizada</option>
+                                          <option value="FAILURE">Até a falha</option>
+                                        </select>
+                                      </label>
+                                      {(['durationSeconds', 'rpe', 'rir'] as const).map((k) => (
+                                        <label key={k}>
+                                          {k === 'durationSeconds'
+                                            ? 'Duração (s)'
+                                            : k.toUpperCase()}
+                                          <input
+                                            type="number"
+                                            min="0"
+                                            max={k === 'rpe' ? 10 : k === 'rir' ? 20 : 10000}
+                                            step={k === 'rpe' ? '0.1' : '1'}
+                                            value={set[k] ?? ''}
+                                            onChange={(e) =>
+                                              mutate((v) => {
+                                                v.days[di].exercises[ei].sets[si] = {
+                                                  ...set,
+                                                  [k]:
+                                                    e.target.value === ''
+                                                      ? null
+                                                      : Number(e.target.value),
+                                                };
+                                              })
+                                            }
+                                          />
+                                        </label>
+                                      ))}
+                                    </div>
+                                    <div className="set-grid" style={{ marginTop: 12 }}>
+                                      {(['cadence', 'technique'] as const).map((k) => (
+                                        <label key={k}>
+                                          {k === 'cadence'
+                                            ? 'Cadência'
+                                            : 'Técnica (drop-set, rest-pause etc.)'}
+                                          <input
+                                            value={set[k] ?? ''}
+                                            maxLength={k === 'cadence' ? 80 : 120}
+                                            onChange={(e) =>
+                                              mutate((v) => {
+                                                v.days[di].exercises[ei].sets[si] = {
+                                                  ...set,
+                                                  [k]: e.target.value || null,
+                                                };
+                                              })
+                                            }
+                                          />
+                                        </label>
+                                      ))}
+                                      <label className="consent">
+                                        <input
+                                          type="checkbox"
+                                          checked={set.unilateral}
+                                          onChange={(e) =>
+                                            mutate((v) => {
+                                              v.days[di].exercises[ei].sets[si].unilateral =
+                                                e.target.checked;
+                                            })
+                                          }
+                                        />{' '}
+                                        Unilateral
+                                      </label>
+                                    </div>
+                                  </details>
+                                  <button
+                                    className="danger"
+                                    style={{ marginTop: 10 }}
+                                    disabled={exercise.sets.length === 1}
+                                    onClick={() =>
+                                      mutate((v) => {
+                                        v.days[di].exercises[ei].sets.splice(si, 1);
+                                      })
+                                    }
+                                  >
+                                    Remover série
+                                  </button>
+                                </details>
+                              ))}
+                              <button
+                                className="secondary"
+                                onClick={() =>
+                                  mutate((v) => {
+                                    v.days[di].exercises[ei].sets.push(series());
+                                  })
+                                }
+                              >
+                                Adicionar série
+                              </button>
+                            </div>
+                          </details>
+                        ))}
+                      </section>
+                    ),
+                  )}
+                  <div className="card editor-savebar" style={{ marginTop: 24 }}>
                     {data.role === 'PROFESSIONAL' && (
                       <>
                         <h3>Atribuir aos alunos vinculados</h3>

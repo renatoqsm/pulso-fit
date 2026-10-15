@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Activity, LayoutDashboard, LogOut, Users, ShieldCheck, ArrowUpRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Logo } from './logo';
+import { WorkflowShell } from './workflow-shell';
 import { AdminTools } from './admin-tools';
 import { ActivityOverview } from './activity-overview';
 import { clearOffline } from '@/lib/session-queue';
@@ -57,6 +58,17 @@ export function Dashboard() {
   useEffect(() => {
     void load();
   }, [load]);
+  useEffect(() => {
+    const open = () => {
+      if (window.location.hash === '#vinculos') {
+        const section = document.getElementById('vinculos') as HTMLDetailsElement | null;
+        if (section) section.open = true;
+      }
+    };
+    open();
+    window.addEventListener('hashchange', open);
+    return () => window.removeEventListener('hashchange', open);
+  }, [data]);
   async function action(path: string, body: unknown) {
     setBusy(true);
     setError('');
@@ -110,71 +122,34 @@ export function Dashboard() {
   const isAdmin = user.role === 'ADMIN';
   const active = links.filter((l) => l.status === 'ACTIVE');
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <Logo />
-        <nav>
-          <a href="/conta" style={{ marginBottom: 12 }}>
-            Conta e privacidade
-          </a>
-          <a href="/exercicios" style={{ marginBottom: 12 }}>
-            <Activity size={18} /> Exercícios
-          </a>
-          <a href="/painel">
-            <LayoutDashboard size={18} /> Meu espaço
-          </a>
-        </nav>
-        <div className="sidebar-footer">
-          <ShieldCheck size={20} />
-          <p>
-            Seu perfil é privado.
-            <br />
-            Você controla seus vínculos.
-          </p>
-          <span>SUA ROTINA · PULSO FIT</span>
-        </div>
-      </aside>
-      <main className="main">
-        <header className="topbar row">
-          <div>
-            <p className="eyebrow" style={{ marginBottom: 6 }}>
-              Seu espaço
-            </p>
-            <span className="muted small">
-              {isAdmin ? 'Administração' : isPro ? 'Área profissional' : 'Área do aluno'}
-            </span>
-          </div>
-          <div className="row">
-            <span className="small">{user.profile.name}</span>
-            <button className="secondary" disabled={busy} onClick={() => action('auth/logout', {})}>
-              <LogOut size={16} />
-              <span>Sair</span>
-            </button>
-          </div>
-        </header>
-        <section className="welcome">
-          <p className="eyebrow">Cada conexão é um novo começo</p>
-          <h1>Olá, {user.profile.name.split(' ')[0]}.</h1>
-          <p>
-            {isAdmin
-              ? 'Revise as habilitações profissionais com responsabilidade.'
-              : isPro
-                ? 'Prepare seu perfil, valide suas habilitações e conecte-se aos seus alunos.'
-                : 'Seu próximo passo começa aqui. Conecte-se aos seus profissionais e mantenha o controle da sua jornada.'}
-          </p>
-        </section>
-        {error && (
-          <p className="message error" role="alert">
-            {error}
-          </p>
-        )}
-        {message && (
-          <p className="message" role="status">
-            {message}
-          </p>
-        )}
-        {isAdmin && <AdminTools />}
-        <ActivityOverview />
+    <WorkflowShell title="Meu dia">
+      <section className="welcome">
+        <p className="eyebrow">Cada conexão é um novo começo</p>
+        <h2>Olá, {user.profile.name.split(' ')[0]}.</h2>
+        <p>
+          {isAdmin
+            ? 'Revise as habilitações profissionais com responsabilidade.'
+            : isPro
+              ? 'Prepare seu perfil, valide suas habilitações e conecte-se aos seus alunos.'
+              : 'Seu treino, sua alimentação e os próximos passos do dia, em um só lugar.'}
+        </p>
+      </section>
+      {error && (
+        <p className="message error" role="alert">
+          {error}
+        </p>
+      )}
+      {message && (
+        <p className="message" role="status">
+          {message}
+        </p>
+      )}
+      {isAdmin && <AdminTools />}
+      <ActivityOverview />
+      <details id="vinculos" className="dashboard-settings" open={isPro || isAdmin || undefined}>
+        <summary>
+          Perfil, vínculos e habilitações <span>Gerenciar conexões e dados do perfil</span>
+        </summary>
         <section className="stats">
           <div className="card stat">
             <Users size={20} />
@@ -490,17 +465,17 @@ export function Dashboard() {
               </form>
             </section>
             <section className="card" style={{ background: '#edf3e3' }}>
-              <span className="badge">PRÓXIMAS ETAPAS</span>
+              <span className="badge">SUA ROTINA</span>
               <h3 style={{ marginTop: 18 }}>Treinos e alimentação</h3>
               <p className="small muted">
                 Treinos, execução de séries, evolução e alimentação estão disponíveis nos módulos
-                habilitados. A base alimentar global depende de importação; rótulos e receitas
-                pessoais já podem ser cadastrados.
+                habilitados. Os catálogos de exercícios e alimentos estão disponíveis; você também
+                pode criar rótulos e receitas pessoais.
               </p>
             </section>
           </div>
         </div>
-      </main>
-    </div>
+      </details>
+    </WorkflowShell>
   );
 }

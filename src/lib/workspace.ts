@@ -72,6 +72,8 @@ export async function workspace(db: PrismaClient, user: User) {
       recentSessions: recentSessions.map((s) => ({
         id: s.id,
         studentId: s.studentId,
+        dayId: s.dayId,
+        endedAt: s.endedAt,
         name: s.day.name,
         status: s.status,
         date: s.startedAt,

@@ -67,16 +67,38 @@ try {
   await page.getByLabel('Senha', { exact: true }).fill('Browser-teste-seguro-123');
   await page.getByRole('button', { name: 'Criar conta', exact: true }).click();
   await page.waitForURL('**/painel');
-  await page.goto(origin + '/treinos');
+  await page.getByRole('heading', { name: 'Sua rotina de hoje', exact: true }).waitFor();
+  await mkdir('test-results', { recursive: true });
+  await page.screenshot({ path: 'test-results/mobile-dashboard.png', fullPage: true });
+  await page.getByRole('button', { name: 'Abrir menu', exact: true }).click();
+  await page
+    .getByRole('navigation', { name: 'Navegação principal' })
+    .getByRole('link', { name: 'Planos de treino', exact: true })
+    .click();
+  await page.waitForURL('**/treinos#programas');
   await page.getByLabel('Nome do programa', { exact: true }).fill('Programa browser ' + tag);
   await page.getByRole('button', { name: 'Criar programa', exact: true }).click();
   await page.getByRole('button', { name: 'Adicionar ficha', exact: true }).click();
   await page.getByLabel('Adicionar exercício', { exact: true }).selectOption({ index: 1 });
-  const repetitions = page.getByLabel('Repetições mín.', { exact: true });
+  const repetitions = page.getByLabel('Repetições mín.', { exact: true }).filter({ visible: true });
   await repetitions.first().waitFor();
   for (let i = 0; i < (await repetitions.count()); i++) await repetitions.nth(i).fill('10');
-  const weights = page.getByLabel('Carga alvo (kg)', { exact: true });
+  const weights = page.getByLabel('Carga alvo (kg)', { exact: true }).filter({ visible: true });
   for (let i = 0; i < (await weights.count()); i++) await weights.nth(i).fill('25');
+  await page.getByRole('button', { name: 'Recolher todos', exact: true }).click();
+  assert.equal(
+    await page.getByLabel('Repetições mín.', { exact: true }).first().isVisible(),
+    false,
+  );
+  await page.getByRole('button', { name: 'Expandir todos', exact: true }).click();
+  await repetitions.first().fill('12');
+  await page.getByRole('button', { name: 'Aplicar primeira série às demais', exact: true }).click();
+  const allRepetitions = page.getByLabel('Repetições mín.', { exact: true });
+  for (let i = 0; i < (await allRepetitions.count()); i++)
+    assert.equal(await allRepetitions.nth(i).inputValue(), '12');
+  await repetitions.first().fill('10');
+  await page.getByRole('button', { name: 'Aplicar primeira série às demais', exact: true }).click();
+  await page.screenshot({ path: 'test-results/mobile-workout-builder.png', fullPage: true });
   await page.getByRole('button', { name: 'Salvar e publicar', exact: true }).click();
   await page.getByRole('button', { name: 'Iniciar / recuperar sessão', exact: true }).click();
   await page.waitForURL('**/sessoes/**');
@@ -182,13 +204,27 @@ try {
     .getByLabel('Nome do plano / planejamento', { exact: true })
     .fill('Plano browser ' + tag);
   await page.getByRole('button', { name: 'Criar planejamento', exact: true }).click();
-  await page.getByRole('button', { name: 'Adicionar refeição', exact: true }).click();
+  assert.equal(
+    await page.locator('#app-navigation a[aria-current="page"]').textContent(),
+    'Planos alimentares',
+  );
+  await page.getByRole('button', { name: 'Café da manhã', exact: true }).click();
+  await page.getByRole('button', { name: 'Duplicar refeição', exact: true }).click();
+  assert.equal(await page.getByRole('tab', { name: /Café da manhã/ }).count(), 2);
+  await page.getByRole('button', { name: 'Remover refeição', exact: true }).click();
+  await page.getByLabel('Horário sugerido', { exact: true }).fill('08:30');
   await page.getByRole('button', { name: 'Adicionar alimento', exact: true }).first().click();
   await page.getByLabel('Alimento', { exact: true }).first().selectOption(foodId);
   await page.getByLabel('Quantidade', { exact: true }).first().fill('50');
   await page.getByRole('button', { name: 'Salvar e publicar', exact: true }).click();
   await page.getByRole('button', { name: 'Criar revisão', exact: true }).waitFor();
-  await page.getByRole('button', { name: 'Diário', exact: true }).click();
+  await page.screenshot({ path: 'test-results/mobile-nutrition-plan.png', fullPage: true });
+  await page.goto(origin + '/painel');
+  await page.getByRole('heading', { name: 'Café da manhã', exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Treinar novamente', exact: true }).waitFor();
+  await page.screenshot({ path: 'test-results/mobile-dashboard-with-plan.png', fullPage: true });
+  await page.getByRole('link', { name: 'Registrar refeição', exact: true }).click();
+  await page.waitForURL('**/alimentacao#diary');
   await page
     .getByRole('button', { name: 'Marcar realizada / registrar consumo', exact: true })
     .click();
@@ -222,6 +258,19 @@ try {
     path: '/workspace/pulso-fit/test-results/desktop-workouts.png',
     fullPage: true,
   });
+  await page.getByRole('button', { name: 'Versão 1 • Publicada', exact: true }).click();
+  await page.getByRole('button', { name: 'Criar revisão', exact: true }).click();
+  await page.getByRole('tab', { name: /Treino 1/ }).waitFor();
+  for (let i = 2; i <= 6; i++)
+    await page.getByLabel('Adicionar exercício', { exact: true }).selectOption({ index: i });
+  await page.getByRole('button', { name: 'Expandir todos', exact: true }).click();
+  await page.getByRole('button', { name: 'Recolher todos', exact: true }).click();
+  assert.equal(await page.locator('.exercise-row').count(), 6);
+  assert.equal(
+    await page.locator('#app-navigation a[aria-current="page"]').textContent(),
+    'Planos de treino',
+  );
+  await page.screenshot({ path: 'test-results/desktop-workout-builder.png', fullPage: true });
   assert.equal(pageErrors.length, 0, JSON.stringify(pageErrors));
   console.log(
     'Browser: cadastro, prescrição, séries, fila criptografada offline, recuperação, evolução, plano e diário passaram; mobile sem overflow; sem erros JS.',
