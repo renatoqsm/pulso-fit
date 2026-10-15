@@ -17,6 +17,27 @@ const equipmentName: Record<string, string> = {
   'Cable machine': 'Máquina de cabos',
 };
 const labelEquipment = (name: string) => equipmentName[name] ?? name;
+const muscleName: Record<string, string> = {
+  'Biceps brachii': 'Bíceps braquial',
+  'Anterior deltoid': 'Deltoide anterior',
+  'Serratus anterior': 'Serrátil anterior',
+  'Pectoralis major': 'Peitoral maior',
+  'Triceps brachii': 'Tríceps braquial',
+  'Rectus abdominis': 'Reto abdominal',
+  Gastrocnemius: 'Gastrocnêmio (panturrilha)',
+  'Gluteus maximus': 'Glúteo máximo',
+  Trapezius: 'Trapézio',
+  'Quadriceps femoris': 'Quadríceps femoral',
+  'Biceps femoris': 'Bíceps femoral (posterior da coxa)',
+  'Latissimus dorsi': 'Grande dorsal',
+  Brachialis: 'Braquial',
+  'Obliquus externus abdominis': 'Oblíquo externo do abdômen',
+  Soleus: 'Sóleo',
+  'Erector spinae': 'Eretores da coluna',
+};
+const labelMuscle = (name: string) => muscleName[name] ?? name;
+const languageLabel = (language?: string) =>
+  language?.startsWith('pt') ? 'português' : language === 'en' ? 'inglês' : language;
 const categoryName: Record<string, string> = {
   STRENGTH: 'Força',
   CARDIO: 'Cardio',
@@ -70,6 +91,10 @@ type Exercise = {
     source: string;
     sourceUrl?: string;
     changes?: string;
+    localization?: {
+      notice: string;
+      original: { name?: string; description?: string; instructions?: string };
+    };
     displayLanguage?: string;
     instructionsLanguage?: string;
     media?: {
@@ -265,7 +290,7 @@ export function ExerciseCatalog({ role }: { role: string }) {
               <option value="">Todos os músculos</option>
               {meta?.muscles.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {m.name}
+                  {labelMuscle(m.name)}
                 </option>
               ))}
             </select>
@@ -352,40 +377,48 @@ export function ExerciseCatalog({ role }: { role: string }) {
           </p>
           {(selected.provenance.displayLanguage || selected.provenance.instructionsLanguage) && (
             <p className="small muted">
-              Nome:{' '}
-              {selected.provenance.displayLanguage === 'pt'
-                ? 'português'
-                : selected.provenance.displayLanguage === 'en'
-                  ? 'inglês'
-                  : selected.provenance.displayLanguage}{' '}
-              · Instruções:{' '}
-              {selected.provenance.instructionsLanguage === 'pt'
-                ? 'português'
-                : selected.provenance.instructionsLanguage === 'en'
-                  ? 'inglês'
-                  : selected.provenance.instructionsLanguage}
-              . Conteúdo mantido no idioma da fonte.
+              Nome: {languageLabel(selected.provenance.displayLanguage)} · Instruções:{' '}
+              {selected.instructions
+                ? languageLabel(selected.provenance.instructionsLanguage)
+                : 'não disponíveis na fonte'}
+              .
             </p>
           )}
-          <h3>Instruções da fonte</h3>
+          <h3>
+            {selected.provenance.localization ? 'Instruções em português' : 'Instruções da fonte'}
+          </h3>
           <p style={{ whiteSpace: 'pre-wrap' }}>
             {selected.instructions ||
               'A fonte não informa instruções de execução. Consulte um profissional.'}
           </p>
+          {selected.provenance.localization && (
+            <>
+              <p className="small muted">{selected.provenance.localization.notice}</p>
+              <details className="card" style={{ marginBottom: 18 }}>
+                <summary>Consultar conteúdo original</summary>
+                <h3>{selected.provenance.localization.original.name ?? selected.name}</h3>
+                <p style={{ whiteSpace: 'pre-wrap' }} lang="en">
+                  {selected.provenance.localization.original.instructions ??
+                    selected.provenance.localization.original.description ??
+                    'A fonte não informa instruções.'}
+                </p>
+              </details>
+            </>
+          )}
           <div className="dashboard-grid">
             <div>
               <h3>Músculos principais</h3>
               <p className="muted small">
                 {selected.muscles
                   .filter((m) => m.role === 'PRIMARY')
-                  .map((m) => m.muscle.name)
+                  .map((m) => labelMuscle(m.muscle.name))
                   .join(', ') || 'Não informado'}
               </p>
               <h3>Músculos secundários</h3>
               <p className="muted small">
                 {selected.muscles
                   .filter((m) => m.role === 'SECONDARY')
-                  .map((m) => m.muscle.name)
+                  .map((m) => labelMuscle(m.muscle.name))
                   .join(', ') || 'Não informado'}
               </p>
             </div>
@@ -727,7 +760,7 @@ function ExerciseEditor({
               >
                 {meta.muscles.map((m) => (
                   <option key={m.id} value={m.id}>
-                    {m.name}
+                    {labelMuscle(m.name)}
                   </option>
                 ))}
               </select>

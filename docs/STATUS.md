@@ -83,3 +83,15 @@ O criador de treinos usa busca no servidor e paginação, removendo o limite ant
 Validação desta atualização: **45 testes em Node e 45 em workerd local**, sem falhas ou ignorados; TypeScript e build OpenNext passaram. Chromium em Node e workerd confirmou a busca e adição de Zottman curl, fora dos primeiros 200 resultados, e os fluxos completos de planos/execução/nutrição/offline. Bundle Worker minificado de aproximadamente 1.173 MiB gzip, sem node:sqlite, abaixo do limite gratuito.
 
 Publicação confirmada pela Cloudflare: versão `920b8b04-e74c-4f3a-b6ff-df5abd34e7a8` em `https://pulso-fit.renatoqsousam.workers.dev`. O teste HTTP direto do domínio público continua bloqueado pela política de rede aplicada ao ambiente; os fluxos foram validados no workerd local.
+
+## Tradução do catálogo para português brasileiro
+
+Os 934 nomes estão em português: 68 traduções originais mantidas e 866 nomes adaptados à nomenclatura brasileira. Os 913 registros com instruções disponíveis possuem texto em português; os 21 sem instruções não receberam conteúdo inventado. Descrições também foram traduzidas. A tradução automática dos textos recebeu glossário e correções linguísticas pontuais, sem revisão técnica profissional; a interface informa isso e oferece consulta ao texto original. Nomes de músculos aparecem em português, mantendo a taxonomia original no banco.
+
+UUIDs, aliases ingleses, licenças, autoria, mídia, favoritos, status e fichas publicadas são preservados. Os nomes anteriores continuam pesquisáveis. O pacote de tradução versionado usa hashes do conteúdo de origem e interrompe quando faltam traduções para um snapshot novo; reaplicação da mesma revisão foi validada como idempotente. Não se apresenta esta adaptação como base de origem brasileira nem como tradução oficial da fonte.
+
+D1 remoto sincronizado: 866 atualizados, 68 inalterados, nenhuma nova identidade. Segunda comparação reconheceu os 934 como inalterados. Testes de dados verificam cobertura, números preservados, aliases e atribuições. Os 46 testes passaram em Node e o Chromium confirmou os nomes portugueses, o texto original expansível, os músculos traduzidos e a busca pelo nome inglês.
+
+Os 46 testes também passaram em workerd local; Chromium validou a interface traduzida e os fluxos completos em ambos os runtimes. O build OpenNext passou, sem node:sqlite, com pacote minificado de aproximadamente 1.32 MiB gzip. A conferência dos textos inclui preservação exata de números e URLs e ausência de redução acentuada do conteúdo. O teste HTTP externo ao domínio público retornou 403 com código 1010; a causa não foi atribuída à aplicação nem à política de rede. Os fluxos autenticados foram validados apenas localmente.
+
+Tradução publicada na Cloudflare: versão `38dff28f-0269-4366-a379-5841960d4295` em `https://pulso-fit.renatoqsousam.workers.dev`. D1 confirmou os 934 nomes e as 913 instruções disponíveis em português, sem novas identidades; conferência final reconheceu 934 registros inalterados.

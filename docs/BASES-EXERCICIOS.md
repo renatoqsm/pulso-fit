@@ -6,8 +6,8 @@ Fonte oficial: https://wger.de/api/v2/exerciseinfo/ (todas as páginas).
 
 O retorno capturado contém 932 exercícios-base e 3.514 traduções em 22 idiomas. O aplicativo preserva também dois registros portugueses do snapshot anterior ausentes na API atual, resultando em **934 exercícios**, sem apagar referências existentes.
 
-- 68 nomes em português e 866 em inglês; a interface indica o idioma. Não foram inventadas traduções.
-- 913 registros com instruções disponíveis; os demais permanecem sem instruções.
+- 934 nomes em português: 68 da fonte e 866 adaptados à terminologia brasileira. Os nomes originais continuam pesquisáveis.
+- 913 registros com instruções disponíveis em português; os demais permanecem sem instruções. As traduções automáticas são identificadas e permitem consultar o texto original, sem alegação de revisão técnica profissional.
 - Músculos principais/secundários, equipamentos, categoria, aliases, UUID original e revisão, quando fornecidos.
 - Referências a 383 imagens e 78 vídeos, com licença e atribuição individuais. São links externos; os arquivos não foram copiados nem incorporados automaticamente.
 - Autoria, licença, fonte, idioma e créditos de traduções e mídias ficam em `provenance`.
@@ -32,6 +32,7 @@ O aplicativo utiliza o snapshot local versionado, sem dependência da API extern
 
 ```bash
 python3 scripts/expand-wger-api-snapshot.py --directory /caminho/captura
+python3 scripts/localize-wger-pt.py
 npm run exercises:import
 ```
 
@@ -43,3 +44,5 @@ python3 scripts/sync-d1-exercises.py --account-id ACCOUNT --database-id DATABASE
 ```
 
 Requer a credencial já configurada no ambiente. O script verifica o banco `pulso-fit`, processa somente catálogo público WGER, preserva IDs/status/favoritos e mantém checkpoint local para retomada. Não exporta nem altera contas, alimentos ou prescrições dos usuários. Cada lote é atômico; a operação completa pode ser retomada após falha. Revise o diff e as licenças ao trocar a captura.
+
+A tradução aplicada está documentada em [PT-BR](../data/wger/pt-BR/README.md). Esta entrega adapta o catálogo internacional existente; não afirma que sua origem seja uma base brasileira.

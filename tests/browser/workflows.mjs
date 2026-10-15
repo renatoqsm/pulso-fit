@@ -68,6 +68,18 @@ try {
   await page.getByRole('button', { name: 'Criar conta', exact: true }).click();
   await page.waitForURL('**/painel');
   await page.getByRole('heading', { name: 'Sua rotina de hoje', exact: true }).waitFor();
+  await page.goto(origin + '/exercicios');
+  await page.getByLabel('Nome ou nome alternativo', { exact: true }).fill('Rosca Zottman');
+  await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+  await page.getByRole('heading', { name: 'Rosca Zottman', exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Ver detalhes', exact: true }).first().click();
+  await page.getByRole('heading', { name: 'Instruções em português', exact: true }).waitFor();
+  await page.getByText('Consultar conteúdo original', { exact: true }).click();
+  await page.getByRole('heading', { name: 'Zottman curl', exact: true }).waitFor();
+  assert.equal(await page.getByRole('option', { name: 'Bíceps braquial', exact: true }).count(), 1);
+  await page.goto(origin + '/painel');
+  await page.getByRole('heading', { name: 'Sua rotina de hoje', exact: true }).waitFor();
+
   await mkdir('test-results', { recursive: true });
   await page.screenshot({ path: 'test-results/mobile-dashboard.png', fullPage: true });
   await page.getByRole('button', { name: 'Abrir menu', exact: true }).click();
@@ -79,11 +91,11 @@ try {
   await page.getByLabel('Nome do programa', { exact: true }).fill('Programa browser ' + tag);
   await page.getByRole('button', { name: 'Criar programa', exact: true }).click();
   await page.getByRole('button', { name: 'Adicionar ficha', exact: true }).click();
-  await page.getByLabel('Buscar exercício', { exact: true }).fill('Zottman');
+  await page.getByLabel('Buscar exercício', { exact: true }).fill('Zottman curl');
   await page
     .getByLabel('Adicionar exercício', { exact: true })
     .locator('option')
-    .filter({ hasText: 'Zottman curl' })
+    .filter({ hasText: 'Rosca Zottman' })
     .waitFor({ state: 'attached' });
 
   await page.getByLabel('Adicionar exercício', { exact: true }).selectOption({ index: 1 });
