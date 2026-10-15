@@ -1,17 +1,13 @@
 import type { PrismaClient } from '@prisma/client';
 import dataset from '../../data/wger/catalog.json';
 import { digest } from './crypto';
+import { normalizeSearch } from './search-normalize';
 export const snapshot = {
   revision: dataset.revision,
   count: dataset.exercises.length,
   notes: dataset.notes,
 };
-export const normalizeSearch = (text: string) =>
-  text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
+export { normalizeSearch } from './search-normalize';
 export async function importExercises(db: PrismaClient, actorId?: string) {
   const job = await db.exerciseImportJob.create({
     data: {

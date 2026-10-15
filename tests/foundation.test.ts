@@ -410,6 +410,9 @@ test(
     let globalId = '';
     await t.test('Catálogo protegido, busca com acentos/aliases, filtros e paginação', async () => {
       assert.equal((await new Client().request('exercises')).status, 401);
+      const picker = await student.request('exercises?picker=true');
+      assert.equal(picker.status, 200);
+      assert.deepEqual(Object.keys(picker.data.items[0]).sort(), ['id', 'name']);
       const list = await student.request('exercises');
       assert.equal(list.status, 200);
       assert.ok(list.data.total > 0);

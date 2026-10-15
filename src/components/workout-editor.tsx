@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { readApiResponse } from '@/lib/read-api-response';
 import { lowVolumeSets } from '@/lib/workout-presets';
 import { WorkflowShell } from './workflow-shell';
 import { useUnsavedChanges } from '@/lib/use-unsaved-changes';
@@ -60,7 +61,7 @@ type Data = {
 };
 const series = (): SetInput => ({
   repsMin: 6,
-  repsMax: 8,
+  repsMax: 10,
   targetKg: null,
   restSeconds: 60,
   durationSeconds: null,
@@ -135,7 +136,7 @@ export function WorkoutEditor() {
   async function load() {
     try {
       const res = await fetch('/api/workouts');
-      const result = await res.json();
+      const result = await readApiResponse(res);
       if (!res.ok) throw new Error(result.error);
       setData(result);
     } catch (e) {
@@ -153,13 +154,18 @@ export function WorkoutEditor() {
     const timer = setTimeout(async () => {
       try {
         const response = await fetch(
-          '/api/exercises?page=' + catalogPage + '&q=' + encodeURIComponent(exerciseSearch.trim()),
+          '/api/exercises?picker=true&page=' +
+            catalogPage +
+            '&q=' +
+            encodeURIComponent(exerciseSearch.trim()),
           { signal: controller.signal, cache: 'no-store' },
         );
-        const result = await response.json();
+        const result = await readApiResponse(response);
         if (!response.ok)
           throw new Error(result.error ?? 'Não foi possível carregar os exercícios.');
         if (controller.signal.aborted) return;
+        if (!Array.isArray(result.items) || typeof result.total !== 'number')
+          throw new Error('Não foi possível carregar os exercícios. Tente novamente.');
         setCatalogItems(result.items);
         setCatalogPages(Math.max(1, result.pages));
         setCatalogTotal(result.total);
@@ -197,14 +203,18 @@ export function WorkoutEditor() {
     window.addEventListener('hashchange', navigate);
     return () => window.removeEventListener('hashchange', navigate);
   }, [version, dirty]);
-  function select(v: Version) {
+  function select(v: Version, preserve = false, editing = false) {
     setVersion(v);
-    setActiveDay(0);
-    setExpanded({});
+    if (!preserve) {
+      setActiveDay(0);
+      setExpanded({});
+    } else setActiveDay((day) => Math.min(day, Math.max(0, v.days.length - 1)));
     setDirty(false);
     setDraft(draftFrom(v));
-    setExerciseSearch('');
-    setCatalogPage(1);
+    if (!preserve) {
+      setExerciseSearch('');
+      setCatalogPage(1);
+    }
     setExercises((previous) => {
       const byId = new Map(previous.map((exercise) => [exercise.id, exercise]));
       for (const day of v.days)
@@ -216,7 +226,7 @@ export function WorkoutEditor() {
             });
       return [...byId.values()];
     });
-    setPreview(!!v.publishedAt);
+    setPreview(editing ? false : !!v.publishedAt);
     const program = data?.own.find(
       (p) => p.id === v.programId || p.versions.some((item) => item.id === v.id),
     );
@@ -229,7 +239,7 @@ export function WorkoutEditor() {
         .filter((studentId) => data?.students.some((student) => student.id === studentId)),
     );
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!preserve) window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   async function editFichas(selected: Version) {
     const program = data?.own.find((p) => p.versions.some((v) => v.id === selected.id));
@@ -237,13 +247,8 @@ export function WorkoutEditor() {
     const draft = [...program.versions]
       .filter((v) => !v.publishedAt && v.number >= selected.number)
       .sort((a, b) => b.number - a.number)[0];
-    if (draft) {
-      select(draft);
-      setMessage('Edite a ficha e salve para atualizar seu treino.');
-    } else {
-      const result = await action(`workouts/${selected.id}/revise`, {});
-      if (result) setMessage('Ficha aberta para edição. Salve para atualizar seu treino.');
-    }
+    select(draft ?? selected, false, true);
+    setMessage('Edite a ficha e salve para atualizar seu treino.');
   }
   async function removePlan(selected: Version) {
     if (
@@ -262,21 +267,23 @@ export function WorkoutEditor() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
-      const result = await res.json();
+      const result = await readApiResponse(res);
       if (!res.ok) throw new Error(result.error);
-      setMessage(result.message ?? 'Salvo.');
       await load();
       if (result.versionId) {
         const response = await fetch(`/api/workouts/version/${result.versionId}`);
-        select(await response.json());
+        const value = await readApiResponse(response);
+        if (!response.ok) throw new Error(value.error ?? 'Não foi possível abrir a ficha.');
+        select(value, path.endsWith('/update'), path.endsWith('/update'));
       } else if (version && !result.removed) {
         const response = await fetch(`/api/workouts/version/${version.id}`);
-        if (response.ok) select(await response.json());
+        if (response.ok) select(await readApiResponse(response));
       }
       if (path.endsWith('/publish') || result.removed) {
         setVersion(undefined);
         setDirty(false);
       }
+      setMessage(result.message ?? 'Salvo.');
       return result;
     } catch (e) {
       setMessage(e instanceof Error ? e.message : 'Falha na conexão.');
@@ -434,7 +441,12 @@ export function WorkoutEditor() {
             </section>
           )}
           {version && (
-            <section className="card workout-builder" style={{ marginTop: 24 }}>
+            <section
+              className="card workout-builder"
+              style={{ marginTop: 24 }}
+              aria-busy={busy}
+              inert={busy}
+            >
               <div className="editor-context">
                 <button
                   className="secondary"
@@ -452,7 +464,7 @@ export function WorkoutEditor() {
                     ? 'Alterações não salvas'
                     : version.publishedAt
                       ? 'Ficha atual'
-                      : 'Em edição'}
+                      : 'Ficha salva'}
                 </span>
               </div>
               <h2 className="editor-title">
@@ -461,12 +473,11 @@ export function WorkoutEditor() {
                   'Seu plano de treino'}
               </h2>
               <div className="row wrap">
-                <h2>{version.publishedAt ? 'Sua ficha atual' : 'Editar suas fichas'}</h2>
+                <h2>{preview ? 'Sua ficha atual' : 'Editar suas fichas'}</h2>
                 <div className="row wrap">
                   <button
                     className="secondary"
                     hidden={
-                      !!version.publishedAt ||
                       !data.enabled ||
                       !data.own.some((p) => p.versions.some((v) => v.id === version.id))
                     }
@@ -485,7 +496,8 @@ export function WorkoutEditor() {
                   >
                     Duplicar programa
                   </button>
-                  {version.publishedAt &&
+                  {preview &&
+                    version.publishedAt &&
                     data.enabled &&
                     data.own.some((p) => p.versions.some((v) => v.id === version.id)) && (
                       <button disabled={busy} onClick={() => void editFichas(version)}>
@@ -494,13 +506,13 @@ export function WorkoutEditor() {
                     )}
                 </div>
               </div>
-              {!version.publishedAt && (
+              {!preview && (
                 <p className="small muted">
                   Edite exercícios, séries e dias abaixo. Ao salvar, esta passa a ser a ficha atual
                   dos próximos treinos.
                 </p>
               )}
-              {preview || version.publishedAt ? (
+              {preview ? (
                 <>
                   <p>{draft.objective}</p>
                   <p className="muted">{draft.notes}</p>
@@ -785,7 +797,7 @@ export function WorkoutEditor() {
                               )}
                             </p>
                           )}
-                          {catalogPages > 1 && (
+                          {!catalogError && !catalogLoading && catalogPages > 1 && (
                             <nav className="catalog-pagination" aria-label="Páginas do catálogo">
                               <button
                                 className="secondary"
@@ -967,7 +979,7 @@ export function WorkoutEditor() {
                                 Aplicar primeira série às demais
                               </button>
                               <p className="small muted low-volume-hint">
-                                Novos exercícios: 1 aquecimento · 2 reconhecimento · 2 trabalho
+                                Padrão: 2 séries de trabalho · 6–10 repetições
                               </p>
                               {exercise.sets.map((set, si) => (
                                 <div key={si} className="compact-set">
@@ -1156,19 +1168,15 @@ export function WorkoutEditor() {
                     >
                       <button
                         disabled={busy}
-                        onClick={async () => {
-                          const saved = await action(`workouts/${version.id}/save`, {
+                        onClick={() =>
+                          action(`workouts/${version.id}/update`, {
                             revision: version.draftRevision,
                             data: draft,
-                          });
-                          if (saved)
-                            await action(`workouts/${version.id}/publish`, {
-                              revision: saved.revision,
-                              studentIds: targets,
-                            });
-                        }}
+                            studentIds: targets,
+                          })
+                        }
                       >
-                        Salvar ficha
+                        {busy ? 'Salvando…' : 'Salvar ficha'}
                       </button>
                     </div>
                   </div>

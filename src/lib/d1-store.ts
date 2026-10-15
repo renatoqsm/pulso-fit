@@ -523,13 +523,29 @@ export class D1Store {
       const prefix = query.prefix();
       const where = query.where(model, args.where, 'r');
       const orders = query.order(model, args.orderBy, 'r');
-      let sql = prefix + 'SELECT r.* FROM ' + query.source(model) + ' r WHERE ' + where;
+      const selected = Object.entries(args.select ?? {})
+        .filter(([, value]) => value === true)
+        .map(([name]) => name);
+      const scalarOnly =
+        !args.include &&
+        selected.length > 0 &&
+        Object.entries(args.select ?? {}).every(
+          ([name, value]) =>
+            !value ||
+            (value === true &&
+              model.fields.some((field) => field.name === name && field.kind !== 'object')),
+        );
+      const projection = scalarOnly ? selected.map((name) => 'r.' + quote(name)).join(',') : 'r.*';
+      let sql =
+        prefix + 'SELECT ' + projection + ' FROM ' + query.source(model) + ' r WHERE ' + where;
       if (orders.length) sql += ' ORDER BY ' + orders.join(',');
       if (args.take !== undefined) sql += ' LIMIT ' + query.param(args.take);
       else if (args.skip) sql += ' LIMIT -1';
       if (args.skip) sql += ' OFFSET ' + query.param(args.skip);
       rows = (await this.rows(query, sql)).map((r) => decoded(model, r));
-      this.remember(model, rows, args.where, args.take === undefined && !args.skip);
+      // Partial rows must never populate the complete-record cache used by mutations.
+      if (!scalarOnly)
+        this.remember(model, rows, args.where, args.take === undefined && !args.skip);
     }
     return this.project(model, rows, args);
   }

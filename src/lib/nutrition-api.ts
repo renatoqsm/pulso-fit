@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { HttpError } from './http-error';
 import { authorship, studentAccess, professional } from './workflow-access';
 import { canAccessStudent } from './access';
-import { normalizeSearch } from './exercise-import';
+import { normalizeSearch } from './search-normalize';
 import {
   scaleNutrients,
   totalNutrients,

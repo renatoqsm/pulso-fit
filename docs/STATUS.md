@@ -135,3 +135,19 @@ Validação local em Node: 46 testes passaram, incluindo negação de exclusão 
 Os 46 testes e o Chromium também passaram no workerd local. A migration 0005 foi aplicada no D1 remoto; a verificação de chaves estrangeiras não apontou violações e a nova tabela estava vazia, sem exclusão de planos de usuários durante a entrega.
 
 Publicação confirmada pela Cloudflare: versão `d34cfdc7-32be-4011-9c78-b38ea7d2a85b` em `https://pulso-fit.renatoqsousam.workers.dev`.
+
+## Continuidade da edição, busca leve e padrão 2 × 6–10
+
+O salvamento agora usa uma única operação atômica `workouts/:id/update`. Mantém o editor, a aba selecionada e a posição de rolagem, inclusive após atualizar uma ficha já disponível para execução. Abrir a edição não cria uma cópia pendente. O servidor conserva snapshots usados por sessões anteriores e verifica revisão/último registro para rejeitar sobrescrita por abas desatualizadas.
+
+Fichas ainda vazias podem ser salvas como progresso; não bloqueiam o salvamento das demais. Enquanto houver ficha vazia, o progresso continua editável e a prescrição anterior permanece disponível para execução. Quando todas estiverem preenchidas, o mesmo Salvar ficha atualiza a prescrição corrente. A confirmação aparece depois de carregar o estado salvo e os controles ficam bloqueados durante a gravação para impedir que uma resposta atrasada descarte novas edições.
+
+Novos exercícios e séries avulsas usam trabalho de 6–10 repetições; cada exercício novo recebe apenas duas séries, sem aquecimento ou reconhecimento. A pedido do único autor ativo identificado no banco remoto, as prescrições atuais foram ajustadas atomicamente: 36 registros de exercícios entre a prescrição corrente e o progresso de edição, mantendo exatamente duas séries de trabalho 6–10. Cargas/descansos de trabalho foram preservados, quando existentes. Prescrições históricas, sessões e logs não foram modificados. O SQL foi validado primeiro em SQLite isolado, com guarda de revisão e backup privado ignorado pelo Git. Segunda conferência reconheceu todos os registros como já configurados.
+
+O erro mostrado na captura comprova uma resposta HTML onde a interface esperava JSON; não determina sozinho a causa do retorno HTML no domínio público. A busca do editor passou a usar uma projeção leve de id/nome, sem instruções, mídias ou relações desnecessárias. A projeção também ocorre no SQL, sem preencher o cache de registros completos com dados parciais. Normalização de busca foi separada do importador para não inicializar o catálogo inteiro em todas as requisições. Respostas HTML/incompletas agora geram mensagem em português e permitem nova tentativa, sem expor erro de parser ou paginação antiga.
+
+Validação em Node: 47 testes passaram, incluindo regressão de projeções escalares e preservação dos dados completos usados em alterações. Chromium validou resposta HTML 503 simulada e recuperação por nova tentativa, o padrão de duas séries, salvar/continuar, criar Lower vazia/salvar/preencher/salvar permanecendo na mesma aba, atualização da ficha já publicada, histórico, execução/offline e exclusão de plano. A resposta 503 registrada no log desse teste foi injetada deliberadamente.
+
+Os 47 testes e o fluxo Chromium também passaram no workerd local, incluindo a falha HTML 503 deliberada e sua recuperação. O build OpenNext/TypeScript passou. A segunda execução do operador em modo de conferência confirmou `changed_exercises: 0`, sem nova gravação. Nenhuma migration de schema foi necessária nesta atualização.
+
+Publicação confirmada pela Cloudflare: versão `7c86a37c-740b-4112-a0c3-da5efffe243e` em `https://pulso-fit.renatoqsousam.workers.dev`. Pacote minificado de aproximadamente 1.32 MiB gzip, sem node:sqlite.

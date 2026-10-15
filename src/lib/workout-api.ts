@@ -48,7 +48,7 @@ export const workoutInput = z
             name: txt.min(1).max(100),
             notes: txt.max(1000).default(''),
             suggestedDays: z.array(z.number().int().min(0).max(6)).max(7).default([]),
-            exercises: z.array(exerciseInput).min(1).max(60),
+            exercises: z.array(exerciseInput).max(60),
           })
           .strict(),
       )
@@ -334,6 +334,74 @@ export async function workoutPost(db: PrismaClient, user: User, path: string, bo
       return json({
         message: 'Plano excluído. O histórico dos treinos realizados foi preservado.',
         removed: true,
+      });
+    }
+    if (parts[2] === 'update') {
+      const input = z
+        .object({
+          revision: z.number().int().min(0),
+          data: workoutInput,
+          studentIds: z.array(id).max(100).default([]),
+        })
+        .strict()
+        .parse(body);
+      const days = await dayData(db, user, input.data);
+      const ready = days.length > 0 && input.data.days.every((day) => day.exercises.length > 0);
+      const targets = user.role === 'STUDENT' ? [user.id] : [...new Set(input.studentIds)];
+      if (ready) await assignmentTargets(db, user, targets, 'TRAINING');
+      const result = await db.$transaction(async (tx) => {
+        if (version.draftRevision !== input.revision) throw conflict();
+        const last = await tx.workoutVersion.findFirst({
+          where: { programId: version.programId },
+          orderBy: { number: 'desc' },
+        });
+        if (last?.id !== version.id) throw conflict();
+        const fields = {
+          objective: input.data.objective,
+          notes: input.data.notes,
+          validFrom: input.data.validFrom,
+          validUntil: input.data.validUntil,
+        };
+        let current;
+        if (version.publishedAt) {
+          current = await tx.workoutVersion.create({
+            data: {
+              programId: version.programId,
+              number: version.number + 1,
+              ...fields,
+              days: { create: days },
+            },
+          });
+        } else {
+          const changed = await tx.workoutVersion.updateMany({
+            where: { id: version.id, publishedAt: null, draftRevision: input.revision },
+            data: { ...fields, draftRevision: { increment: 1 } },
+          });
+          if (!changed.count) throw conflict();
+          await tx.workoutDay.deleteMany({ where: { versionId: version.id } });
+          current = await tx.workoutVersion.update({
+            where: { id: version.id },
+            data: { days: { create: days } },
+          });
+        }
+        if (ready) {
+          await tx.workoutVersion.update({
+            where: { id: current.id },
+            data: { publishedAt: new Date() },
+          });
+          for (const studentId of targets)
+            await tx.workoutAssignment.create({ data: { versionId: current.id, studentId } });
+        }
+        await tx.auditLog.create({
+          data: { actorId: user.id, action: 'WORKOUT_UPDATED', resourceId: current.id },
+        });
+        return current;
+      });
+      return json({
+        message: ready
+          ? 'Ficha salva e atualizada.'
+          : 'Alterações salvas. Continue montando as fichas; as fichas vazias ainda não estão disponíveis para execução.',
+        versionId: result.id,
       });
     }
     if (parts[2] === 'save') {

@@ -293,3 +293,29 @@ test('D1: pais novos precedem relações já agrupadas para pais existentes', as
     await f.dispose();
   }
 });
+
+test('D1: projeção escalar não substitui dados completos no cache da transação', async () => {
+  const f = await fixture();
+  try {
+    const original = await f.db.user.create({ data: userData() });
+    await f.db.$transaction(async (tx) => {
+      const partial = await tx.user.findUniqueOrThrow({
+        where: { id: original.id },
+        select: { id: true },
+      });
+      assert.deepEqual(partial, { id: original.id });
+      const updated = await tx.user.update({
+        where: { id: original.id },
+        data: { email: 'projection-' + crypto.randomUUID() + '@example.test' },
+      });
+      assert.equal(updated.passwordHash, original.passwordHash);
+      assert.equal(updated.role, original.role);
+    });
+    assert.equal(
+      (await f.db.user.findUniqueOrThrow({ where: { id: original.id } })).passwordHash,
+      original.passwordHash,
+    );
+  } finally {
+    await f.dispose();
+  }
+});

@@ -91,9 +91,22 @@ try {
   await page.getByLabel('Nome do programa', { exact: true }).fill('Programa browser ' + tag);
   await page.getByRole('button', { name: 'Criar programa', exact: true }).click();
   await page.getByRole('button', { name: 'Adicionar ficha', exact: true }).click();
+  await page.route(
+    '**/api/exercises?picker=true*',
+    (route) =>
+      route.fulfill({
+        status: 503,
+        contentType: 'text/html',
+        body: '<!DOCTYPE html><html>Serviço temporariamente indisponível</html>',
+      }),
+    { times: 1 },
+  );
   await page.getByLabel('Buscar exercício', { exact: true }).fill('Zottman curl');
+  await page.getByText(/O servidor não conseguiu responder agora/).waitFor();
+  assert.equal(await page.getByText(/Unexpected token/).count(), 0);
+  await page.getByRole('button', { name: 'Tentar carregar novamente', exact: true }).click();
   await page.getByRole('button', { name: 'Adicionar Rosca Zottman', exact: true }).click();
-  assert.equal(await page.locator('.compact-set').count(), 5);
+  assert.equal(await page.locator('.compact-set').count(), 2);
   await page
     .locator('.exercise-row')
     .first()
@@ -102,24 +115,24 @@ try {
     await page
       .getByLabel('Repetições mín.', { exact: true })
       .evaluateAll((inputs) => inputs.map((input) => input.value)),
-    ['10', '2', '2', '6', '6'],
+    ['6', '6'],
   );
   assert.deepEqual(
     await page
       .getByLabel('Repetições máx.', { exact: true })
       .evaluateAll((inputs) => inputs.map((input) => input.value)),
-    ['15', '5', '5', '8', '8'],
+    ['10', '10'],
   );
   assert.deepEqual(
     await page
       .locator('.compact-set-header select')
       .evaluateAll((inputs) => inputs.map((input) => input.value)),
-    ['WARMUP', 'RECOGNITION', 'RECOGNITION', 'WORKING', 'WORKING'],
+    ['WORKING', 'WORKING'],
   );
   await page.getByRole('button', { name: 'Adicionar série', exact: true }).click();
-  assert.equal(await page.getByLabel('Repetições mín.', { exact: true }).nth(5).inputValue(), '6');
-  assert.equal(await page.getByLabel('Repetições máx.', { exact: true }).nth(5).inputValue(), '8');
-  await page.getByRole('button', { name: 'Remover série 6', exact: true }).click();
+  assert.equal(await page.getByLabel('Repetições mín.', { exact: true }).nth(2).inputValue(), '6');
+  assert.equal(await page.getByLabel('Repetições máx.', { exact: true }).nth(2).inputValue(), '10');
+  await page.getByRole('button', { name: 'Remover série 3', exact: true }).click();
   await page.getByLabel('Buscar exercício', { exact: true }).fill('');
   const repetitions = page.getByLabel('Repetições mín.', { exact: true }).filter({ visible: true });
   await repetitions.first().waitFor();
@@ -132,16 +145,36 @@ try {
     false,
   );
   await page.getByRole('button', { name: 'Expandir todos', exact: true }).click();
-  await repetitions.first().fill('12');
+  await repetitions.first().fill('9');
   await page.getByRole('button', { name: 'Aplicar primeira série às demais', exact: true }).click();
   const allRepetitions = page.getByLabel('Repetições mín.', { exact: true });
   for (let i = 0; i < (await allRepetitions.count()); i++)
-    assert.equal(await allRepetitions.nth(i).inputValue(), '12');
+    assert.equal(await allRepetitions.nth(i).inputValue(), '9');
   await repetitions.first().fill('10');
   await page.getByRole('button', { name: 'Aplicar primeira série às demais', exact: true }).click();
   await page.screenshot({ path: 'test-results/mobile-workout-builder.png', fullPage: true });
   await page.getByRole('button', { name: 'Salvar ficha', exact: true }).click();
-  await page.getByRole('button', { name: 'Iniciar / recuperar sessão', exact: true }).click();
+  await page.getByText('Ficha salva e atualizada.', { exact: true }).waitFor();
+  assert.equal(await page.getByLabel('Nome da ficha', { exact: true }).inputValue(), 'Treino 1');
+  await page.getByRole('button', { name: 'Adicionar ficha', exact: true }).click();
+  await page.getByLabel('Nome da ficha', { exact: true }).fill('Lower');
+  await page.getByRole('button', { name: 'Salvar ficha', exact: true }).click();
+  await page.getByText(/Alterações salvas. Continue montando/).waitFor();
+  assert.equal(await page.getByLabel('Nome da ficha', { exact: true }).inputValue(), 'Lower');
+  await page
+    .getByRole('list', { name: 'Exercícios encontrados', exact: true })
+    .getByRole('button')
+    .first()
+    .click();
+  await page.getByRole('button', { name: 'Salvar ficha', exact: true }).click();
+  await page.getByText('Ficha salva e atualizada.', { exact: true }).waitFor();
+  assert.equal(await page.getByLabel('Nome da ficha', { exact: true }).inputValue(), 'Lower');
+  await page.getByRole('button', { name: 'Voltar aos planos', exact: true }).click();
+
+  await page
+    .getByRole('button', { name: 'Iniciar / recuperar sessão', exact: true })
+    .first()
+    .click();
   await page.waitForURL('**/sessoes/**');
   const sessionUrl = page.url();
   await page.getByLabel('Repetições feitas', { exact: true }).first().fill('10');
@@ -155,7 +188,7 @@ try {
   await page.getByLabel('Repetições feitas', { exact: true }).nth(1).fill('12');
   await page.getByLabel('Carga utilizada (kg)', { exact: true }).nth(1).fill('25');
   await page
-    .getByRole('heading', { name: 'Série 2 • Reconhecimento', exact: true })
+    .getByRole('heading', { name: 'Série 2 • Série válida', exact: true })
     .locator('..')
     .getByRole('button', { name: 'Concluir série', exact: true })
     .click();
@@ -262,7 +295,7 @@ try {
   await page.screenshot({ path: 'test-results/mobile-nutrition-plan.png', fullPage: true });
   await page.goto(origin + '/painel');
   await page.getByRole('heading', { name: 'Café da manhã', exact: true }).waitFor();
-  await page.getByRole('button', { name: 'Treinar novamente', exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Começar treino', exact: true }).waitFor();
   await page.screenshot({ path: 'test-results/mobile-dashboard-with-plan.png', fullPage: true });
   await page.getByRole('link', { name: 'Registrar refeição', exact: true }).click();
   await page.waitForURL('**/alimentacao#diary');
@@ -290,7 +323,10 @@ try {
   });
   await page.goto(origin + '/treinos');
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.getByRole('button', { name: 'Iniciar / recuperar sessão', exact: true }).waitFor();
+  await page
+    .getByRole('button', { name: 'Iniciar / recuperar sessão', exact: true })
+    .first()
+    .waitFor();
   assert.ok(
     await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2),
     'Overflow no desktop',
@@ -315,7 +351,12 @@ try {
   await page.screenshot({ path: 'test-results/desktop-workout-builder.png', fullPage: true });
   await page.getByLabel('Nome da ficha', { exact: true }).fill('Ficha editada');
   await page.getByRole('button', { name: 'Salvar ficha', exact: true }).click();
-  await page.getByRole('button', { name: 'Iniciar / recuperar sessão', exact: true }).waitFor();
+  await page.getByText('Ficha salva e atualizada.', { exact: true }).waitFor();
+  assert.equal(
+    await page.getByLabel('Nome da ficha', { exact: true }).inputValue(),
+    'Ficha editada',
+  );
+  await page.getByRole('button', { name: 'Voltar aos planos', exact: true }).click();
   const programs = await (await context.request.get(origin + '/api/workouts')).json();
   const editedProgram = programs.own.find((program) => program.name === 'Programa browser ' + tag);
   const current = programs.assigned.find(

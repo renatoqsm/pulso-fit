@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from './admin-permissions';
 import { HttpError } from './http-error';
-import { importExercises, normalizeSearch, snapshot } from './exercise-import';
+import { normalizeSearch } from './search-normalize';
 const category = z.enum(['STRENGTH', 'CARDIO', 'MOBILITY', 'OTHER']);
 const text = z.string().trim();
 const input = z
@@ -46,6 +46,7 @@ async function trainer(db: PrismaClient, user: User) {
 }
 export async function exerciseGet(db: PrismaClient, user: User, path: string, req: NextRequest) {
   if (path === 'exercises/meta') {
+    const { snapshot } = await import('./exercise-import');
     const [muscles, equipment] = await Promise.all([
       db.muscle.findMany({ orderBy: { name: 'asc' } }),
       db.equipment.findMany({ orderBy: { name: 'asc' } }),
@@ -73,6 +74,7 @@ export async function exerciseGet(db: PrismaClient, user: User, path: string, re
         muscle: text.max(40).optional(),
         equipment: text.max(40).optional(),
         category: category.optional(),
+        picker: z.enum(['true', 'false']).optional(),
         favorite: z.enum(['true', 'false']).optional(),
         includeInactive: z.enum(['true', 'false']).optional(),
         page: z.coerce.number().int().min(1).max(10000).default(1),
@@ -87,13 +89,21 @@ export async function exerciseGet(db: PrismaClient, user: User, path: string, re
       ...(params.favorite === 'true' ? { favorites: { some: { userId: user.id } } } : {}),
     };
     const [items, total] = await Promise.all([
-      db.exercise.findMany({
-        where,
-        include: relations(user.id),
-        orderBy: [{ name: 'asc' }, { id: 'asc' }],
-        skip: (params.page - 1) * 20,
-        take: 20,
-      }),
+      params.picker === 'true'
+        ? db.exercise.findMany({
+            where,
+            select: { id: true, name: true },
+            orderBy: [{ name: 'asc' }, { id: 'asc' }],
+            skip: (params.page - 1) * 20,
+            take: 20,
+          })
+        : db.exercise.findMany({
+            where,
+            include: relations(user.id),
+            orderBy: [{ name: 'asc' }, { id: 'asc' }],
+            skip: (params.page - 1) * 20,
+            take: 20,
+          }),
       db.exercise.count({ where }),
     ]);
     return json({ items, total, page: params.page, pages: Math.ceil(total / 20) });
@@ -115,7 +125,7 @@ export async function exercisePost(db: PrismaClient, user: User, path: string, b
       .parse(body);
     return json({
       message: 'Catálogo sincronizado com o snapshot oficial.',
-      result: await importExercises(db, user.id),
+      result: await (await import('./exercise-import')).importExercises(db, user.id),
     });
   }
   if (path === 'exercises/create') {
