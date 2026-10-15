@@ -25,6 +25,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"scripts/*.ts\" \"tests/**/*.{ts,mjs}\" \"docs/*.md\""
   },
   "dependencies": {
+    "@noble/hashes": "2.4.0",
     "@prisma/adapter-pg": "6.19.2",
     "@prisma/client": "6.19.2",
     "decimal.js": "^10.6.0",

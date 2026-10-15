@@ -1,5 +1,5 @@
 import type { PrismaClient, User } from '@prisma/client';
-import { digest, randomToken } from './crypto';
+import { derivePasswordKey, digest, randomToken } from './crypto';
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 export function newMfaSecret() {
   const bytes = crypto.getRandomValues(new Uint8Array(20));
@@ -50,20 +50,12 @@ export async function totp(secret: string, counter: number) {
   );
 }
 async function encryptionKey(password: string, salt: string) {
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(password),
-    'PBKDF2',
-    false,
-    ['deriveKey'],
-  );
-  return crypto.subtle.deriveKey(
-    { name: 'PBKDF2', hash: 'SHA-512', iterations: 210000, salt: new TextEncoder().encode(salt) },
-    key,
-    { name: 'AES-GCM', length: 256 },
-    false,
-    ['encrypt', 'decrypt'],
-  );
+  const bytes = await derivePasswordKey(password, salt);
+  try {
+    return await crypto.subtle.importKey('raw', bytes, 'AES-GCM', false, ['encrypt', 'decrypt']);
+  } finally {
+    bytes.fill(0);
+  }
 }
 export async function encryptMfa(secret: string, password: string, userId: string) {
   const mfaSalt = randomToken(),

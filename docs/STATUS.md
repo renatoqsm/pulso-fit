@@ -55,3 +55,9 @@ Evolução usa até as 1.000 sessões concluídas mais recentes, ordenadas crono
 ## Ambiente e reprodução
 
 O setup salvo instala dependências, gera tipos/metadados, migra SQLite local e carrega catálogos reais. Não depende de Docker/PostgreSQL. O rascunho atualizado precisa ser salvo/publicado na interface para novas tarefas; a ferramenta não aplica essa alteração à máquina. Restauração em tarefa independente ainda não foi verificada. Consulte README e DEPLOY-CLOUDFLARE.md para os comandos exatos.
+
+## Ajuste de autenticação após publicação
+
+A mensagem genérica no cadastro foi investigada: o D1 recebeu o limitador de tentativas, sem criar usuário ou sessão. Workerd local não impõe o limite nativo de iterações PBKDF2 observado como restrição do runtime de produção. Foi implementado fallback estrito para essa exceção, preservando PBKDF2 SHA-512/210.000 e MFA. Sete testes direcionados passaram (incluindo interoperabilidade do operador e simulação da restrição), TypeScript e novo build OpenNext passaram. Esse ajuste não comprova por si só a causa do erro reportado nem que o cadastro público passou: a exceção remota ainda não foi capturada e o host segue sem acesso na política aplicada deste ambiente. Avaliar CPU no plano real, sem reduzir custo da senha.
+
+Atualização publicada em `https://pulso-fit.renatoqsousam.workers.dev`, versão `136012c2-500a-4079-b4b8-02c4d6dafb1c`. Deploy confirmado pela Cloudflare; validação pública do cadastro permanece pendente. Auditoria npm de dependências de produção: zero vulnerabilidades reportadas.

@@ -54,3 +54,5 @@ Local: migrations por arquivo em transação SQLite, checksums e exclusão mútu
 ## Operação
 
 D1 exclusivo do Pulso Fit; banco de outro projeto não foi modificado. Token Cloudflare fica no ambiente seguro do operador, não no Worker ou no código. Produção usa DB, ASSETS e APP_URL HTTPS. Sem upgrade automático de plano ou contratação de PostgreSQL. Quotas gratuitas, contenção de escrita, backups/restauração e políticas legais exigem acompanhamento operacional.
+
+Compatibilidade de senha em Workers: a derivação nativa continua preferencial. Se WebCrypto recusar explicitamente 210.000 iterações por limite de PBKDF2, @noble/hashes 2.4.0 executa o mesmo PBKDF2 SHA-512, salt UTF-8 e saída de 32 bytes. O formato de hashes permanece idêntico e a mesma derivação atende a chave AES-GCM do MFA. Outros erros criptográficos são propagados. O fallback foi comparado a vetor independente e testado com hashes e MFA; CPU em produção precisa ser medida, pois a implementação em JavaScript é mais custosa e não garante caber no Workers Free.
