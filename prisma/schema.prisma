@@ -1,0 +1,526 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "client"
+}
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+enum Role {
+  STUDENT
+  PROFESSIONAL
+  ADMIN
+}
+enum Area {
+  TRAINING
+  NUTRITION
+}
+enum CredentialStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+enum LinkStatus {
+  ACTIVE
+  ENDED
+}
+enum Scope {
+  TRAINING_HISTORY
+  NUTRITION_HISTORY
+}
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  passwordHash String
+  mfaEnabled Boolean @default(false)
+  mfaCipher String?
+  mfaIv String?
+  mfaSalt String?
+  mfaLastCounter Int?
+  mfaRecoveryHashes String[] @default([])
+  disabledAt DateTime?
+  adminPermissions String[] @default(["VERIFY_CREDENTIALS", "MANAGE_USERS", "MANAGE_CATALOG"])
+  role Role
+  createdAt DateTime @default(now())
+  profile Profile?
+  sessions Session[]
+  credentials ProfessionalCredential[] @relation("professional")
+  reviews ProfessionalCredential[] @relation("reviewer")
+  invitations Invitation[]
+  studentLinks ProfessionalStudentLink[] @relation("student")
+  professionalLinks ProfessionalStudentLink[] @relation("professional")
+  audits AuditLog[]
+  customExercises Exercise[]
+  exerciseFavorites ExerciseFavorite[]
+  programs WorkoutProgram[]
+  workoutAssignments WorkoutAssignment[]
+  workoutSessions WorkoutSession[]
+  foods Food[]
+  nutritionPlans NutritionPlan[]
+  nutritionAssignments NutritionAssignment[]
+  mealLogs MealLog[]
+  media MediaAsset[]
+  deletionRequests DeletionRequest[]
+}
+model Profile {
+  userId String @id
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  name String
+  bio String @default("")
+  specialty String @default("")
+  contact String @default("")
+  photoId String?
+}
+model Session {
+  id String @id @default(cuid())
+  tokenHash String @unique
+  userId String
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@index([userId,expiresAt])
+}
+model ProfessionalCredential {
+  id String @id @default(cuid())
+  professionalId String
+  professional User @relation("professional",fields:[professionalId],references:[id])
+  area Area
+  registration String
+  region String
+  status CredentialStatus @default(PENDING)
+  reviewerId String?
+  reviewer User? @relation("reviewer",fields:[reviewerId],references:[id])
+  reviewedAt DateTime?
+  createdAt DateTime @default(now())
+  @@unique([professionalId,area])
+  @@index([status])
+}
+model Invitation {
+  id String @id @default(cuid())
+  professionalId String
+  professional User @relation(fields:[professionalId],references:[id])
+  area Area
+  tokenHash String @unique
+  expiresAt DateTime
+  consumedAt DateTime?
+  createdAt DateTime @default(now())
+  links ProfessionalStudentLink[]
+  @@index([professionalId,expiresAt])
+}
+model ProfessionalStudentLink {
+  id String @id @default(cuid())
+  studentId String
+  student User @relation("student",fields:[studentId],references:[id])
+  professionalId String
+  professional User @relation("professional",fields:[professionalId],references:[id])
+  area Area
+  status LinkStatus @default(ACTIVE)
+  startedAt DateTime @default(now())
+  endedAt DateTime?
+  invitationId String
+  invitation Invitation @relation(fields:[invitationId],references:[id])
+  consents AccessConsent[]
+  @@unique([studentId,professionalId,area])
+  @@index([professionalId,area,status])
+  @@index([studentId,status])
+}
+model AccessConsent {
+  id String @id @default(cuid())
+  linkId String
+  link ProfessionalStudentLink @relation(fields:[linkId],references:[id])
+  scope Scope
+  grantedAt DateTime @default(now())
+  revokedAt DateTime?
+  @@index([linkId,revokedAt])
+}
+model AuditLog {
+  id String @id @default(cuid())
+  actorId String
+  actor User @relation(fields:[actorId],references:[id])
+  action String
+  resourceId String
+  createdAt DateTime @default(now())
+  @@index([actorId,createdAt])
+}
+model RateLimit {
+  key String @id
+  count Int @default(1)
+  expiresAt DateTime
+  @@index([expiresAt])
+}
+
+enum ExerciseSource {
+  WGER
+  CUSTOM
+}
+enum ExerciseCategory {
+  STRENGTH
+  CARDIO
+  MOBILITY
+  OTHER
+}
+enum MuscleRole {
+  PRIMARY
+  SECONDARY
+}
+model Exercise {
+  id String @id @default(cuid())
+  source ExerciseSource
+  externalId String?
+  ownerId String?
+  owner User? @relation(fields:[ownerId],references:[id])
+  name String
+  aliases String[] @default([])
+  description String @default("")
+  instructions String @default("")
+  searchText String
+  category ExerciseCategory @default(OTHER)
+  sourceCategory String?
+  movementType String?
+  technicalLevel String?
+  active Boolean @default(true)
+  provenance Json
+  contentHash String?
+  sourceRevision String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  muscles ExerciseMuscle[]
+  equipment ExerciseEquipment[]
+  favorites ExerciseFavorite[]
+  @@unique([source,externalId])
+  @@index([ownerId,active])
+  @@index([source,active])
+  @@index([category,active])
+}
+model Muscle {
+  id String @id
+  name String
+  alternateName String?
+  exercises ExerciseMuscle[]
+}
+model Equipment {
+  id String @id
+  name String
+  exercises ExerciseEquipment[]
+}
+model ExerciseMuscle {
+  exerciseId String
+  exercise Exercise @relation(fields:[exerciseId],references:[id],onDelete:Cascade)
+  muscleId String
+  muscle Muscle @relation(fields:[muscleId],references:[id])
+  role MuscleRole
+  @@id([exerciseId,muscleId,role])
+  @@index([muscleId,role])
+}
+model ExerciseEquipment {
+  exerciseId String
+  exercise Exercise @relation(fields:[exerciseId],references:[id],onDelete:Cascade)
+  equipmentId String
+  equipment Equipment @relation(fields:[equipmentId],references:[id])
+  @@id([exerciseId,equipmentId])
+  @@index([equipmentId])
+}
+model ExerciseFavorite {
+  userId String
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  exerciseId String
+  exercise Exercise @relation(fields:[exerciseId],references:[id],onDelete:Cascade)
+  createdAt DateTime @default(now())
+  @@id([userId,exerciseId])
+}
+model ExerciseImportJob {
+  id String @id @default(cuid())
+  source String
+  revision String
+  status String
+  imported Int @default(0)
+  updated Int @default(0)
+  unchanged Int @default(0)
+  skipped Int @default(0)
+  notes Json
+  startedAt DateTime @default(now())
+  finishedAt DateTime?
+  @@index([source,startedAt])
+}
+
+enum SessionStatus {
+  IN_PROGRESS
+  COMPLETED
+  INTERRUPTED
+}
+model WorkoutProgram {
+  id String @id @default(cuid())
+  authorId String
+  author User @relation(fields:[authorId],references:[id])
+  name String
+  template Boolean @default(false)
+  createdAt DateTime @default(now())
+  versions WorkoutVersion[]
+  @@index([authorId])
+}
+model WorkoutVersion {
+  id String @id @default(cuid())
+  programId String
+  program WorkoutProgram @relation(fields:[programId],references:[id])
+  number Int
+  draftRevision Int @default(0)
+  objective String @default("")
+  notes String @default("")
+  validFrom DateTime?
+  validUntil DateTime?
+  publishedAt DateTime?
+  createdAt DateTime @default(now())
+  days WorkoutDay[]
+  assignments WorkoutAssignment[]
+  sessions WorkoutSession[]
+  @@unique([programId,number])
+}
+model WorkoutDay {
+  id String @id @default(cuid())
+  versionId String
+  version WorkoutVersion @relation(fields:[versionId],references:[id],onDelete:Cascade)
+  name String
+  notes String @default("")
+  suggestedDays Int[] @default([])
+  position Int
+  exercises WorkoutPrescriptionExercise[]
+  sessions WorkoutSession[]
+  @@unique([versionId,position])
+}
+model WorkoutPrescriptionExercise {
+  id String @id @default(cuid())
+  dayId String
+  day WorkoutDay @relation(fields:[dayId],references:[id],onDelete:Cascade)
+  exerciseId String
+  snapshot Json
+  position Int
+  notes String @default("")
+  groupKey String?
+  sets WorkoutPrescriptionSet[]
+  sessionExercises WorkoutSessionExercise[]
+  @@unique([dayId,position])
+}
+model WorkoutPrescriptionSet {
+  id String @id @default(cuid())
+  exerciseId String
+  exercise WorkoutPrescriptionExercise @relation(fields:[exerciseId],references:[id],onDelete:Cascade)
+  position Int
+  repsMin Int?
+  repsMax Int?
+  targetKg Decimal? @db.Decimal(10,3)
+  durationSeconds Int?
+  restSeconds Int @default(60)
+  kind String @default("WORKING")
+  cadence String?
+  rpe Decimal? @db.Decimal(4,1)
+  rir Int?
+  unilateral Boolean @default(false)
+  technique String?
+  logs WorkoutSessionSet[]
+  @@unique([exerciseId,position])
+}
+model WorkoutAssignment {
+  id String @id @default(cuid())
+  versionId String
+  version WorkoutVersion @relation(fields:[versionId],references:[id])
+  studentId String
+  student User @relation(fields:[studentId],references:[id])
+  createdAt DateTime @default(now())
+  @@unique([versionId,studentId])
+}
+model WorkoutSession {
+  id String @id
+  studentId String
+  student User @relation(fields:[studentId],references:[id])
+  versionId String
+  version WorkoutVersion @relation(fields:[versionId],references:[id])
+  dayId String
+  day WorkoutDay @relation(fields:[dayId],references:[id])
+  status SessionStatus @default(IN_PROGRESS)
+  revision Int @default(0)
+  startedAt DateTime @default(now())
+  endedAt DateTime?
+  effort Int?
+  difficulty Int?
+  feedback String @default("")
+  discomfort String @default("")
+  technicalDifficulty Boolean @default(false)
+  rating Int?
+  exercises WorkoutSessionExercise[]
+  feedbackReplies WorkoutReply[]
+  @@index([studentId,startedAt])
+}
+model WorkoutSessionExercise {
+  id String @id @default(cuid())
+  sessionId String
+  session WorkoutSession @relation(fields:[sessionId],references:[id])
+  prescriptionExerciseId String
+  prescription WorkoutPrescriptionExercise @relation(fields:[prescriptionExerciseId],references:[id])
+  status String @default("PLANNED")
+  substituteId String?
+  substituteSnapshot Json?
+  notes String @default("")
+  sets WorkoutSessionSet[]
+  @@unique([sessionId,prescriptionExerciseId])
+}
+model WorkoutSessionSet {
+  id String @id @default(cuid())
+  sessionExerciseId String
+  exercise WorkoutSessionExercise @relation(fields:[sessionExerciseId],references:[id])
+  prescriptionSetId String
+  prescription WorkoutPrescriptionSet @relation(fields:[prescriptionSetId],references:[id])
+  actualReps Int?
+  actualKg Decimal? @db.Decimal(10,3)
+  actualSeconds Int?
+  rpe Decimal? @db.Decimal(4,1)
+  rir Int?
+  completedAt DateTime?
+  @@unique([sessionExerciseId,prescriptionSetId])
+}
+model WorkoutReply {
+  id String @id @default(cuid())
+  sessionId String
+  session WorkoutSession @relation(fields:[sessionId],references:[id])
+  authorId String
+  text String
+  createdAt DateTime @default(now())
+}
+model ActivityOutbox {
+  id String @id
+  sessionId String @unique
+  payload Json
+  state String @default("PENDING")
+  attempts Int @default(0)
+  createdAt DateTime @default(now())
+}
+model Food {
+  id String @id @default(cuid())
+  ownerId String?
+  owner User? @relation(fields:[ownerId],references:[id])
+  source String
+  externalId String?
+  sourceVersion String?
+  name String
+  aliases String[] @default([])
+  searchText String
+  preparation String @default("")
+  referenceUnit String
+  nutrients Json
+  provenance Json
+  active Boolean @default(true)
+  createdAt DateTime @default(now())
+  measures FoodMeasure[]
+  @@unique([source,externalId])
+  @@index([ownerId,active])
+}
+model FoodMeasure {
+  id String @id @default(cuid())
+  foodId String
+  food Food @relation(fields:[foodId],references:[id])
+  name String
+  quantity Decimal @db.Decimal(12,4)
+  unit String
+  provenance String
+}
+model NutritionPlan {
+  id String @id @default(cuid())
+  authorId String
+  author User @relation(fields:[authorId],references:[id])
+  name String
+  createdAt DateTime @default(now())
+  versions NutritionVersion[]
+}
+model NutritionVersion {
+  id String @id @default(cuid())
+  planId String
+  plan NutritionPlan @relation(fields:[planId],references:[id])
+  number Int
+  draftRevision Int @default(0)
+  objective String @default("")
+  notes String @default("")
+  validFrom DateTime?
+  publishedAt DateTime?
+  meals NutritionMeal[]
+  assignments NutritionAssignment[]
+  @@unique([planId,number])
+}
+model NutritionMeal {
+  id String @id @default(cuid())
+  versionId String
+  version NutritionVersion @relation(fields:[versionId],references:[id],onDelete:Cascade)
+  name String
+  time String?
+  position Int
+  notes String @default("")
+  items NutritionMealItem[]
+  @@unique([versionId,position])
+}
+model NutritionMealItem {
+  id String @id @default(cuid())
+  mealId String
+  meal NutritionMeal @relation(fields:[mealId],references:[id],onDelete:Cascade)
+  position Int
+  foodId String
+  quantity Decimal @db.Decimal(12,4)
+  unit String
+  snapshot Json
+  substitutions Json
+  @@unique([mealId,position])
+}
+model NutritionAssignment {
+  id String @id @default(cuid())
+  versionId String
+  version NutritionVersion @relation(fields:[versionId],references:[id])
+  studentId String
+  student User @relation(fields:[studentId],references:[id])
+  @@unique([versionId,studentId])
+}
+model MealLog {
+  id String @id
+  studentId String
+  student User @relation(fields:[studentId],references:[id])
+  date String
+  mealName String
+  prescribedMealId String?
+  consumedAt DateTime?
+  notes String @default("")
+  revision Int @default(0)
+  items MealLogItem[]
+  replies NutritionReply[]
+  @@index([studentId,date])
+}
+model MealLogItem {
+  id String @id @default(cuid())
+  logId String
+  log MealLog @relation(fields:[logId],references:[id],onDelete:Cascade)
+  foodId String
+  quantity Decimal @db.Decimal(12,4)
+  unit String
+  snapshot Json
+}
+model NutritionReply {
+  id String @id @default(cuid())
+  logId String
+  log MealLog @relation(fields:[logId],references:[id])
+  authorId String
+  text String
+  createdAt DateTime @default(now())
+}
+
+model MediaAsset {
+  id String @id @default(cuid())
+  ownerId String
+  owner User @relation(fields:[ownerId],references:[id])
+  mimeType String
+  data Bytes
+  createdAt DateTime @default(now())
+  @@index([ownerId])
+}
+model DeletionRequest {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields:[userId],references:[id])
+  status String @default("PENDING_RETENTION_REVIEW")
+  createdAt DateTime @default(now())
+  @@index([userId,status])
+}

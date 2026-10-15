@@ -1,0 +1,4265 @@
+{
+  "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+  "source": "https://github.com/wger-project/wger",
+  "skipped": [],
+  "notes": [
+    "Snapshot oficial, somente português (language 7).",
+    "Sem imagens ou vídeos; licenças de mídia não avaliadas.",
+    "Parte das entradas não informa autoria; esse campo permanece ausente, com fonte e licença preservadas.",
+    "Descrição técnica preservada da fonte; nível e tipo de movimento ausentes."
+  ],
+  "muscles": {
+    "1": {
+      "name": "Biceps brachii",
+      "is_front": true,
+      "name_en": "Biceps"
+    },
+    "2": {
+      "name": "Anterior deltoid",
+      "is_front": true,
+      "name_en": "Shoulders"
+    },
+    "3": {
+      "name": "Serratus anterior",
+      "is_front": true,
+      "name_en": ""
+    },
+    "4": {
+      "name": "Pectoralis major",
+      "is_front": true,
+      "name_en": "Chest"
+    },
+    "5": {
+      "name": "Triceps brachii",
+      "is_front": false,
+      "name_en": "Triceps"
+    },
+    "6": {
+      "name": "Rectus abdominis",
+      "is_front": true,
+      "name_en": "Abs"
+    },
+    "7": {
+      "name": "Gastrocnemius",
+      "is_front": false,
+      "name_en": "Calves"
+    },
+    "8": {
+      "name": "Gluteus maximus",
+      "is_front": false,
+      "name_en": "Glutes"
+    },
+    "9": {
+      "name": "Trapezius",
+      "is_front": false,
+      "name_en": ""
+    },
+    "10": {
+      "name": "Quadriceps femoris",
+      "is_front": true,
+      "name_en": "Quads"
+    },
+    "11": {
+      "name": "Biceps femoris",
+      "is_front": false,
+      "name_en": "Hamstrings"
+    },
+    "12": {
+      "name": "Latissimus dorsi",
+      "is_front": false,
+      "name_en": "Lats"
+    },
+    "13": {
+      "name": "Brachialis",
+      "is_front": true,
+      "name_en": ""
+    },
+    "14": {
+      "name": "Obliquus externus abdominis",
+      "is_front": true,
+      "name_en": ""
+    },
+    "15": {
+      "name": "Soleus",
+      "is_front": false,
+      "name_en": ""
+    },
+    "16": {
+      "name": "Erector spinae",
+      "is_front": false,
+      "name_en": "Lower back"
+    }
+  },
+  "equipment": {
+    "1": {
+      "name": "Barbell"
+    },
+    "2": {
+      "name": "SZ-Bar"
+    },
+    "3": {
+      "name": "Dumbbell"
+    },
+    "4": {
+      "name": "Gym mat"
+    },
+    "5": {
+      "name": "Swiss Ball"
+    },
+    "6": {
+      "name": "Pull-up bar"
+    },
+    "7": {
+      "name": "none (bodyweight exercise)"
+    },
+    "8": {
+      "name": "Bench"
+    },
+    "9": {
+      "name": "Incline bench"
+    },
+    "10": {
+      "name": "Kettlebell"
+    },
+    "11": {
+      "name": "Resistance band"
+    },
+    "12": {
+      "name": "Cable machine"
+    }
+  },
+  "exercises": [
+    {
+      "externalId": "09dd3e3c-e53a-4e2c-a2e3-645d334f53e2",
+      "name": "Fundos Para Tríceps",
+      "aliases": [
+        "Dips"
+      ],
+      "description": "Levante-se em barras paralelas mantenha pressionado por 1 segundo, abaixe lentamente e controle por 4 segundos, depois volte sem descanso",
+      "sourceCategory": "Chest",
+      "primaryMuscles": [
+        "4",
+        "5"
+      ],
+      "secondaryMuscles": [
+        "5"
+      ],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/194/view",
+        "base": {
+          "id": 194,
+          "author": "BFad07",
+          "authorUrl": "",
+          "license": "CC0",
+          "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 676,
+            "author": "BFad07",
+            "authorUrl": "",
+            "license": "CC0",
+            "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+            "sourceUrl": "",
+            "name": "Fundos Para Tríceps",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 781,
+            "author": "BFad07",
+            "authorUrl": "",
+            "license": "CC0",
+            "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+            "sourceUrl": "",
+            "name": "Dips",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 676,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "48ee1385-47c5-4821-8b6a-57fac6130776",
+      "name": "Flexão burpee",
+      "aliases": [
+        "Burpees"
+      ],
+      "description": "Posição inicial:\n\nFique de pé reto, com os pés afastados alinhados ao quadris.\n\nPassos:\n\n1. Se agache e se apoie com as mãos no chão entre os joelhos e a frente de seus pés, mantendo as costas retas.\n2. Mantendo as mãos no chão, pule jogando as pernas para trás para a posição de prancha altas.\n3. Faça uma flexão de braços.\n4. Pule os pés para frente para voltar à posição de agachamento.\n5. Repita.",
+      "sourceCategory": "Chest",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/132/view",
+        "base": {
+          "id": 132,
+          "author": "er0355",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 354,
+            "author": "er0355",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Burpees",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1304,
+            "author": "er0355",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Flexão burpee",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1304,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "b186f1f8-4957-44dc-bf30-d0b00064ce6f",
+      "name": "Abdominal",
+      "aliases": [
+        "Crunches"
+      ],
+      "description": "1. Deite-se de barriga para cima no chão com os joelhos dobrados.\n2. Curve os ombros em direção a pélvis. As mãos podem ficar atrás ou do lado do pescoço ou cruzadas sobre o peito.\n3. Repita",
+      "sourceCategory": "Abs",
+      "primaryMuscles": [
+        "6"
+      ],
+      "secondaryMuscles": [
+        "3"
+      ],
+      "equipment": [
+        "4"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/167/view",
+        "base": {
+          "id": 167,
+          "author": "wger.de",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 91,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Crunches",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1316,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Abdominal",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1316,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "4d255f25-f199-401a-bc81-7ffab1d0ed24",
+      "name": "Polichinelos",
+      "aliases": [
+        "Jumping Jacks"
+      ],
+      "description": "1. Fique com seus pés juntos e os braços em repouso de cada lado\n2. Pule para uma posição em que suas pernas fiquem abertas e as mãos toquem sob sua cabeça\n3. Repita",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [
+        "10"
+      ],
+      "secondaryMuscles": [],
+      "equipment": [],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/320/view",
+        "base": {
+          "id": 320,
+          "author": "student1234",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 810,
+            "author": "student1234",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Jumping Jacks",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1330,
+            "author": "student1234",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Polichinelos",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1330,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "c2078aac-e4e2-4103-a845-6252a3eb795e",
+      "name": "Levantamento de pernas",
+      "aliases": [
+        "Leg Raise"
+      ],
+      "description": "Posição inicial:\n\nDeite-se de costas, com os pés juntos, e os braços ao seu lado.\n\nPassos:\n\n1. Dobre os joelhos, depois os endireite para apontar para cima.\n2. Mantenha as pernas retas, abaixe-as juntas, sem tocar o chão. Quanto mais baixo você for, mais intenso será o exercício.\n3. Levante as duas pernas juntas para apontar para cima novamente.\n4. Repita a partir do passo 2.",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [
+        "14",
+        "6"
+      ],
+      "secondaryMuscles": [],
+      "equipment": [],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/376/view",
+        "base": {
+          "id": 376,
+          "author": "BFad07",
+          "authorUrl": "",
+          "license": "CC0",
+          "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 791,
+            "author": "BFad07",
+            "authorUrl": "",
+            "license": "CC0",
+            "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+            "sourceUrl": "",
+            "name": "Leg Raise",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1346,
+            "author": "BFad07",
+            "authorUrl": "",
+            "license": "CC0",
+            "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+            "sourceUrl": "",
+            "name": "Levantamento de pernas",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1346,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "3b96a05b-9705-48da-b43e-6e098234bb35",
+      "name": "Flexão Pike",
+      "aliases": [
+        "Pike Push Ups"
+      ],
+      "description": "Posição inicial:\n\nCom a cara virada para baixo:Seu corpo deve fazer uma forma em V, com as costas, braços e pernas retas. Seus quadris devem estar para cima no ar.Você pode chegar a esta posição caminhando com as mãos para trás a partir de uma prancha alta.\n\nPassos:\n\n1. Dobre os cotovelos para o lado, mantendo suas costas e pernas retas e movendo sua cabeça para mais perto do chão.\n2. Endireite os braços, empurrando os quadris para cima e mantendo as costas e as pernas retas.\n3. Repita.",
+      "sourceCategory": "Arms",
+      "primaryMuscles": [
+        "4"
+      ],
+      "secondaryMuscles": [
+        "5"
+      ],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/454/view",
+        "base": {
+          "id": 454,
+          "author": "Nash",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 361,
+            "author": "Nash",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Pike Push Ups",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1359,
+            "author": "Nash",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Flexão Pike",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1359,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "fe04cf35-1af5-4b51-89d4-c38d7eaa0db1",
+      "name": "Pistol squats esquerda",
+      "aliases": [
+        "Pistol Squat"
+      ],
+      "description": "1. Fique de pé em uma perna, com a outra perna reta e ligeiramente para frente.\n2. Dobre um joelho lentamente, descendo para um agachamento e mantendo as costas e a outra perna reta.\n3. Levante-se lentamente do agachamento, endireitando o joelho dobrado e mantendo a outra perna reta.\n4. Repita",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [
+        "11",
+        "8"
+      ],
+      "secondaryMuscles": [
+        "2",
+        "1",
+        "13"
+      ],
+      "equipment": [],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/456/view",
+        "base": {
+          "id": 456,
+          "author": "minifigmaster125",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 160,
+            "author": "minifigmaster125",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Pistol Squat",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1371,
+            "author": "minifigmaster125",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Pistol squats esquerda",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1371,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "8e420408-0682-4ab6-89f5-2681e54c7ce0",
+      "name": "Flexões de braço",
+      "aliases": [
+        "Pull-ups"
+      ],
+      "description": "Posição inicial:\n\nComece pendurando-se na barra de pull-up, com as palmas das mãos voltadas para fora e os pés fora do chão.Suas mãos devem estar ligeiramente mais afastadas do que a largura dos ombros. Apenas ligeiramente, de modo que os cotovelos ainda estejam na frente do corpo e não diretamente para o lado.Seu corpo deve ser reto e apontado ligeiramente para a frente. Seus braços devem estar estendidos.\n\nPassos:\n\n1. Use sua força para puxar o corpo para cima de maneira uniforme, aproximando o peito da barra e o queixo logo acima dela. NÃO se levante usando impulso, como chutar.\n2. Abaixe cuidadosamente o corpo de volta à posição inicial.\n3. Repita.\n\nDicas:\n\n* Para fazer flexões corretamente, você deve primeiro aumentar a força em várias áreas-chave, incluindo ombros, braços e abdominais. Comece com flexões somente depois de ter construído força suficiente com outros exercícios.",
+      "sourceCategory": "Back",
+      "primaryMuscles": [
+        "12"
+      ],
+      "secondaryMuscles": [
+        "2",
+        "1",
+        "9"
+      ],
+      "equipment": [
+        "6"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/475/view",
+        "base": {
+          "id": 475,
+          "author": "wger.de",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 107,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Pull-ups",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1395,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Flexões de braço",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1395,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "c9e57bbe-e839-44c6-861d-1c8dd2845e36",
+      "name": "Prancha horizontal",
+      "aliases": [
+        "Plank"
+      ],
+      "description": "Posição inicial:\n\n1. Inicie na posição de quatro.Os braços devem dobrar-se em um ângulo reto, com os ombro alinhados aos cotovelos.As costas devem estar direitas, com todo o corpo em linha reta.\n\nPassos:\n\n1. Mantenha essa posição.",
+      "sourceCategory": "Abs",
+      "primaryMuscles": [
+        "14",
+        "6"
+      ],
+      "secondaryMuscles": [
+        "1",
+        "10",
+        "5"
+      ],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/458/view",
+        "base": {
+          "id": 458,
+          "author": "YYCfit / BFad07",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 238,
+            "author": "YYCfit / BFad07",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Plank",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1406,
+            "author": "YYCfit / BFad07",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Prancha horizontal",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1406,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "f956977e-cc05-4db2-a387-ba6140b1ef34",
+      "name": "Encolher os ombros",
+      "aliases": [
+        "Shoulder Shrug"
+      ],
+      "description": "Posicão inicial:\n\nSente-se ou fique de pé com as costas retas.\n\nPassos:\n\n1. Levante os ombros o máximo possível e segure por 5 segundos.\n2. Solte os ombros de volta para uma posição relaxada.\n3. Repita.",
+      "sourceCategory": "Shoulders",
+      "primaryMuscles": [
+        "9"
+      ],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/570/view",
+        "base": {
+          "id": 570,
+          "author": "BFad07",
+          "authorUrl": "",
+          "license": "CC0",
+          "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 805,
+            "author": "BFad07",
+            "authorUrl": "",
+            "license": "CC0",
+            "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+            "sourceUrl": "",
+            "name": "Shoulder Shrug",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1418,
+            "author": "BFad07",
+            "authorUrl": "",
+            "license": "CC0",
+            "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+            "sourceUrl": "",
+            "name": "Encolher os ombros",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1418,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "e1b99153-0102-47fc-b0cd-c21509827b0b",
+      "name": "Prancha lateral esquerda",
+      "aliases": [
+        "Side Plank"
+      ],
+      "description": "1. Deite-se de lado, com o cotovelo inferior em ângulo reto, com o braço para fora\n2. Levante sua pélvis do chão levantando o ombro inferior para cima, mantendo o antebraço no chão; sua cabeça, pélvis e pés devem estar em linha reta\n3. Mantenha esta posição",
+      "sourceCategory": "Abs",
+      "primaryMuscles": [
+        "6"
+      ],
+      "secondaryMuscles": [
+        "14"
+      ],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/580/view",
+        "base": {
+          "id": 580,
+          "author": "http://www.bodybuilding.com/",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 325,
+            "author": "http://www.bodybuilding.com/",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Side Plank",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1429,
+            "author": "http://www.bodybuilding.com/",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Prancha lateral esquerda",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1429,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "0a5a7661-1e24-4c15-bb2b-503672141307",
+      "name": "Agachamentos de sumô",
+      "aliases": [
+        "Sumo Squats"
+      ],
+      "description": "Posição inicial:\n\nFique em pé com as pernas separadas e os dedos dos pés virados para fora.\n\nPassos:\n\n1. Agache lentamente dobrando os joelhos. Jogue os braços para frente. Mantenha a cabeça, o peito e os quadris em linha reta. Aperte seus glúteos.\n2. Levante de volta para a posição inicial.\n3. Repita este exercício em um movimento pulsante.",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [
+        "8",
+        "10"
+      ],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/632/view",
+        "base": {
+          "id": 632,
+          "author": "sophialj",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 570,
+            "author": "sophialj",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Sumo Squats",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1440,
+            "author": "sophialj",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Agachamentos de sumô",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1440,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "30ac081b-fb79-4253-9457-8efc07568790",
+      "name": "Agachamento de impulso",
+      "aliases": [
+        "Squat Thrust"
+      ],
+      "description": "Posição inicial:\n\nComece na posição de prancha alta:costas, braços e pernas retos e as mãos afastadas alinhadas aos ombros.\n\nPassos:\n\n1. Pule jogando seus pés para frente entre os braços, mantendo as costas reta.\n2. Mantendo suas mãos no chão, retorne suas pernas para a posição de prancha altas.\n3. Repita.",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [
+        "8",
+        "10",
+        "6",
+        "15"
+      ],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/616/view",
+        "base": {
+          "id": 616,
+          "author": "BFad07",
+          "authorUrl": "",
+          "license": "CC0",
+          "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 795,
+            "author": "BFad07",
+            "authorUrl": "",
+            "license": "CC0",
+            "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+            "sourceUrl": "",
+            "name": "Squat Thrust",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1450,
+            "author": "BFad07",
+            "authorUrl": "",
+            "license": "CC0",
+            "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+            "sourceUrl": "",
+            "name": "Agachamento de impulso",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1450,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "a2f5b6ef-b780-49c0-8d96-fdaff23e27ce",
+      "name": "Agachamentos",
+      "aliases": [
+        "Squats"
+      ],
+      "description": "1. Fique com os pés alinhados com os ombros\n2. Mova o quadril para trás e dobre os joelhos e o quadril para abaixar o troco\n3. Repita",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [
+        "10"
+      ],
+      "secondaryMuscles": [
+        "8"
+      ],
+      "equipment": [
+        "1"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/615/view",
+        "base": {
+          "id": 615,
+          "author": "wger.de",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 111,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Squats",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1461,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Agachamentos",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1461,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "46ee5805-512a-43a2-944c-97f7744b0078",
+      "name": "Agachamento parede",
+      "aliases": [
+        "Wall Squat"
+      ],
+      "description": "1. Encoste na parede, de frente com os pés firmes no chão, alinhados na largura dos ombros e afastados da parede cerca de 60 centímetros\n2. Deslize pela parede, mantendo as costas pressionada, até que as pernas fiquem em ângulo reto, paralelas ao chão. Os joelhos devem estar diretamente acima dos tornozelos.Dor no quadríceps é normal. Pare se sentir dor nos joelhos ou na rótula do joelho",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [
+        "11",
+        "10"
+      ],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/718/view",
+        "base": {
+          "id": 718,
+          "author": "Blablabla",
+          "authorUrl": "",
+          "license": "CC0",
+          "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 387,
+            "author": "Blablabla",
+            "authorUrl": "",
+            "license": "CC0",
+            "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+            "sourceUrl": "",
+            "name": "Wall Squat",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1475,
+            "author": "Blablabla",
+            "authorUrl": "",
+            "license": "CC0",
+            "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+            "sourceUrl": "",
+            "name": "Agachamento parede",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1475,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "4e752292-051a-4043-8f80-a390c23875e6",
+      "name": "Elevação da panturrilha esquerda",
+      "aliases": [
+        "Calf raises, one legged"
+      ],
+      "description": "1. Fique de pé no chão ou na borda de um degrau para aumentar o alcance do movimento. Levante um pé, colocando a parte superior sobre sua panturrilha.\n2. Levante os calcanhares até ficar de pé sobre os dedos do pé.\n3. Fique nesta posição por três segundos, depois abaixe o pé sem tocar o chão com seu calcanhar.",
+      "sourceCategory": "Calves",
+      "primaryMuscles": [
+        "7"
+      ],
+      "secondaryMuscles": [],
+      "equipment": [],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/702/view",
+        "base": {
+          "id": 702,
+          "author": "McMarcel13",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1048,
+            "author": "McMarcel13",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Calf raises, one legged",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1491,
+            "author": "McMarcel13",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Elevação da panturrilha esquerda",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1491,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "9e6dae29-5d03-440a-bdf1-2cb25a5179c2",
+      "name": "Progressos",
+      "aliases": [
+        "Step-ups"
+      ],
+      "description": "1. Fique de pé de frente para uma cadeira\n2. Suba na cadeira\n3. Desça da cadeira\n4. Repita",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "8"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/981/view",
+        "base": {
+          "id": 981,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1499,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Step-ups",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1505,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Progressos",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1505,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "db5bd076-2f1d-4b72-9be9-610e5c3f5724",
+      "name": "Joelhos para cima",
+      "aliases": [
+        "High knees"
+      ],
+      "description": "1. Corra no lugar, colocando os joelhos o mais alto o confortável e trocando de pernas a um ritmo rápido",
+      "sourceCategory": "Cardio",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/983/view",
+        "base": {
+          "id": 983,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1529,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "High knees",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1535,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Joelhos para cima",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1535,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "3284fd27-5402-4821-9c32-29066d4e2667",
+      "name": "Investidas",
+      "aliases": [
+        "Lunges"
+      ],
+      "description": "1. Fique de pé com as costas retas\n2. Dê um grande passo adiante com sua perna esquerda\n3. Desça com sua pélvis até quase tocar o chão com o seu joelho direito\n4. Leve sua pélvis de volta para cima\n5. Retorne para a posição de pé, dando um passo atrás\n6. Repita, trocando de pernas a cada vez",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/984/view",
+        "base": {
+          "id": 984,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1544,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Lunges",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1550,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Investidas",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1550,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "a9633731-1d86-4b4a-996f-33a1dee0b0e1",
+      "name": "Flexão em T",
+      "aliases": [
+        "Push-up rotations"
+      ],
+      "description": "1. Faça uma flexão de braços pradrão1.a Deite-se de barriga para baixo1.b Coloque suas mãos perto dos ouvidos1.c Use suas mão para levantar a barriga até que os braços estejam retos, mantendo as costas retas1.d Dobre os braços até que o peito quase toque o chão, certificando-se de que as costas estejam retas1.e Repita a partir do passo 1.c\n2. Gire seu corpo para o lado para que as costas fiquem retas, de modo que a mão inferior que sustenta o corpo fique totalmente estendida, e apenas a mão inferior e o pé toquem o chão\n3. Repita, mudando de lado no passo 2 cada vez",
+      "sourceCategory": "Arms",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/985/view",
+        "base": {
+          "id": 985,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1559,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Push-up rotations",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1565,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Flexão em T",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1565,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "9801e20b-69c3-43d0-9066-450a68230c42",
+      "name": "Side split squats esquerda",
+      "aliases": [
+        "Side split squats left"
+      ],
+      "description": "1. Fique de pé e dê um passo lateral largo, apenas maior que a largura dos ombros.\n2. Dobre um joelho até que sua coxa fique parelela ao chão. O joelho dobrado deve estar em linha com o pé.\n3. Empurre de volta para a posição inicial e repita.",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/986/view",
+        "base": {
+          "id": 986,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1574,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Side split squats left",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1580,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Side split squats esquerda",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1580,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "fa9838ed-84e8-476c-8157-1774a9c90aff",
+      "name": "Side split squats direita",
+      "aliases": [
+        "Side split squats right"
+      ],
+      "description": "1. Fique de pé e dê um passo lateral largo, apenas maior que a largura dos ombros.\n2. Dobre um joelho até que sua coxa fique parelela ao chão. O joelho dobrado deve estar em linha com o pé.\n3. Empurre de volta para a posição inicial e repita.",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/987/view",
+        "base": {
+          "id": 987,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1588,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Side split squats right",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1594,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Side split squats direita",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1594,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "7ce489d2-1948-46de-aa80-277b2ca737aa",
+      "name": "Bulgarian split squats esquerda",
+      "aliases": [
+        "Bulgarian split squats left"
+      ],
+      "description": "1. Fique de pé em frente a uma cadeira e dê um grande passo. Coloque a parte superior de um de seus pés sobre a cadeira.\n2. Dobre o joelho da frente, equilibrando-se com os braços até que o joelho de trás quase toque o chão\n3. Empurre de volta para a posição inicial e repita.",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/988/view",
+        "base": {
+          "id": 988,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1602,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Bulgarian split squats left",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1608,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Bulgarian split squats esquerda",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1608,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "44afe80f-1ab2-4149-adbf-d8e0ece990ce",
+      "name": "Bulgarian split squats direita",
+      "aliases": [
+        "Bulgarian split squats right"
+      ],
+      "description": "1. Fique de pé em frente a uma cadeira e dê um grande passo. Coloque a parte superior de um de seus pés sobre a cadeira.\n2. Dobre o joelho da frente, equilibrando-se com os braços até que o joelho de trás quase toque o chão\n3. Empurre de volta para a posição inicial e repita.",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/989/view",
+        "base": {
+          "id": 989,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1616,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Bulgarian split squats right",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1622,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Bulgarian split squats direita",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1622,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "6ddea666-5a57-4ac0-926f-01f8cfdaa4fd",
+      "name": "Coice",
+      "aliases": [
+        "Kneeling kickbacks"
+      ],
+      "description": "1. Fique em posição de quatro.\n2. Empurre um pé para trás até que esteja totalmente estendido, concentrando-se nos músculos dos glúteos.\n3. Fique por um segundo depois retorne à posição inicial.\n4. Repita, alternando os pés",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/990/view",
+        "base": {
+          "id": 990,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1630,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Kneeling kickbacks",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1635,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Coice",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1635,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "80d83f98-efe5-4d87-a403-c0feadc8650f",
+      "name": "Split squats esquerda",
+      "aliases": [
+        "Split squats left"
+      ],
+      "description": "1. Fique de pé com as costas retas\n2. Dê um grande passo para frente com sua perna esquerda\n3. Leve sua pélvis para baixo até quase tocar o chão com seu joelho direito\n4. Leve sua pélvis de volta para cima\n5. Repita a partir do passo 3.",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/991/view",
+        "base": {
+          "id": 991,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1643,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Split squats left",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1649,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Split squats esquerda",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1649,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "1d8599d8-59a5-4faf-a9cf-b81639cbf68b",
+      "name": "Split squats direita",
+      "aliases": [
+        "Split squats right"
+      ],
+      "description": "1. Fique de pé com as costas retas\n2. Dê um grande passo para frente com sua perna esquerda\n3. Leve sua pélvis para baixo até quase tocar o chão com seu joelho direito\n4. Leve sua pélvis de volta para cima\n5. Repita a partir do passo 3.",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/992/view",
+        "base": {
+          "id": 992,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1657,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Split squats right",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1663,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Split squats direita",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1663,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "cd51aa2a-52b3-43df-8011-0c8ef4b7ed11",
+      "name": "Corda de Salto: saltos básicos",
+      "aliases": [
+        "Jump rope: basic jumps"
+      ],
+      "description": "Este exercício requer uma corda de salto. Certifique-se de que o comprimento da corda é ajustado à sua altura. Uma maneira de verificar é agarrar ambas as pegas com uma mão e ficar no meio da corda pendurada no chão com um pé. Se a corda (excluindo as pegas) chegar mesmo abaixo do seu peito, o seu comprimento é o correcto. Uma corda mais curta seria perigosa, pois poderia atingir-se a si próprio, e uma corda mais comprida seria uma má forma.\n\n1. Coloque os pés juntos, dobre um pouco os joelhos, mantenha a cabeça e o corpo direitos, mantenha os cotovelos para dentro, abra os braços.\n2. Rodar apenas os pulsos com força suficiente para fazer girar a corda.\n3. Saltem só com força suficiente para passar a corda por baixo dos pés.\n4. Repita a partir do passo 2.",
+      "sourceCategory": "Cardio",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/993/view",
+        "base": {
+          "id": 993,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1671,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Jump rope: basic jumps",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1677,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Corda de Salto: saltos básicos",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1677,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "9d9c4c9f-045f-4af5-adf2-8bb07c3516dc",
+      "name": "Círculos com o braço pra frente",
+      "aliases": [
+        "Forward arm circles"
+      ],
+      "description": "1. Fique em pé com as costas retas.\n2. Mantendo os braços esticados, traga-os à sua frente, mova-os para baixo, atrás das costas, depois sobre a cabeça e de volta à posição inicial.\n3. Continue circulando seus braços conforme descrito na etapa 2.",
+      "sourceCategory": "Arms",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/994/view",
+        "base": {
+          "id": 994,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1687,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Forward arm circles",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1694,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Círculos com o braço pra frente",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1694,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "69b3da17-11cc-41fe-bbc1-ee6c45ced41c",
+      "name": "Círculos com o braço pra trás",
+      "aliases": [
+        "Backward arm circles"
+      ],
+      "description": "1. Fique em pé com as costas retas.\n2. Mantendo os braços esticados, leve-os à sua frente, levante-os acima da cabeça e, a seguir, continue o movimento atrás das costas e desça até a posição inicial.\n3. Continue circulando seus braços conforme descrito na etapa 2.",
+      "sourceCategory": "Arms",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/995/view",
+        "base": {
+          "id": 995,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1702,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Backward arm circles",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1707,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Círculos com o braço pra trás",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1707,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "53324f8e-df38-456f-9b7d-8f3a43f45f31",
+      "name": "Montanhistas",
+      "aliases": [
+        "Mountain climbers"
+      ],
+      "description": "Posição inicial:\n\nComeçar na posição vertical de flexão, ou na prancha alta.As mãos devem estar diretamente abaixo dos seus ombros.Manter a cabeça alinhada com as costas, virada para o chão.Os pés devem ter a distância entre os quadris.\n\nPassos:\n\n1. Mova um joelho em direção ao centro do corpo, em direção aos cotovelos, mantendo a outra perna estendida.\n2. Num movimento de salto rápido, endireite a perna dobrada para fora e puxe o outro joelho em direção ao seu corpo.\n3. Continue a repetir o passo 2, alternando as pernas.\n\nNotas:\n\nAo longo do exercício, as costas devem permanecer o mais reto o possível - evite uma corcunda ou uma curvatura nas costas.",
+      "sourceCategory": "Chest",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/996/view",
+        "base": {
+          "id": 996,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1715,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Mountain climbers",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1722,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Montanhistas",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1722,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "18d277a0-7222-46e7-b2bf-47c8ed169c30",
+      "name": "Burpee sem flexão",
+      "aliases": [
+        "4-count burpees"
+      ],
+      "description": "Posição inicial:\n\nFique de pé reto, com os pés afastados alinhados ao quadris.\n\nPassos:\n\n1. Se agache e se apoie com as mãos no chão entre os joelhos e a frente de seus pés, mantendo as costas retas.\n2. Mantendo as mãos no chão, pule jogando as pernas para trás para a posição de prancha altas\n3. Pule os pés para frente para voltar à posição de agachamento.\n4. Repita.",
+      "sourceCategory": "Chest",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/997/view",
+        "base": {
+          "id": 997,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1731,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "4-count burpees",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1735,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Burpee sem flexão",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1735,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "853e4429-da4a-492d-b042-5c124282c005",
+      "name": "Burpee sem flexão",
+      "aliases": [
+        "No push-up burpees"
+      ],
+      "description": "Posição inicial:\n\nFique de pé reto, com os pés afastados alinhados ao quadris.\n\nPassos:\n\n1. Se agache e se apoie com as mãos no chão entre os joelhos e a frente de seus pés, mantendo as costas retas.\n2. Mantendo as mãos no chão, pule jogando as pernas para trás para a posição de prancha altas.\n3. Pule os pés para frente para voltar à posição de agachamento.\n4. Salte.\n5. Repita.",
+      "sourceCategory": "Chest",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/998/view",
+        "base": {
+          "id": 998,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1742,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "No push-up burpees",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1746,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Burpee sem flexão",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1746,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "616f9026-1a1d-4ed8-b068-cfbb81b6a000",
+      "name": "Lunge reverso",
+      "aliases": [
+        "Reverse lunges"
+      ],
+      "description": "Posição inicial:\n\nFique de pé reto, com os pés afastados.\n\nPassos:\n\n1. Dê um passo para trás com uma perna para que você possa dobrar-se confortavelmente a um ângulo de 90 graus.\n2. Dobre lentamente ambos os joelhos para formar ângulos de 90 graus.\n3. Retorne para a posição inicial.\n4. Repita, alternando as pernas.",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/999/view",
+        "base": {
+          "id": 999,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1753,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Reverse lunges",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1758,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Lunge reverso",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1758,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "cf79d9fb-ffce-4648-a64f-27e4274e4c20",
+      "name": "Mergulho em solo",
+      "aliases": [
+        "Floor dips"
+      ],
+      "description": "Posição inicial:\n\nSente-se com seus braços atrás de você, apoiando suas costas.Seus dedos devem apontar para frente.Seus joelhos devem estar dobrados, com os pés juntos.\n\nPassos:\n\n1. Levante seus quadris do chão, endireitando seus braços.\n2. Dobre os cotovelos, abaixando os quadris.\n3. Endireite os braços, voltando à posição anterior.\n4. Repita os passos 2 e 3.\n\nNotas:\n\nA dificuldade do exercício depende do quanto você eleva seus quadris.",
+      "sourceCategory": "Arms",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1000/view",
+        "base": {
+          "id": 1000,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1767,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Floor dips",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1771,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Mergulho em solo",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1771,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "b2b40a54-e42b-49ec-97da-4c929ae41d42",
+      "name": "Prancha alta",
+      "aliases": [
+        "High plank"
+      ],
+      "description": "Posição inicial:\n\nEntre na posição de prancha alta:as mãos e os dedos dos pés devem tocar o chão, as costas, os braços e as pernas devem estar retos.Para chegar a essa posição, você pode deitar de bruços, colocar as mãos voltadas para baixo ao lado da cabeça e levantar os braços até que estejam retos.\n\nPassos:\n\n1. Mantenha a posição inicial durante todo o exercício.",
+      "sourceCategory": "Chest",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1001/view",
+        "base": {
+          "id": 1001,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1779,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "High plank",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1783,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Prancha alta",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1783,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "6e1af72c-f9f5-490d-8977-564df4f24b6f",
+      "name": "Postura da criança (Balsana)",
+      "aliases": [
+        "Child's pose"
+      ],
+      "description": "Posição inicial:\n\nComece de quatro, joelhos, dedos dos pés e mãos tocando o chão. Seus dois dedões dos pés devem estar se tocando.\n\nPassos:\n\n1. Mova os joelhos para que fiquem aproximadamente na largura do quadril.\n2. Ao expirar, mova a pélvis para trás para se sentar sobre os calcanhares. Suas mãos ainda devem estar tocando o chão.\n3. Relaxe a parte superior do corpo, abaixando a testa até o chão e deixando as mãos avançarem naturalmente.\n4. Permaneça nesta postura.\n\nDicas:\n\n* Para sair da postura, passe os braços para trás sob os ombros e mova a parte superior do corpo para cima, para uma posição sentada.",
+      "sourceCategory": "Back",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1002/view",
+        "base": {
+          "id": 1002,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1791,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Child's pose",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1795,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Postura da criança (Balsana)",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1795,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "9b5f8c6e-2436-4ded-aea9-8c698b0c8768",
+      "name": "Levantamento terra com Kettlebell",
+      "aliases": [
+        "Kettlebell deadlifts"
+      ],
+      "description": "Posição inicial:\n\nFique em pé na largura do quadril, com o kettlebell centralizado entre os tornozelos. Suas costas devem estar retas, sua cabeça voltada para a frente.\n\nPassos:\n\n1. Dobre os quadris e dobre levemente os joelhos para colocar as mãos nas alças do kettlebell. Suas costas devem estar retas enquanto você executa o movimento.\n2. Agarre as alças do kettlebell, com as mãos empurrando em direções opostas, como se fosse separar a alça.\n3. Enquanto faz contato com seus abdominais e glúteos, fique em pé.\n4. Dobre os quadris novamente para trazer o kettlebell de volta para baixo, semelhante ao passo 1.\n5. Repita a partir da etapa 3.\n\nDicas:\n\n* Certifique-se de realizar os movimentos corretamente, pois fazer o contrário pode causar lesões. Por exemplo, não se agache em vez de dobrar os quadris, não arredonde as costas ao alcançar o kettlebell e não se incline para trás ao se levantar.",
+      "sourceCategory": "Back",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "10"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1003/view",
+        "base": {
+          "id": 1003,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1803,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Kettlebell deadlifts",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1807,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Levantamento terra com Kettlebell",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1807,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "4b278f57-4505-419a-8b34-172b53eb4adc",
+      "name": "Rotação do ombro para frente",
+      "aliases": [
+        "Forward shoulder rotation"
+      ],
+      "description": "Posicão inicial:\n\nSente-se ou fique de pé com as costas retas.\n\nPassos:\n\n1. Coloque as mãos nos ombros.\n2. Gire repetidamente ambas as articulações dos ombros em um movimento circular em um ritmo moderado.",
+      "sourceCategory": "Back",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1004/view",
+        "base": {
+          "id": 1004,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1814,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Forward shoulder rotation",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1819,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Rotação do ombro para frente",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1819,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "1a40cc23-4609-4951-9b76-237715ae85ed",
+      "name": "Rotação do ombro para trás",
+      "aliases": [
+        "Backward shoulder rotation"
+      ],
+      "description": "Posicão inicial:\n\nSente-se ou fique de pé com as costas retas.\n\nPassos:\n\n1. Coloque as mãos nos ombros.\n2. Gire repetidamente ambas as articulações dos ombros em um movimento circular em um ritmo moderado.",
+      "sourceCategory": "Back",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1005/view",
+        "base": {
+          "id": 1005,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1826,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Backward shoulder rotation",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1831,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Rotação do ombro para trás",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1831,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "04e7fd92-e2e5-4212-ad7c-7542e98f7d83",
+      "name": "Flexão de queixo",
+      "aliases": [
+        "Chin tuck"
+      ],
+      "description": "Posicão inicial:\n\nSente-se ou fique de pé com as costas retas.\n\nPassos:\n\n1. Coloque os dedos no queixo para incliná-lo para dentro lentamente, movendo a cabeça para trás para alinhá-la com a coluna.\n2. Segure por 5 segundos.\n3. Volte à posição normal da cabeça e repita.",
+      "sourceCategory": "Back",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1006/view",
+        "base": {
+          "id": 1006,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1838,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Chin tuck",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1841,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Flexão de queixo",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1841,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "336e224a-a7a1-4808-9871-1ad8cfc3fee7",
+      "name": "Virar a cabeça",
+      "aliases": [
+        "Head turns"
+      ],
+      "description": "Posição inicial:\n\nSente-se ou fique em pé com as costas retas e com os ombros para baixo.\n\nPassos:\n\n1. Sente-se ou levante-se ereto, ombros caídos.\n2. Vire a cabeça para o lado o máximo possível. Pare quando você atingir um limite e segure por 5 segundos.\n3. Retorne à posição central e repita, mudando de lado.",
+      "sourceCategory": "Shoulders",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1007/view",
+        "base": {
+          "id": 1007,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1847,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Head turns",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1851,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Virar a cabeça",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1851,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "2ecf2e55-c1f3-40ac-b20e-0954f41a2021",
+      "name": "Alongamento de pescoço para esquerda",
+      "aliases": [
+        "Left neck stretch"
+      ],
+      "description": "Posição inicial:\n\nSente-se ou fique em pé com as costas retas.\n\nPassos:\n\n1. Incline a cabeça para o lado e segure por 8 segundos para alongar a lateral do pescoço.\n2. Com a mão mais próxima no topo da cabeça, puxe suavemente para alongar ainda mais. Segure por 8 segundos.\n3. Vire o queixo para o ombro. Segure por 8 segundos.\n4. Solte e retorne à posição inicial.",
+      "sourceCategory": "Shoulders",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1008/view",
+        "base": {
+          "id": 1008,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1860,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Left neck stretch",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1864,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Alongamento de pescoço para esquerda",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1864,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "7ea504e7-3310-4638-a111-054fabfd4b80",
+      "name": "Alongamento de pescoço para direita",
+      "aliases": [
+        "Right neck stretch"
+      ],
+      "description": "Posição inicial:\n\nSente-se ou fique em pé com as costas retas.\n\nPassos:\n\n1. Incline a cabeça para o lado e segure por 8 segundos para alongar a lateral do pescoço.\n2. Com a mão mais próxima no topo da cabeça, puxe suavemente para alongar ainda mais. Segure por 8 segundos.\n3. Vire o queixo para o ombro. Segure por 8 segundos.\n4. Solte e retorne à posição inicial.",
+      "sourceCategory": "Shoulders",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1009/view",
+        "base": {
+          "id": 1009,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1872,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Right neck stretch",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1876,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Alongamento de pescoço para direita",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1876,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "b646e62d-c616-4460-b4d1-23cc6a6ddb51",
+      "name": "Alongamento de pescoço",
+      "aliases": [
+        "Back neck stretch"
+      ],
+      "description": "Posição inicial:\n\nSente-se ereto em uma cadeira ou em um travesseiro firme.\n\nPassos:\n\n1. Expire e incline a cabeça para frente, queixo no peito, colocando as mãos atrás da cabeça.\n2. Use as mãos para puxar a cabeça levemente para baixo. Segure por 5 segundos.\n3. Puxe os ombros para trás e para baixo usando os músculos das costas. Isso deve aumentar o alongamento do pescoço. Segure por 5 segundos.\n4. Agora empurre suavemente a cabeça para cima, enquanto também a puxa para baixo com as mãos. Equilibre as duas forças para que sua cabeça não se mova. Segure por pelo menos 5 segundos.\n5. Leve os dedos à testa e use-os para mover suavemente a cabeça de volta à posição original.",
+      "sourceCategory": "Back",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1010/view",
+        "base": {
+          "id": 1010,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1884,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Back neck stretch",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1889,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Alongamento de pescoço",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1889,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "dcbfa3f0-ba88-4633-a30d-c188dccc5d3f",
+      "name": "Alongamento frontal do pescoço",
+      "aliases": [
+        "Front neck stretch"
+      ],
+      "description": "Posição inicial:\n\nSente-se ou fique em pé com as costas retas.\n\nPassos:\n\n1. Abra bem a boca.\n2. Incline lentamente a cabeça para trás com a boca aberta. Se sentir necessidade de apoio, junte as mãos atrás da cabeça.\n3. Feche e abra a boca muito lentamente.\n4. Ao final, retorne lentamente à posição inicial e feche a boca.",
+      "sourceCategory": "Back",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1011/view",
+        "base": {
+          "id": 1011,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1896,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Front neck stretch",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1901,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Alongamento frontal do pescoço",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1901,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "5e2761cf-839e-435e-bedb-35e132dcb5ce",
+      "name": "Prancha lateral direita",
+      "aliases": [
+        "Side plank right"
+      ],
+      "description": "1. Deite-se de lado, com o cotovelo inferior em ângulo reto, com o braço para fora\n2. Levante sua pélvis do chão levantando o ombro inferior para cima, mantendo o antebraço no chão; sua cabeça, pélvis e pés devem estar em linha reta\n3. Mantenha esta posição",
+      "sourceCategory": "Abs",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1019/view",
+        "base": {
+          "id": 1019,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1923,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Side plank right",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1929,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Prancha lateral direita",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1929,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "ec9dca8d-1456-430a-abed-70b8bab4779a",
+      "name": "Pistol squats direita",
+      "aliases": [
+        "Pistol squats right"
+      ],
+      "description": "1. Fique de pé em uma perna, com a outra perna reta e ligeiramente para frente.\n2. Dobre um joelho lentamente, descendo para um agachamento e mantendo as costas e a outra perna reta.\n3. Levante-se lentamente do agachamento, endireitando o joelho dobrado e mantendo a outra perna reta.\n4. Repita",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1020/view",
+        "base": {
+          "id": 1020,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1938,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Pistol squats right",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1944,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Pistol squats direita",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1944,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "04ba9a37-4725-43f0-a0b6-767cdab9a79e",
+      "name": "Elevação da panturrilha direita",
+      "aliases": [
+        "Calf raises, right leg"
+      ],
+      "description": "1. Fique de pé no chão ou na borda de um degrau para aumentar o alcance do movimento. Levante um pé, colocando a parte superior sobre sua panturrilha.\n2. Levante os calcanhares até ficar de pé sobre os dedos do pé.\n3. Fique nesta posição por três segundos, depois abaixe o pé sem tocar o chão com seu calcanhar.",
+      "sourceCategory": "Calves",
+      "primaryMuscles": [],
+      "secondaryMuscles": [],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1021/view",
+        "base": {
+          "id": 1021,
+          "author": "",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 1952,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Calf raises, right leg",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 1958,
+            "author": "",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Elevação da panturrilha direita",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 1958,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "ee8e8db4-2d82-49e1-ab7f-891e9a354934",
+      "name": "Levantamento terra",
+      "aliases": [
+        "Deadlifts"
+      ],
+      "description": "Fique firme, com os pés ligeiramente mais afastados do que os ombros. Fique diretamente atrás da barra, onde ela mal deve tocar sua canela, com os pés apontando um pouco para fora. Curve-se com as costas retas, os joelhos também apontando um pouco para fora. Agarre a barra com uma pegada na largura dos ombros, uma pegada por baixo e uma pegada reversa.\nPuxe o peso para cima. No ponto mais alto, faça uma leve depressão para trás e puxe a barra para trás. Segure 1 ou 2 segundos nessa posição. Desça, certificando-se de que as costas não estão dobradas. Depois de descer, você pode voltar assim que os pesos tocarem o chão ou fazer uma pausa, dependendo do peso.",
+      "sourceCategory": "Back",
+      "primaryMuscles": [
+        "12"
+      ],
+      "secondaryMuscles": [
+        "8"
+      ],
+      "equipment": [
+        "1"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/184/view",
+        "base": {
+          "id": 184,
+          "author": "wger.de",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 105,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Deadlifts",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2135,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Levantamento terra",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2135,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "7f834f07-fa7b-46b6-8ffa-45930b0602db",
+      "name": "Pull Ups na máquina",
+      "aliases": [
+        "Pull Ups on Machine"
+      ],
+      "description": "Os pull-ups da máquina são uma variação assistida do exercício pull-up tradicional. Eles são projetados para ajudar as pessoas que estão desenvolvendo a força necessária para realizar o movimento completo. A máquina permite ajustar o peso para fornecer suporte adequado durante o exercício.\nPara realizar flexões na máquina, siga os seguintes passos: posicione-se corretamente, ajuste o peso para o suporte desejado, segure a barra com as mãos alinhadas com os ombros, mantenha os braços retos e a postura ereta. Inicie o movimento flexionando os cotovelos e puxando o corpo em direção à barra. Suba até que seu queixo esteja acima da barra e seus ombros estejam firmes.\nA descida deve ser feita de forma controlada, estendendo totalmente os braços. Realize o número desejado de repetições, adaptando-o à sua habilidade. Lembre-se de respirar corretamente durante o exercício, inspirando na fase descendente e expirando ao puxar o corpo para cima.\nA prática regular de flexões na máquina fortalecerá os músculos das costas, ombros e braços, ajudando a melhorar a postura e a força geral. À medida que você ganha mais força, pode reduzir gradualmente a assistência fornecida pela máquina e progredir para a tradicional flexão sem ajuda.\nEssa variação do exercício é uma opção acessível para iniciantes ou pessoas que lutam para realizar flexões completas. Lembre-se de adaptar o peso e o número de repetições de acordo com seu nível de força e capacidade. A prática regular e a progressão gradual ajudarão a melhorar sua forma e progredir em direção a flexões completas.",
+      "sourceCategory": "Back",
+      "primaryMuscles": [
+        "12"
+      ],
+      "secondaryMuscles": [
+        "2",
+        "1",
+        "9"
+      ],
+      "equipment": [],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/477/view",
+        "base": {
+          "id": 477,
+          "author": "wger.de",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 140,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Pull Ups on Machine",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2136,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Pull Ups na máquina",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2136,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "a7e6c20a-6ddc-4401-9935-ace2d02e3995",
+      "name": "Remada baixa",
+      "aliases": [
+        "Long-Pulley (low Row)"
+      ],
+      "description": "Sente-se, coloque os pés nos pontos de apoio e agarre a barra com uma pegada larga. Puxe o peso com um movimento rápido em direção ao umbigo, não para cima. Mantenha os braços e cotovelos durante o movimento próximos ao corpo. Seus ombros são puxados juntos. Deixe o peso cair lentamente até que seus braços estejam completamente esticados.",
+      "sourceCategory": "Back",
+      "primaryMuscles": [
+        "12"
+      ],
+      "secondaryMuscles": [
+        "1",
+        "13"
+      ],
+      "equipment": [],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/394/view",
+        "base": {
+          "id": 394,
+          "author": "wger.de",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 143,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Long-Pulley (low Row)",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2137,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Remada baixa",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2137,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "cfb6a754-57be-431b-b8d0-d9963120bd5a",
+      "name": "Flexão de Punho com Barra",
+      "aliases": [
+        "Barbell Wrist Curl"
+      ],
+      "description": "Sentado em um banco, pegue uma barra com as palmas das mãos voltadas para cima e as mãos afastadas na largura dos ombros. Descanse os antebraços nas coxas e deixe os pulsos pendurados sobre os joelhos. Execute o movimento curvando as palmas das mãos e os pulsos em direção ao rosto.\nFaça uma pausa por um momento na posição superior e, em seguida, retorne lentamente a barra à posição inicial.",
+      "sourceCategory": "Arms",
+      "primaryMuscles": [
+        "2",
+        "11"
+      ],
+      "secondaryMuscles": [
+        "1",
+        "14"
+      ],
+      "equipment": [
+        "1",
+        "8"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/51/view",
+        "base": {
+          "id": 51,
+          "author": "burenl",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 758,
+            "author": "burenl",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Barbell Wrist Curl",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2138,
+            "author": "burenl",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Flexão de Punho com Barra",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2138,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "f00630d6-578f-487f-8bf5-39c96366ccb8",
+      "name": "Extensões de tríceps no cabo com barra",
+      "aliases": [
+        "Triceps Extensions on Cable With Bar"
+      ],
+      "description": "Agarre a barra, fique em pé com os pés afastados dos ombros, mantenha as costas retas e incline-se um pouco para a frente. Empurre a barra para baixo, certificando-se de que os cotovelos não se movam durante o exercício. Sem pausa, volte à posição inicial.",
+      "sourceCategory": "Arms",
+      "primaryMuscles": [
+        "5"
+      ],
+      "secondaryMuscles": [],
+      "equipment": [],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/660/view",
+        "base": {
+          "id": 660,
+          "author": "wger.de",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 90,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Triceps Extensions on Cable With Bar",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2139,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Extensões de tríceps no cabo com barra",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2139,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "8bb42000-834f-48ab-af5c-0c31d94e0181",
+      "name": "Puxada de Biceps",
+      "aliases": [
+        "Biceps Close Grip Pull Down"
+      ],
+      "description": "Na máquina de puxada de costas, segure a barra com as mãos relativamente próximas. Use uma pegada pronada (P.ex.: o dorso das suas mãos vão ficar voltados para a máquina). Então puxe a barra em uma linha reta, como se fosse em direção ao chão. Garanta que seus bíceps sejam a força motriz do movimento. Você provavelmente sentirá seus ombros e latíssimo trabalhando, mas garanta que seus bíceps sejam os músculos mais afetados.",
+      "sourceCategory": "Arms",
+      "primaryMuscles": [
+        "1"
+      ],
+      "secondaryMuscles": [
+        "2",
+        "12"
+      ],
+      "equipment": [],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1280/view",
+        "base": {
+          "id": 1280,
+          "author": "daniel.escada",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 2247,
+            "author": "daniel.escada",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Biceps Close Grip Pull Down",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2248,
+            "author": "daniel.escada",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Puxada de Biceps",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2248,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "22c59ede-970b-43e1-bb51-ac1c2be0b0e0",
+      "name": "Stiff",
+      "aliases": [
+        "Stiff-legged Deadlifts"
+      ],
+      "description": "Voce pega o halter, trava a dorsal estufa o peito, inclina até a altura do calcanhar",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [
+        "11"
+      ],
+      "secondaryMuscles": [
+        "8"
+      ],
+      "equipment": [
+        "1"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/627/view",
+        "base": {
+          "id": 627,
+          "author": "tuckerm",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 209,
+            "author": "tuckerm",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Stiff-legged Deadlifts",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2654,
+            "author": "admin",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Stiff",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2654,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "3d2adf99-8fe9-45cb-b669-c5b18242e282",
+      "name": "Elevação lateral na mãquina",
+      "aliases": [
+        "Machine lateral wise"
+      ],
+      "description": "A elevação lateral na máquina é um exercício isolado que trabalha o músculo deltoide medial (lateral) para construir ombros mais largos e definidos. O caminho de movimento fixo da máquina proporciona maior estabilidade do que com halteres, tornando-a ideal para iniciantes ou para aqueles que desejam se concentrar apenas na ativação muscular.",
+      "sourceCategory": "Shoulders",
+      "primaryMuscles": [
+        "2"
+      ],
+      "secondaryMuscles": [],
+      "equipment": [
+        "4"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1654/view",
+        "base": {
+          "id": 1654,
+          "author": "roneydya",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 2774,
+            "author": "roneydya",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Machine lateral wise",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2775,
+            "author": "roneydya",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Elevação lateral na mãquina",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2775,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "28321cf3-70e6-48a4-ade1-d11382180cb3",
+      "name": "Supino com halteres",
+      "aliases": [
+        "Benchpress Dumbbells"
+      ],
+      "description": "O movimento é muito semelhante ao supino com barra; no entanto, o peso é abaixado até o peito em um ponto mais baixo.\n\nSegure dois halteres e deite-se em um banco. Mantenha os pesos próximos ao peito, na altura dos mamilos, e empurre-os para cima até que os braços fiquem estendidos. Abaixe o peso de forma lenta e controlada.",
+      "sourceCategory": "Chest",
+      "primaryMuscles": [
+        "4"
+      ],
+      "secondaryMuscles": [
+        "2",
+        "5"
+      ],
+      "equipment": [
+        "8",
+        "3"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/75/view",
+        "base": {
+          "id": 75,
+          "author": "wger.de",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 97,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Benchpress Dumbbells",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2789,
+            "author": "Jhonatan",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Supino com halteres",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2789,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "57e17672-52b9-43cf-8d0d-4b3f06a0c0d0",
+      "name": "Supino Inclinado com Halteres.",
+      "aliases": [
+        "Incline Bench Press - Dumbbell"
+      ],
+      "description": "- * O banco deve estar inclinado entre 30 e 45 graus.\n- * Certifique-se de empurrar os halteres diretamente para cima (perpendiculares ao chão).",
+      "sourceCategory": "Chest",
+      "primaryMuscles": [
+        "4"
+      ],
+      "secondaryMuscles": [
+        "2",
+        "5"
+      ],
+      "equipment": [
+        "3",
+        "9"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/537/view",
+        "base": {
+          "id": 537,
+          "author": "wger.de",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 210,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Incline Bench Press - Dumbbell",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2790,
+            "author": "Jhonatan",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Supino Inclinado com Halteres.",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2790,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "bb080cd6-bf24-42ce-8258-f38cf8e9e71c",
+      "name": "Polichinelos",
+      "aliases": [
+        "Jumping Jacks"
+      ],
+      "description": "Exercício de corpo inteiro onde você salta abrindo as pernas e levantando os braços acima da cabeça.",
+      "sourceCategory": "Cardio",
+      "primaryMuscles": [
+        "7",
+        "10"
+      ],
+      "secondaryMuscles": [
+        "2",
+        "6",
+        "9"
+      ],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1669/view",
+        "base": {
+          "id": 1669,
+          "author": "Jhonatan",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 2791,
+            "author": "Jhonatan",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Jumping Jacks",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2792,
+            "author": "Jhonatan",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Polichinelos",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2792,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "1fae7d45-0731-4640-8809-94c76b836571",
+      "name": "Círculos de perna (frente-trás)",
+      "aliases": [
+        "Leg Swings (Front–Back)"
+      ],
+      "description": "Fique em pé ao lado de uma parede ou apoio estável. Balance uma perna para frente e para trás em movimento controlado, mantendo o tronco ereto e o abdômen contraído. Troque de perna após completar as repetições.",
+      "sourceCategory": "Legs",
+      "primaryMuscles": [
+        "11"
+      ],
+      "secondaryMuscles": [
+        "8",
+        "10"
+      ],
+      "equipment": [
+        "7"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1670/view",
+        "base": {
+          "id": 1670,
+          "author": "Jhonatan",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 2793,
+            "author": "Jhonatan",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Leg Swings (Front–Back)",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2794,
+            "author": "Jhonatan",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Círculos de perna (frente-trás)",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2794,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "0fed3cd1-f6ef-4306-8c63-28246a931bf0",
+      "name": "Supino com Halteres",
+      "aliases": [
+        "Dumbbell Bench Press"
+      ],
+      "description": "Deite-se em um banco plano e empurre os halteres para cima até que os braços estejam totalmente estendidos, depois abaixe-os lentamente.",
+      "sourceCategory": "Chest",
+      "primaryMuscles": [
+        "4"
+      ],
+      "secondaryMuscles": [
+        "2",
+        "5"
+      ],
+      "equipment": [
+        "3"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/1676/view",
+        "base": {
+          "id": 1676,
+          "author": "Jhonatan",
+          "authorUrl": "",
+          "license": "CC-BY-SA 4",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 2799,
+            "author": "Jhonatan",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Dumbbell Bench Press",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2800,
+            "author": "Jhonatan",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Supino com Halteres",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2800,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "fff05d7a-f374-4c8a-9885-39f49076918f",
+      "name": "Puxada Alta",
+      "aliases": [
+        "Lat Pull Down (Straight Back)"
+      ],
+      "description": "Puxe a barra para baixo até o strenum e mantenha as costas retas.",
+      "sourceCategory": "Back",
+      "primaryMuscles": [
+        "12"
+      ],
+      "secondaryMuscles": [],
+      "equipment": [],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/355/view",
+        "base": {
+          "id": 355,
+          "author": "drthurlow",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 187,
+            "author": "drthurlow",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Lat Pull Down (Straight Back)",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2846,
+            "author": "br_Orion",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Puxada Alta",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2846,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "4af6dbd9-8991-484b-9810-68f117c21edf",
+      "name": "Remada Curvada",
+      "aliases": [
+        "Bent Over Rowing"
+      ],
+      "description": "1. Segurando uma barra com pegada pronada (palmas das mãos voltadas para baixo), dobre ligeiramente os joelhos e incline o tronco para a frente, flexionando a cintura, mantendo as costas retas até que fiquem quase paralelas ao chão. Dica: Certifique-se de manter a cabeça erguida. A barra deve ficar pendurada diretamente à sua frente, com os braços perpendiculares ao chão e ao tronco. Esta é a sua posição inicial.\n2. Agora, mantendo o tronco imóvel, expire e levante a barra em sua direção. Mantenha os cotovelos próximos ao corpo e use apenas os antebraços para sustentar o peso. Na posição de contração máxima, contraia os músculos das costas e mantenha a posição por uma breve pausa.\n3. Em seguida, inspire e abaixe lentamente a barra de volta à posição inicial.\n4. Repita o número de repetições recomendado.",
+      "sourceCategory": "Back",
+      "primaryMuscles": [
+        "12"
+      ],
+      "secondaryMuscles": [
+        "2",
+        "1"
+      ],
+      "equipment": [
+        "1"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/83/view",
+        "base": {
+          "id": 83,
+          "author": "wger.de",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 109,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Bent Over Rowing",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2847,
+            "author": "br_Orion",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Remada Curvada",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2847,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "7b99a081-6b1a-4aa5-b86a-5a935d083a35",
+      "name": "Rosca direta com barra reta",
+      "aliases": [
+        "Biceps Curls With Barbell"
+      ],
+      "description": "Segure a barra na largura dos ombros, pois as costas estão retas, os ombros ligamente para trás e os braços estão armazenados. Dobre os braços, levantando o peso, com um movimento rápido. Sem fazer uma pausa, baixar a barra com um movimento lento e controlado.\n\nNão dê seu corpo equilibrar durante o exercício, todo o trabalho é feito pelos bíceps, que são os humanos múltiplos que devem se mover (preste atenção aos cotovelos).",
+      "sourceCategory": "Arms",
+      "primaryMuscles": [
+        "1"
+      ],
+      "secondaryMuscles": [
+        "13"
+      ],
+      "equipment": [
+        "1"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/91/view",
+        "base": {
+          "id": 91,
+          "author": "wger.de",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 74,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Biceps Curls With Barbell",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2888,
+            "author": "roneydya",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Rosca direta com barra reta",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2888,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "a6c2a970-a621-4e03-be1d-4a29118b1687",
+      "name": "Levantamento terra em rack",
+      "aliases": [
+        "Rack Deadlift"
+      ],
+      "description": "O levantamento terra deve ser feito usando uma máquina Smith ou um rack livre. A barra ou haltere deve ficar logo abaixo do nível da rótula. Levante usando os glúteos e através dos calcanhares e depois volte à posição inicial com um movimento de controle de 2 segundos.\n\nEste exercício tem como alvo principalmente a região lombar e os glúteos.",
+      "sourceCategory": "Back",
+      "primaryMuscles": [
+        "8"
+      ],
+      "secondaryMuscles": [
+        "1"
+      ],
+      "equipment": [],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/484/view",
+        "base": {
+          "id": 484,
+          "author": "Mahoney",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 161,
+            "author": "Mahoney",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Rack Deadlift",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2900,
+            "author": "roneydya",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Levantamento terra em rack",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2900,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "6c671e43-497f-4863-8d78-b592f3b5e7c6",
+      "name": "Tríceps na máquina",
+      "aliases": [
+        "Triceps on Machine"
+      ],
+      "description": "Sente-se\ne segure a barra firmemente com as mãos. Agora pressione o peso para\ncima (não estenda totalmente os braços) e abaixe-o lentamente novamente.\nTal como acontece com outros exercícios de tríceps, é importante não\nmover a parte superior dos braços.",
+      "sourceCategory": "Arms",
+      "primaryMuscles": [
+        "5"
+      ],
+      "secondaryMuscles": [],
+      "equipment": [],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/661/view",
+        "base": {
+          "id": 661,
+          "author": "wger.de",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 139,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Triceps on Machine",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2924,
+            "author": "stwalkerster",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Tríceps na máquina",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2924,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    },
+    {
+      "externalId": "c0d9fe98-f4fe-49f3-8037-05e1984e7d2d",
+      "name": "Biceps Martelo",
+      "aliases": [
+        "Hammer Curls"
+      ],
+      "description": "Segure dois halteres e sente-se em um banco com as costas retas, os ombros estão ligados rolados para trás. Seus amigos apostam para seu corpo. Dobre os braços e levante o peso com um movimento rápido. Não gire como homens, como acontece com os cachos. Sem nenhuma pausa, baixar o haltere com um movimento lento e controlado.\n\nNão balance o corpo durante o exercício, o bíceps deve fazer todo o trabalho aqui. Os cotovelos estão ao seu lado e não se movem.",
+      "sourceCategory": "Arms",
+      "primaryMuscles": [
+        "1"
+      ],
+      "secondaryMuscles": [],
+      "equipment": [
+        "3"
+      ],
+      "provenance": {
+        "source": "wger",
+        "revision": "da6405b6c066dd773f7acfff1b2cd774f1b4ecda",
+        "sourceUrl": "https://wger.de/en/exercise/272/view",
+        "base": {
+          "id": 272,
+          "author": "wger.de",
+          "authorUrl": "",
+          "license": "CC-BY-SA 3",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+          "sourceUrl": "",
+          "name": null,
+          "language": null,
+          "title": "",
+          "derivativeSourceUrl": ""
+        },
+        "translations": [
+          {
+            "id": 86,
+            "author": "wger.de",
+            "authorUrl": "",
+            "license": "CC-BY-SA 3",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+            "sourceUrl": "",
+            "name": "Hammer Curls",
+            "language": 2,
+            "title": "",
+            "derivativeSourceUrl": ""
+          },
+          {
+            "id": 2930,
+            "author": "roneydya",
+            "authorUrl": "",
+            "license": "CC-BY-SA 4",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+            "sourceUrl": "",
+            "name": "Biceps Martelo",
+            "language": 7,
+            "title": "",
+            "derivativeSourceUrl": ""
+          }
+        ],
+        "selectedTranslation": 2930,
+        "changes": "Texto-fonte exibido sem renderização de HTML; categorias técnicas não inferidas. Sem mídias."
+      }
+    }
+  ]
+}

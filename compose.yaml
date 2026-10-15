@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:17@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3
+    container_name: pulso-fit-postgres
+    environment:
+      POSTGRES_USER: pulso
+      POSTGRES_PASSWORD: pulso_local_dev
+      POSTGRES_DB: pulso_fit
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pulso-fit-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pulso -d pulso_fit"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+volumes:
+  pulso-fit-pgdata:
+    name: pulso-fit-pgdata

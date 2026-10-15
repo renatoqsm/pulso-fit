@@ -1,0 +1,14 @@
+node_modules/
+.next/
+.open-next/
+.wrangler/
+.env*
+!.env.example
+.dev.vars*
+*.tsbuildinfo
+
+test-results/
+.local/
+.wrangler-test/
+__pycache__/
+*.pyc

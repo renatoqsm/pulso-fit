@@ -1,0 +1,61 @@
+{
+  "name": "pulso-fit",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "prisma generate && next build",
+    "start": "next start --hostname 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "prisma generate && tsx scripts/generate-d1-schema.ts",
+    "db:deploy": "tsx scripts/migrate.ts",
+    "admin:create": "tsx scripts/create-admin.ts",
+    "test": "tsx --test tests/*.test.ts",
+    "cf:build": "PULSO_TARGET=cloudflare opennextjs-cloudflare build",
+    "cf:preview": "npm run cf:build && wrangler dev",
+    "cf:deploy": "npm run cf:build && wrangler deploy",
+    "db:diff": "prisma migrate diff",
+    "test:crypto": "tsx --test tests/crypto.test.ts",
+    "exercises:import": "tsx scripts/import-exercises.ts",
+    "foods:import-usda": "tsx scripts/import-usda.ts",
+    "test:browser": "node tests/browser/workflows.mjs",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"scripts/*.ts\" \"tests/**/*.{ts,mjs}\" \"docs/*.md\""
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "6.19.2",
+    "@prisma/client": "6.19.2",
+    "decimal.js": "^10.6.0",
+    "dotenv": "^18.0.8",
+    "lucide-react": "^0.468.0",
+    "next": "15.5.28",
+    "pg": "^8.16.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@opennextjs/cloudflare": "1.20.11",
+    "@prisma/internals": "^6.19.2",
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.15.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "playwright-core": "^1.64.1",
+    "prettier": "^3.9.10",
+    "prisma": "6.19.2",
+    "tailwindcss": "^4.1.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.148.0"
+  },
+  "type": "module",
+  "overrides": {
+    "postcss": "8.5.30",
+    "effect": "3.22.2",
+    "deepmerge-ts": "8.0.2"
+  }
+}

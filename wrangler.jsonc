@@ -1,0 +1,45 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pulso-fit",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-14",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": false
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "pulso-fit",
+      "database_id": "2b735f22-afc1-432c-9b62-8ef9db70d46c",
+      "migrations_dir": "prisma/d1-migrations"
+    }
+  ],
+  "env": {
+    "test": {
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "pulso-fit-test",
+          "database_id": "00000000-0000-0000-0000-000000000001",
+          "migrations_dir": "prisma/d1-migrations"
+        }
+      ],
+      "vars": {
+        "APP_URL": "http://localhost:3101",
+        "PULSO_QUERY_DIAGNOSTICS": "1"
+      }
+    }
+  },
+  "account_id": "1f2952b80beb2fcde6ae3b4baebb5c55",
+  "workers_dev": true,
+  "vars": {
+    "APP_URL": "https://pulso-fit.renatoqsousam.workers.dev"
+  }
+}
