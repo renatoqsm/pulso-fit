@@ -34,15 +34,17 @@ Exercícios do snapshot oficial wger em português, com atribuições e licença
 
 Os testes completos de escrita ocorreram somente nos bancos locais dedicados; não criamos pessoas ou prontuários fictícios em produção. Eles não estabelecem latência, CPU e quotas do Worker publicado.
 
-## Publicação bloqueada
+## Publicação confirmada
 
-O D1 está operacional. A publicação do Worker recebeu **HTTP 401** no PUT para `workers/scripts/pulso-fit`, com mensagem de falha de autenticação da integração `codex-secret-api.cloudflare.com`. Uma consulta D1 subsequente funcionou; portanto, acesso ao banco não resolve a autorização de publicação. É necessário revisar/reconectar a credencial segura com permissão Workers Scripts Edit na conta configurada. Não há deploy confirmado nem endereço público validado.
+Publicado em **https://pulso-fit.renatoqsousam.workers.dev**, versão `f959fa6e-4453-495e-9ee4-a9e031864a57`. A API Cloudflare aceitou upload, deployment e habilitação de workers.dev. Binding DB: D1 pulso-fit; ASSETS e APP_URL de produção confirmados. Startup informado de 25 ms não mede custo de login ou de outras operações.
 
-A origem pretendida é `https://pulso-fit.renatoqsousam.workers.dev`. Esse host foi incluído no rascunho da configuração de rede, mas a política aplicada ainda permite apenas os três hosts de API/fontes e presets. Salvar/publicar essa alteração na interface permitirá testar o endereço após o deploy. Publicar o ambiente é diferente de publicar a aplicação.
+O 401 foi diagnosticado como falha da integração do ambiente em uploads grandes, não falta de Edit. O pacote incluía source map de 7,6 MB e somava 11 MB. Um teste de 9 MB chegou à Cloudflare; 11 MB recebeu o mesmo 401 textual da integração, sem CF-Ray. O deploy sem source maps funcionou com a mesma credencial e o caminho normal de rede. A configuração Wrangler fixa minificação e omissão dos mapas nos próximos envios. Consulte DEPLOY-CLOUDFLARE.md para evidência e consequência na depuração.
+
+A verificação HTTPS da aplicação ainda depende de aplicar a liberação do host na rede do ambiente. O rascunho já contém esse domínio, mas a política aplicada ainda permite os três hosts de API/fontes e presets. Publicação foi confirmada pela API; fluxo HTTP público e CPU de cadastro/login ainda não foram verificados neste ambiente.
 
 ## Pendências de lançamento
 
-1. Concluir autenticação de deploy e validar HTTPS, cookies, origem, login/cadastro e CPU no Worker real.
+1. Aplicar a liberação de rede do host e validar HTTPS, cookies, origem, login/cadastro e CPU no Worker real.
 2. Criar administrador por terminal seguro usando o script D1 e ativar MFA; nenhum administrador foi inventado ou cadastrado em produção.
 3. Configurar recuperação e confirmação por email, política legal de retenção/descarte, procedimento de habilitação profissional, backups/restauração e monitoramento. Exclusão permanece PENDING_RETENTION_REVIEW.
 4. Validar aparelhos físicos/Safari, acessibilidade completa e carga. Os fluxos principais foram validados em Chromium; isso não cobre visualmente todos os formulários profissionais.

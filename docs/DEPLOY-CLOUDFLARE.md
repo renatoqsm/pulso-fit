@@ -37,7 +37,7 @@ Não há administrador criado. O operador deve fornecer ADMIN_EMAIL, ADMIN_NAME 
 export XDG_CONFIG_HOME=/workspace/.config
 export WRANGLER_SEND_METRICS=false NEXT_TELEMETRY_DISABLED=1
 npm run cf:build
-npx wrangler deploy --minify --env ""
+npx wrangler deploy --minify --upload-source-maps=false --env ""
 ```
 
 O build Cloudflare substitui o módulo SQLite nativo pelo módulo que exige a binding. O pacote minificado validado mede aproximadamente 925 KiB gzip. Logs de requisição estão desabilitados. Verifique quotas D1 e CPU Workers do plano vigente: o limite interno de 50 consultas por operação não garante gratuidade para qualquer carga. PBKDF2 SHA-512 usa 210 mil iterações; não reduza o custo de senha para acomodar CPU.
@@ -62,8 +62,11 @@ As 42 verificações e o fluxo de navegador passaram em Node e workerd. Depois d
 
 ## Situação da publicação
 
-Em 15/10/2026, o D1 remoto foi criado, migrado, carregado e consultado com sucesso. O envio do Worker recebeu HTTP 401 no PUT de publicação: “authentication failed for integration codex-secret-api.cloudflare.com”. A disponibilidade do token e o acesso ao D1 não comprovam autorização para publicar Workers. Corrija/reconecte a credencial segura com autorização Workers Scripts Edit na conta indicada e repita o deploy. Não há publicação confirmada nem URL validada.
+Em 15/10/2026, o aplicativo foi publicado em `https://pulso-fit.renatoqsousam.workers.dev`, versão `f959fa6e-4453-495e-9ee4-a9e031864a57`, com a binding D1 e assets. A API confirmou upload, deployment e habilitação do subdomínio. Startup reportado: 25 ms. O banco remoto contém os catálogos oficiais, sem usuários de desenvolvimento.
 
-O host do aplicativo foi adicionado ao rascunho de rede, mas ainda não está na política aplicada. Salve/publique essa configuração na interface do ambiente para permitir a verificação HTTPS depois do deploy. Publicar o ambiente não publica o aplicativo.
+O HTTP 401 anterior vinha da integração de credenciais do ambiente ao enviar um corpo grande, e não de falta de Workers Scripts Edit. Diagnóstico controlado: token ativo, consultas e uploads pequenos chegam à Cloudflare; multipart inválido com 9 MB recebe erro de validação Cloudflare 10021, enquanto 11 MB recebe o 401 textual da integração, sem CF-Ray. O Wrangler incluía 3.375.266 bytes de código e 7.626.931 bytes de source map: 11.005.362 bytes no multipart. Esse resultado localiza um limite efetivo no caminho de autenticação do ambiente; não estabelece o valor exato do limite.
+
+A opção oficial `--upload-source-maps=false` remove somente os mapas de depuração do upload. Com ela, o deploy foi aceito usando a mesma credencial, proxy e verificação TLS. `wrangler.jsonc` fixa `minify: true` e `upload_source_maps: false` para os próximos deploys. Não é necessário trocar o token por causa desse erro. Pilhas de erro em produção não terão os mapas enviados; o código e mapas locais permanecem disponíveis para análise.
+O host do aplicativo foi adicionado ao rascunho de rede, mas ainda não está na política aplicada. Salve/publique essa configuração na interface do ambiente para permitir a verificação HTTPS do aplicativo publicado. Publicar o ambiente não publica o aplicativo.
 
 Após publicar, valide página inicial, cookies, origem inválida, autorização, persistência e custo de CPU de cadastro/login. Testes locais não comprovam essas propriedades em produção. Antes do lançamento, conclua recuperação/verificação por email, retenção legal, backups/restauração e monitoramento. A PWA mantém apenas shell público; a fila de séries é cifrada e opt-in.
