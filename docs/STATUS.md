@@ -95,3 +95,17 @@ D1 remoto sincronizado: 866 atualizados, 68 inalterados, nenhuma nova identidade
 Os 46 testes também passaram em workerd local; Chromium validou a interface traduzida e os fluxos completos em ambos os runtimes. O build OpenNext passou, sem node:sqlite, com pacote minificado de aproximadamente 1.32 MiB gzip. A conferência dos textos inclui preservação exata de números e URLs e ausência de redução acentuada do conteúdo. O teste HTTP externo ao domínio público retornou 403 com código 1010; a causa não foi atribuída à aplicação nem à política de rede. Os fluxos autenticados foram validados apenas localmente.
 
 Tradução publicada na Cloudflare: versão `38dff28f-0269-4366-a379-5841960d4295` em `https://pulso-fit.renatoqsousam.workers.dev`. D1 confirmou os 934 nomes e as 913 instruções disponíveis em português, sem novas identidades; conferência final reconheceu 934 registros inalterados.
+
+## Séries Low volume e seleção direta de exercícios
+
+Novos exercícios entram com cinco séries: um aquecimento de 10–15 repetições, dois reconhecimentos de 2–5 e dois trabalhos de 6–8. Carga permanece vazia; o descanso anterior de 60 segundos continua editável. Ao adicionar uma série avulsa, o padrão é trabalho com 6–8 repetições. Fichas já salvas não são reescritas.
+
+Reconhecimento é persistido como série preparatória (`WARMUP`) com a identificação `Reconhecimento` no campo de técnica existente. Editor e execução mostram o nome correto, sem alteração de schema. A cópia de ajustes entre séries preserva seus tipos e identificações.
+
+A configuração básica usa linhas compactas com tipo, repetições mínimas/máximas, carga e descanso visíveis; parâmetros avançados ficam recolhidos. O seletor de exercícios foi substituído por uma única barra de busca e resultados clicáveis imediatamente abaixo, mantendo paginação, carregamento, erros e pesquisa no catálogo completo.
+
+TypeScript, build OpenNext e 46 testes em Node passaram. Chromium confirmou o padrão exato das cinco séries, adição/remoção de série avulsa, seleção direta, publicação e identificação de reconhecimento na execução, além dos fluxos de treino/offline/alimentação e ausência de overflow móvel e desktop.
+
+Os 46 testes e o fluxo Chromium também passaram no workerd local. A captura móvel confirmou os campos compactos com as faixas Low volume originais.
+
+Atualização publicada na Cloudflare: versão `9e53cde0-ac64-4b7b-99f5-fb3a088c4756` em `https://pulso-fit.renatoqsousam.workers.dev`. Publicação confirmada pelo Wrangler; pacote de aproximadamente 1.32 MiB gzip. Não houve migração ou carga de dados em produção nesta atualização.

@@ -92,13 +92,34 @@ try {
   await page.getByRole('button', { name: 'Criar programa', exact: true }).click();
   await page.getByRole('button', { name: 'Adicionar ficha', exact: true }).click();
   await page.getByLabel('Buscar exercício', { exact: true }).fill('Zottman curl');
+  await page.getByRole('button', { name: 'Adicionar Rosca Zottman', exact: true }).click();
+  assert.equal(await page.locator('.compact-set').count(), 5);
   await page
-    .getByLabel('Adicionar exercício', { exact: true })
-    .locator('option')
-    .filter({ hasText: 'Rosca Zottman' })
-    .waitFor({ state: 'attached' });
-
-  await page.getByLabel('Adicionar exercício', { exact: true }).selectOption({ index: 1 });
+    .locator('.exercise-row')
+    .first()
+    .screenshot({ path: 'test-results/mobile-low-volume-preset.png' });
+  assert.deepEqual(
+    await page
+      .getByLabel('Repetições mín.', { exact: true })
+      .evaluateAll((inputs) => inputs.map((input) => input.value)),
+    ['10', '2', '2', '6', '6'],
+  );
+  assert.deepEqual(
+    await page
+      .getByLabel('Repetições máx.', { exact: true })
+      .evaluateAll((inputs) => inputs.map((input) => input.value)),
+    ['15', '5', '5', '8', '8'],
+  );
+  assert.deepEqual(
+    await page
+      .locator('.compact-set-header select')
+      .evaluateAll((inputs) => inputs.map((input) => input.value)),
+    ['WARMUP', 'RECOGNITION', 'RECOGNITION', 'WORKING', 'WORKING'],
+  );
+  await page.getByRole('button', { name: 'Adicionar série', exact: true }).click();
+  assert.equal(await page.getByLabel('Repetições mín.', { exact: true }).nth(5).inputValue(), '6');
+  assert.equal(await page.getByLabel('Repetições máx.', { exact: true }).nth(5).inputValue(), '8');
+  await page.getByRole('button', { name: 'Remover série 6', exact: true }).click();
   await page.getByLabel('Buscar exercício', { exact: true }).fill('');
   const repetitions = page.getByLabel('Repetições mín.', { exact: true }).filter({ visible: true });
   await repetitions.first().waitFor();
@@ -134,7 +155,7 @@ try {
   await page.getByLabel('Repetições feitas', { exact: true }).nth(1).fill('12');
   await page.getByLabel('Carga utilizada (kg)', { exact: true }).nth(1).fill('25');
   await page
-    .getByRole('heading', { name: 'Série 2 • Série válida', exact: true })
+    .getByRole('heading', { name: 'Série 2 • Reconhecimento', exact: true })
     .locator('..')
     .getByRole('button', { name: 'Concluir série', exact: true })
     .click();
@@ -281,8 +302,9 @@ try {
   await page.getByRole('button', { name: 'Versão 1 • Publicada', exact: true }).click();
   await page.getByRole('button', { name: 'Criar revisão', exact: true }).click();
   await page.getByRole('tab', { name: /Treino 1/ }).waitFor();
-  for (let i = 2; i <= 6; i++)
-    await page.getByLabel('Adicionar exercício', { exact: true }).selectOption({ index: i });
+  const results = page.getByRole('list', { name: 'Exercícios encontrados', exact: true });
+  await results.getByRole('button').first().waitFor();
+  for (let i = 1; i <= 5; i++) await results.getByRole('button').nth(i).click();
   await page.getByRole('button', { name: 'Expandir todos', exact: true }).click();
   await page.getByRole('button', { name: 'Recolher todos', exact: true }).click();
   assert.equal(await page.locator('.exercise-row').count(), 6);

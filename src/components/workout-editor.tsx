@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { lowVolumeSets } from '@/lib/workout-presets';
 import { WorkflowShell } from './workflow-shell';
 import { useUnsavedChanges } from '@/lib/use-unsaved-changes';
 import { ChevronDown, GripVertical, Plus, Search, ArrowLeft, Dumbbell } from 'lucide-react';
@@ -56,8 +57,8 @@ type Data = {
   role: string;
 };
 const series = (): SetInput => ({
-  repsMin: null,
-  repsMax: null,
+  repsMin: 6,
+  repsMax: 8,
   targetKg: null,
   restSeconds: 60,
   durationSeconds: null,
@@ -650,41 +651,48 @@ export function WorkoutEditor() {
                               }}
                             />
                           </label>
-                          <label style={{ marginTop: 18 }}>
-                            Adicionar exercício
-                            <select
-                              aria-label="Adicionar exercício"
-                              value=""
-                              disabled={catalogLoading || !!catalogError}
-                              onChange={(e) => {
-                                if (e.target.value) {
-                                  mutate((v) => {
-                                    v.days[di].exercises.push({
-                                      exerciseId: e.target.value,
-                                      notes: '',
-                                      groupKey: null,
-                                      sets: [series(), series(), series()],
-                                    });
-                                  });
-                                  setExpanded((old) => ({
-                                    ...old,
-                                    [di + ':' + day.exercises.length]: true,
-                                  }));
-                                }
-                              }}
+                          {!catalogError && (
+                            <ul
+                              className="exercise-search-results"
+                              aria-label="Exercícios encontrados"
+                              aria-busy={catalogLoading}
                             >
-                              <option value="">
-                                {catalogLoading
-                                  ? 'Carregando exercícios…'
-                                  : 'Selecione no catálogo'}
-                              </option>
-                              {catalogItems.map((exercise) => (
-                                <option value={exercise.id} key={exercise.id}>
-                                  {exercise.name}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
+                              {catalogLoading ? (
+                                <li className="muted small">Buscando exercícios…</li>
+                              ) : (
+                                catalogItems.map((item) => (
+                                  <li key={item.id}>
+                                    <button
+                                      className="exercise-search-result"
+                                      aria-label={'Adicionar ' + item.name}
+                                      onClick={() => {
+                                        mutate((v) => {
+                                          v.days[di].exercises.push({
+                                            exerciseId: item.id,
+                                            notes: '',
+                                            groupKey: null,
+                                            sets: lowVolumeSets(),
+                                          });
+                                        });
+                                        setExpanded((old) => ({
+                                          ...old,
+                                          [di + ':' + day.exercises.length]: true,
+                                        }));
+                                      }}
+                                    >
+                                      <span>{item.name}</span>
+                                      <span className="search-add">
+                                        <Plus size={15} />{' '}
+                                        {day.exercises.some((e) => e.exerciseId === item.id)
+                                          ? 'Adicionar novamente'
+                                          : 'Adicionar'}
+                                      </span>
+                                    </button>
+                                  </li>
+                                ))
+                              )}
+                            </ul>
+                          )}
                           {catalogError && (
                             <div className="message error catalog-error" role="alert">
                               {catalogError}
@@ -762,7 +770,7 @@ export function WorkoutEditor() {
                             <Dumbbell size={26} />
                             <h3>Vamos montar esta ficha?</h3>
                             <p>
-                              Busque um exercício abaixo e ajuste as séries. Você pode duplicar e
+                              Busque um exercício acima e ajuste as séries. Você pode duplicar e
                               reordenar depois.
                             </p>
                           </div>
@@ -798,12 +806,9 @@ export function WorkoutEditor() {
                                   'Exercício'}
                               </strong>
                               <span className="exercise-prescription">
-                                {exercise.sets.length} séries · {exercise.sets[0]?.repsMin ?? '—'}
-                                {exercise.sets[0]?.repsMax &&
-                                exercise.sets[0].repsMax !== exercise.sets[0].repsMin
-                                  ? '–' + exercise.sets[0].repsMax
-                                  : ''}{' '}
-                                rep.
+                                {exercise.sets.length} séries ·{' '}
+                                {exercise.sets.filter((set) => set.kind !== 'WARMUP').length} de
+                                trabalho
                               </span>
                               <ChevronDown size={18} />
                             </summary>
@@ -886,28 +891,64 @@ export function WorkoutEditor() {
                                 onClick={() =>
                                   mutate((v) => {
                                     const target = v.days[di].exercises[ei];
-                                    target.sets = target.sets.map(() =>
-                                      structuredClone(target.sets[0]),
-                                    );
+                                    target.sets = target.sets.map((set) => ({
+                                      ...structuredClone(target.sets[0]),
+                                      kind: set.kind,
+                                      technique: set.technique,
+                                    }));
                                   })
                                 }
                               >
                                 Aplicar primeira série às demais
                               </button>
+                              <p className="small muted low-volume-hint">
+                                Novos exercícios: 1 aquecimento · 2 reconhecimento · 2 trabalho
+                              </p>
                               {exercise.sets.map((set, si) => (
-                                <details key={si} className="link-card set-editor" open={si === 0}>
-                                  <summary>
-                                    Série {si + 1}
-                                    <span>
-                                      {set.repsMin ?? '—'}
-                                      {set.repsMax && set.repsMax !== set.repsMin
-                                        ? '–' + set.repsMax
-                                        : ''}{' '}
-                                      rep. · {set.targetKg ?? '—'} kg · {set.restSeconds}s de
-                                      descanso
-                                    </span>
-                                  </summary>
-                                  <div className="set-grid">
+                                <div key={si} className="compact-set">
+                                  <div className="compact-set-header">
+                                    <strong>Série {si + 1}</strong>
+                                    <select
+                                      aria-label={'Tipo da série ' + (si + 1)}
+                                      value={
+                                        set.kind === 'WARMUP' && set.technique === 'Reconhecimento'
+                                          ? 'RECOGNITION'
+                                          : set.kind
+                                      }
+                                      onChange={(e) =>
+                                        mutate((v) => {
+                                          const target = v.days[di].exercises[ei].sets[si];
+                                          target.kind =
+                                            e.target.value === 'RECOGNITION'
+                                              ? 'WARMUP'
+                                              : (e.target.value as SetInput['kind']);
+                                          if (e.target.value === 'RECOGNITION')
+                                            target.technique = 'Reconhecimento';
+                                          else if (target.technique === 'Reconhecimento')
+                                            target.technique = null;
+                                        })
+                                      }
+                                    >
+                                      <option value="WARMUP">Aquecimento</option>
+                                      <option value="RECOGNITION">Reconhecimento</option>
+                                      <option value="WORKING">Trabalho</option>
+                                      <option value="TIMED">Temporizada</option>
+                                      <option value="FAILURE">Até a falha</option>
+                                    </select>
+                                    <button
+                                      className="secondary compact-remove"
+                                      aria-label={'Remover série ' + (si + 1)}
+                                      disabled={exercise.sets.length === 1}
+                                      onClick={() =>
+                                        mutate((v) => {
+                                          v.days[di].exercises[ei].sets.splice(si, 1);
+                                        })
+                                      }
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                  <div className="set-grid compact-set-fields">
                                     {(
                                       [
                                         ['repsMin', 'Repetições mín.'],
@@ -943,23 +984,6 @@ export function WorkoutEditor() {
                                   <details style={{ marginTop: 12 }}>
                                     <summary>Parâmetros avançados</summary>
                                     <div className="set-grid" style={{ marginTop: 12 }}>
-                                      <label>
-                                        Tipo
-                                        <select
-                                          value={set.kind}
-                                          onChange={(e) =>
-                                            mutate((v) => {
-                                              v.days[di].exercises[ei].sets[si].kind = e.target
-                                                .value as SetInput['kind'];
-                                            })
-                                          }
-                                        >
-                                          <option value="WORKING">Série válida</option>
-                                          <option value="WARMUP">Aquecimento</option>
-                                          <option value="TIMED">Temporizada</option>
-                                          <option value="FAILURE">Até a falha</option>
-                                        </select>
-                                      </label>
                                       {(['durationSeconds', 'rpe', 'rir'] as const).map((k) => (
                                         <label key={k}>
                                           {k === 'durationSeconds'
@@ -1021,19 +1045,7 @@ export function WorkoutEditor() {
                                       </label>
                                     </div>
                                   </details>
-                                  <button
-                                    className="danger"
-                                    style={{ marginTop: 10 }}
-                                    disabled={exercise.sets.length === 1}
-                                    onClick={() =>
-                                      mutate((v) => {
-                                        v.days[di].exercises[ei].sets.splice(si, 1);
-                                      })
-                                    }
-                                  >
-                                    Remover série
-                                  </button>
-                                </details>
+                                </div>
                               ))}
                               <button
                                 className="secondary"

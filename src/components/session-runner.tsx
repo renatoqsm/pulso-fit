@@ -411,7 +411,9 @@ export function SessionRunner({ id }: { id: string }) {
                     <h3>
                       Série {set.position + 1} •{' '}
                       {set.kind === 'WARMUP'
-                        ? 'Aquecimento'
+                        ? set.technique === 'Reconhecimento'
+                          ? 'Reconhecimento'
+                          : 'Aquecimento'
                         : set.kind === 'FAILURE'
                           ? 'Até a falha'
                           : set.kind === 'TIMED'
@@ -430,7 +432,10 @@ export function SessionRunner({ id }: { id: string }) {
                       {set.targetKg != null ? ` • ${set.targetKg} kg` : ''} • descanso{' '}
                       {set.restSeconds}s{set.unilateral ? ' • unilateral' : ''}
                       {set.cadence ? ` • cadência ${set.cadence}` : ''}
-                      {set.technique ? ` • ${set.technique}` : ''}
+                      {set.technique &&
+                      !(set.kind === 'WARMUP' && set.technique === 'Reconhecimento')
+                        ? ` • ${set.technique}`
+                        : ''}
                     </p>
                     <div className="set-grid">
                       {(
